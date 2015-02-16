@@ -1,0 +1,11 @@
+{
+  "room": "we-3-kpop",
+  "redditfeed": {
+    "subreddit": "kpop"
+  },
+  "database": {
+    "db": { "native_parser": true },
+    "server": { "poolSize": 5 },
+    "replset": { "rs_name": "sekshiRepl" }
+  }
+}
