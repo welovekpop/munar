@@ -11,12 +11,16 @@ var redis = require("redis");
 var path = require("path");
 var util = require("util");
 var fs = require("fs");
+var debug = require('debug')('sekshi:sekshi')
+var logChat = require('debug')('sekshi:chat')
 
-Sekshi = function(args) {
+module.exports = Sekshi
+
+function Sekshi(args) {
     Sekshi.super_.call(this);
 
     this.invokeLogger(function(msg, verbosity, color) {
-        console.log(msg);
+        debug(msg)
     });
 
     this.db = null;
@@ -92,13 +96,13 @@ Sekshi.prototype.setRoom = function(room) {
     this.connect(this._room);
 };
 
-Sekshi.prototype.storage = function(func, arguments, callback) {
+Sekshi.prototype.storage = function(func, args, callback) {
     if(this.storageStatus === 1) {
-        this._redis.send_command(func, arguments, callback);
+        this._redis.send_command(func, args, callback);
     } else {
         this.storageBuffer.push({
             func: func,
-            arguments: arguments,
+            arguments: args,
             callback: callback
         });
 
@@ -193,7 +197,7 @@ Sekshi.prototype.onMessage = function(msg) {
             }
         }
     } else {
-        console.log([msg.username, ": ", msg.message].join(''));
+        logChat(msg.username, msg.message)
     }
 };
 
@@ -267,5 +271,3 @@ Sekshi.prototype.unloadModules = function(modulePath) {
         delete require.cache[path.resolve(moduleFiles[i])];
     }
 };
-
-module.exports = Sekshi;

@@ -6,6 +6,7 @@
   "author": "Sooyou",
   "homepage": "xn--xck.moe",
   "dependencies": {
+    "debug": "*",
     "redis": "*",
     "mongoose": "*",
     "mongoose-auto-increment": "*",
