@@ -12,7 +12,6 @@
     "mongoose-auto-increment": "*",
     "object-assign": "^2.0.0",
     "plugged": "*",
-    "redis": "*",
     "snoocore": "*",
     "when": "*"
   }

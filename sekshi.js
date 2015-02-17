@@ -7,7 +7,6 @@
 /*****************************/
 
 var Plugged = require("plugged");
-var redis = require("redis");
 var path = require("path");
 var util = require("util");
 var fs = require("fs");
@@ -29,22 +28,7 @@ function Sekshi(args) {
     this.delimiter = args.delimiter || '!';
     this.modulePath = args.modulePath || "./modules";
 
-    this.storageBuffer = [];
-    this.storageStatus = -1;
-    this.storageBufferID = -1;
-
     this._room = args.room
-    this._redis = redis.createClient();
-
-    this._redis.on("error", function() {
-        this.storageStatus = -1;
-
-        this.storageBufferID = setInterval(this._drainStorage.bind(this), 30*1000);
-    }.bind(this));
-
-    this._redis.on("idle", function() {
-        this.storageStatus = 1;
-    });
 
     this.loadModules(this.modulePath);
 }
@@ -96,20 +80,6 @@ Sekshi.prototype.setRoom = function(room) {
     this.connect(this._room);
 };
 
-Sekshi.prototype.storage = function(func, args, callback) {
-    if(this.storageStatus === 1) {
-        this._redis.send_command(func, args, callback);
-    } else {
-        this.storageBuffer.push({
-            func: func,
-            arguments: args,
-            callback: callback
-        });
-
-        console.warn("\x1b[32;1mSomething isn't right with redis, storage call gets buffered\x1b[0m");
-    }
-};
-
 Sekshi.prototype.parseArguments = function(str, args) {
     args = args || [];
     str = str || "";
@@ -153,19 +123,6 @@ Sekshi.prototype.reloadmodules = function(modulePath) {
     this.loadModules(modulePath);
 };
 
-Sekshi.prototype._drainStorage = function() {
-    var obj = null;
-
-    if(this.storageBuffer.length === 0) {
-        clearInterval(this.storageBufferID);
-        this.storageBufferID = -1;
-    }
-
-    for(var i = this.storageBuffer.length; i > 0; i--) {
-        obj = this.storageBuffer.shift();
-        this.storage(obj.func, obj.arguments, obj.callback);
-    }
-};
 
 Sekshi.prototype.onMessage = function(msg) {
     if (msg.message.charAt(0) === this.delimiter) {

@@ -34,9 +34,6 @@ Misc.prototype.onUserLeave = function(user) {
     
     for(var i = this.waitlist.length - 1; i >= 0; i--) {
         if(this.waitlist[i] == user.id) {
-            //var key = "MISC:wdc:" + user.id;
-            //this.sekshi.storage("set", [key, i]);
-            //this.sekshi.storage("expire", [key, 6*60*60]);
 
             this.dropped.push({
                 id: this.waitlist[i],
@@ -48,10 +45,6 @@ Misc.prototype.onUserLeave = function(user) {
 };
 
 Misc.prototype.dc = function(user) {
-    /*this.sekshi.storage("get", ["MISC:wdc:" + user.id], function(err, reply) {
-        console.log(err);
-        console.log(reply);
-    });*/
 
     for(var i = this.dropped.length - 1; i >= 0; i--) {
         if(user.id == this.dropped[i].id) {
