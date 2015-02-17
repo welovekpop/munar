@@ -1,11 +1,12 @@
 {
   "name": "sekshi",
   "description": "sekshi is a BOT system developed for We <3 KPOP",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "sekshi",
   "author": "Sooyou",
   "homepage": "xn--xck.moe",
   "dependencies": {
+    "babel": "^4.1.1",
     "debug": "*",
     "franc": "*",
     "mongoose": "*",
@@ -13,6 +14,10 @@
     "object-assign": "^2.0.0",
     "plugged": "*",
     "snoocore": "*",
-    "when": "*"
+    "when": "*",
+    "ws": "^0.7.1"
+  },
+  "scripts": {
+    "start": "./node_modules/babel/bin/babel-node app.js"
   }
 }
