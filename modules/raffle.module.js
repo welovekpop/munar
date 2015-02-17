@@ -1,10 +1,11 @@
 var debug = require('debug')('sekshi:raffle')
+var assign = require('object-assign')
 
 module.exports = Raffle
 
 export default class Raffle {
 
-  constructor(sekshi) {
+  constructor(sekshi, conf = {}) {
     this.name = 'Raffle'
     this.author = 'ReAnna'
     this.version = '0.1.0'
@@ -18,10 +19,10 @@ export default class Raffle {
       lottery: sekshi.USERROLE.MANAGER
     }
 
-    this.options = {
+    this.options = assign({
       duration: 120
     , minPosition: 6
-    }
+    }, conf)
 
     this._running = false
     this._players = []
