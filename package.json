@@ -2,7 +2,7 @@
   "name": "sekshi",
   "description": "sekshi is a BOT system developed for We <3 KPOP",
   "version": "0.1.0",
-  "main": "sekshi",
+  "main": "lib/sekshi",
   "author": "Sooyou",
   "homepage": "xn--xck.moe",
   "dependencies": {
@@ -18,6 +18,8 @@
     "ws": "^0.7.1"
   },
   "scripts": {
-    "start": "./node_modules/babel/bin/babel-node app.js"
+    "start": "node lib/app.js",
+    "babel-start": "./node_modules/babel/bin/babel-node src/app.js",
+    "babel": "./node_modules/babel/bin/babel/index.js --out-dir lib src"
   }
 }

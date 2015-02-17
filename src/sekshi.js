@@ -26,7 +26,7 @@ function Sekshi(args) {
 
     this.modules = [];
     this.delimiter = args.delimiter || '!';
-    this.modulePath = args.modulePath || "./modules";
+    this.modulePath = args.modulePath || path.join(__dirname, "modules");
 
     this._room = args.room
 
@@ -181,7 +181,7 @@ Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
 
         } else if (stat.isFile()) {
             if (modulePath.slice(modulePath.indexOf('.') + 1) === "module.js")
-                modules.push(["./", modulePath].join(''));
+                modules.push(modulePath);
         }
     }
 

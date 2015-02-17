@@ -1,13 +1,13 @@
 var readline = require("readline");
 var Sekshi = require("./sekshi");
-var config = require('./config.json')
+var config = require('../config.json')
 
 var sekshi = new Sekshi(config);
 legacyFixes(sekshi)
 
 var rl = readline.createInterface(process.stdin, process.stdout);
 
-sekshi.start(require("./creds.json"));
+sekshi.start(require("../creds.json"));
 
 sekshi.on(sekshi.CONN_PART, function() {
     console.error("connection parted");
