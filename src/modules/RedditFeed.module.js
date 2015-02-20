@@ -18,7 +18,7 @@ function RedditFeed(bot) {
         "interval": 300000,
         "format": "%feed | %title by %submitter | %link"
     };
-    this.reddit = new Snoocore({ userAgent: "RedditFeed v" + this.version + "by /u/schrobby" });
+    this.reddit = new Snoocore({ userAgent: "RedditFeed v" + this.version + " by /u/schrobby" });
     this.lastPost = "";
 
     if (this.areSettingsValid())
@@ -34,7 +34,7 @@ RedditFeed.prototype.destroy = function() {
 
 RedditFeed.prototype.name = "RedditFeed";
 RedditFeed.prototype.author = "schrobby";
-RedditFeed.prototype.version = "0.1";
+RedditFeed.prototype.version = "0.2.0";
 RedditFeed.prototype.description = "Announces new submissions from a configurable list of subreddits.";
 
 RedditFeed.prototype.setfeedinterval = function(user, interval) {
@@ -107,10 +107,8 @@ RedditFeed.prototype.runTimer = function() {
     when.all(promises).then(function() {
         if (this.lastPost && this.bot.isModuleEnabled(this.name)) {
             for(var i = posts.length - 1; i >= 0; i--) {
-                this.bot.sendChat([
-                    '[r/kpop] ',
-                    posts[i]["data"]["author"], " posted: ", posts[i]["data"]["title"], ' ', posts[i]["data"]["url"]
-                    ].join(''));
+                this.bot.sendChat(`[r/kpop] ${posts[i].data.author} posted: ` +
+                                  `${posts[i].data.title} https://reddit.com/${posts[i].data.id}`);
             }
         }
 
