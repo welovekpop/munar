@@ -1,3 +1,5 @@
+const debug = require('debug')('sekshi:greeting')
+
 function Socials(sekshi) {
     this.sekshi = sekshi;
 
@@ -11,26 +13,27 @@ function Socials(sekshi) {
     this.lastGreeted = -1;
 
     this.greetings = [
-    "Hai ",
-    "Welcome ",
-    "How's it going ",
-    "Good day ",
-    "Hej ",
-    "Sup ",
-    "Hi ",
-    "G'day "
+        'Hai @',
+        'Welcome, @!',
+        'hoi @',
+        'Heyho @',
+        'Hej @',
+        '안녕, @!',
+        'Hi @',
+        '/me hugs @'
     ];
 
     this.emojis = [
-    ":exclamation:",
-    ":purple_heart:",
-    ":blue_heart:",
-    ":v:",
-    ":smirk:",
-    ":laughing:"
+        ':exclamation:',
+        ':purple_heart:',
+        ':blue_heart:',
+        ':v:',
+        ':smirk:',
+        ':laughing:'
     ];
 
-    sekshi.on(sekshi.USER_JOIN, this.greet.bind(this));
+    this.greet = this.greet.bind(this)
+    sekshi.on(sekshi.USER_JOIN, this.greet);
 }
 
 Socials.prototype.name = "Socials";
@@ -50,25 +53,23 @@ Socials.prototype.greet = function(user) {
     if(!this.autogreet || this.lastGreeted == user.id || user.username === this.sekshi.getSelf().username || !this.sekshi.isModuleEnabled(this.name))
         return;
 
+    debug('saying hi', user)
+
     this.lastGreeted = user.id;
 
-    setTimeout(this.sekshi.sendChat.bind(this.sekshi), 2*1000, [this.greetings[(user.username === "severus" ? this.greetings[4] : Math.floor(this.greetings.length * Math.random()))], 
-        '@', user.username, ' ', 
-        (user.username === "shineestaemint" ? " :heart:" :
-            (this.sekshi.isFriend(user.id) ? 
-                this.emojis[Math.floor(this.emojis.length * Math.random())] : 
-                ''
-            )
-        )
-        ].join(''));
+    let greeting = this.greetings[Math.floor(this.greetings.length * Math.random())]
+    let message = greeting.replace(/@/, `@${user.username}`)
+                + (this.sekshi.isFriend(user.id) ?
+                     this.emojis[Math.floor(this.emojis.length * Math.random())] : '')
+    setTimeout(this.sekshi.sendChat.bind(this.sekshi, message), 2 * 1000)
 };
 
 Socials.prototype.fb = function(user) {
-    this.sekshi.sendChat("https://www.facebook.com/welovekpop.club");
+    this.sekshi.sendChat("https://facebook.com/welovekpop.club");
 };
 
 Socials.prototype.web = function(user) {
-    this.sekshi.sendChat("http://www.welovekpop.club");
+    this.sekshi.sendChat("http://welovekpop.club");
 };
 
 module.exports = Socials;
