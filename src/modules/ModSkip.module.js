@@ -40,8 +40,12 @@ export default class ModSkip {
 
   lockskip(user, reason) {
     this.sekshi.sendChat(this._skipMessage(user, reason))
-    this.sekshi.skipDJ(id, () => {
-      this.sekshi.moveDJ(id, this.options.lockskipPos)
+    this.sekshi.setLock(true, false, () => {
+      this.sekshi.skipDJ(id, () => {
+        this.sekshi.moveDJ(id, this.options.lockskipPos, () => {
+          this.setLock(false, false)
+        })
+      })
     })
   }
 
