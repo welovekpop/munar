@@ -124,6 +124,13 @@ Sekshi.prototype.reloadmodules = function(modulePath) {
     this.loadModules(modulePath);
 };
 
+Sekshi.prototype.lockskipDJ = function (id, position, cb) {
+    this.skipDJ(id, e => {
+        if (e) cb(e)
+        else this.moveDJ(id, position, cb)
+    })
+}
+
 // this might be a bit brittle
 // it's to handle users with fancy chars in their names, but this does mean that
 // if we actually try to send &amp;, it will come out as & instead
@@ -143,7 +150,7 @@ Sekshi.prototype.onMessage = function(msg) {
         var self = this;
         var args = [];
         var func = null;
-        var user = self.getUserByID(msg.id, true);
+        var user = msg.id === 'sekshi' ? { role: this.USERROLE.HOST } : self.getUserByID(msg.id, true);
 
         if(!user)
             return;

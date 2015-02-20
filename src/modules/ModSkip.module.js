@@ -5,14 +5,15 @@ export default class ModSkip {
   constructor(sekshi, options = {}) {
     this.name = 'ModSkip'
     this.author = 'ReAnna'
-    this.version = '0.1.0'
+    this.version = '0.2.0'
     this.description = 'Simple DJ skipping tools'
 
     this.sekshi = sekshi
     this.options = assign({
       reasons: {
         kpop: 'This is a Korean music dedicated room, please only play music by Korean artists.',
-        history: 'This song is in the history. Please pick another.'
+        history: 'This song is in the history. Please pick another.',
+        duration: 'This song is too long. Please pick a shorter one.'
       },
       lockskipPos: 1
     }, options)
@@ -23,10 +24,13 @@ export default class ModSkip {
     }
   }
 
-  _skipMessage(user, reason) {
-    if (this.options.reasons.hasOwnProperty(reason)) {
+  _skipMessage(user, reason = false) {
+    if (reason && this.options.reasons.hasOwnProperty(reason)) {
+      reason = this.options.reasons[reason]
+    }
+    if (reason) {
       let dj = this.sekshi.getCurrentDJ()
-      return `@${dj.username} ${this.options.reasons[reason]}`
+      return `@${dj.username} ${reason}`
     }
     else {
       return `/me ${user.username} used skip!`
@@ -40,13 +44,7 @@ export default class ModSkip {
 
   lockskip(user, reason) {
     this.sekshi.sendChat(this._skipMessage(user, reason))
-    this.sekshi.setLock(true, false, () => {
-      this.sekshi.skipDJ(id, () => {
-        this.sekshi.moveDJ(id, this.options.lockskipPos, () => {
-          this.setLock(false, false)
-        })
-      })
-    })
+    this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
   }
 
 }
