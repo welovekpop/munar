@@ -13,6 +13,8 @@ var fs = require("fs");
 var debug = require('debug')('sekshi:sekshi')
 var logChat = require('debug')('sekshi:chat')
 
+const unescape = require('unescape')
+
 module.exports = Sekshi
 
 function Sekshi(args) {
@@ -31,6 +33,7 @@ function Sekshi(args) {
     this._room = args.room
 
     this.loadModules(this.modulePath);
+    this.on(this.CHAT, this.onMessage.bind(this));
 }
 
 util.inherits(Sekshi, Plugged);
@@ -53,13 +56,11 @@ Sekshi.prototype.start = function(credentials) {
         console.error("Error: " + err);
     })
 
-    this.once(this.JOINED_ROOM, function _onJoinedRoom(err) {
+    this.once(this.JOINED_ROOM, err => {
         if (err) {
             console.error(err.message);
             process.exit(1);
         }
-
-        this.on(this.CHAT, this.onMessage.bind(this));
     });
 };
 
@@ -123,8 +124,19 @@ Sekshi.prototype.reloadmodules = function(modulePath) {
     this.loadModules(modulePath);
 };
 
+// this might be a bit brittle
+// it's to handle users with fancy chars in their names, but this does mean that
+// if we actually try to send &amp;, it will come out as & instead
+// TODO maybe fix this in SooYou/plugged?
+Sekshi.prototype.sendChat = function (data) {
+    return Sekshi.super_.prototype.sendChat.call(this, unescape(data))
+}
 
 Sekshi.prototype.onMessage = function(msg) {
+    if (!this.getCurrentRoomStats()) {
+        return
+    }
+
     if (msg.message.charAt(0) === this.delimiter) {
         this.deleteMessage(msg.cid);
 
@@ -149,7 +161,7 @@ Sekshi.prototype.onMessage = function(msg) {
                 if (args[0].role >= self.modules[i].module.permissions[func])
                     self.modules[i].module[func].apply(self.modules[i].module, args);
                 else
-                    self.sendChat(['@', msg.username, " you don't have permission to use this command"].join(''), 5 * 1000);
+                    self.sendChat(`@${msg.username}: you don't have permission to use this command`, 5 * 1000);
                 break;
             }
         }
