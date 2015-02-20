@@ -1,12 +1,12 @@
-var debug = require('debug')('sekshi:raffle')
+var debug = require('debug')('sekshi:roulette')
 var assign = require('object-assign')
 
-export default class Raffle {
+export default class Roulette {
 
   constructor(sekshi, conf = {}) {
-    this.name = 'Raffle'
+    this.name = 'Roulette'
     this.author = 'ReAnna'
-    this.version = '0.1.0'
+    this.version = '0.2.0'
     this.description = 'Runs random raffles for wait list position #1.'
 
     this.sekshi = sekshi
@@ -14,7 +14,7 @@ export default class Raffle {
     this.permissions = {
       play: sekshi.USERROLE.NONE,
       players: sekshi.USERROLE.NONE,
-      lottery: sekshi.USERROLE.MANAGER
+      roulette: sekshi.USERROLE.MANAGER
     }
 
     this.options = assign({
@@ -26,11 +26,17 @@ export default class Raffle {
     this._players = []
   }
 
-  lottery(user) {
+  destroy() {
+    if (this._timer) {
+      clearTimeout(this._timer)
+    }
+  }
+
+  roulette(user) {
     this._running = true
     this._players = []
 
-    debug('starting raffle')
+    debug('starting roulette')
     this._timer = setTimeout(this.onEnd.bind(this), this.options.duration * 1000)
   }
 
@@ -44,7 +50,7 @@ export default class Raffle {
         this.sekshi.sendChat(`@${user.username} You need to be in the wait list if you want to join the raffle!`)
       }
       else if (idx < this.options.minPosition) {
-        this.sekshi.sendChat(`@${user.username} You can only join the raffle if you are on position ${this.option.minPosition} or higher!`)
+        this.sekshi.sendChat(`@${user.username} You can only join the roulette if you are on position ${this.option.minPosition} or higher!`)
       }
       else {
         this._players.push(user)
@@ -54,16 +60,17 @@ export default class Raffle {
 
   players() {
     debug('players', this._players.length)
-    this.sekshi.sendChat('Raffle players: ' +
+    this.sekshi.sendChat('Roulette players: ' +
                          this._players.map(user => user.username).join(' | '))
   }
 
   onEnd() {
     this._running = false
+    this._timer = null
     var winner = this._players[Math.floor(Math.random() * this._players.length)]
     debug('winner', winner.username)
-    this.sekshi.sendChat(`Raffle winner: @${winner.username}`)
-    this.sekshi.moveDJ(winner.id, 1, () => {
+    this.sekshi.sendChat(`Roulette winner: @${winner.username}. Congratulations!`)
+    this.sekshi.moveDJ(winner.id, 0, () => {
       debug('winner moved')
     })
     this._players = []
