@@ -13,6 +13,7 @@
     "mongoose-auto-increment": "*",
     "object-assign": "^2.0.0",
     "plugged": "*",
+    "promise": "^6.1.0",
     "snoocore": "*",
     "when": "*",
     "ws": "^0.7.1"

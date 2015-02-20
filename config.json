@@ -1,11 +1,7 @@
 {
   "room": "more-tests",
+  "mongo": "mongodb://localhost/sekshi",
   "redditfeed": {
     "subreddit": "kpop"
-  },
-  "database": {
-    "db": { "native_parser": true },
-    "server": { "poolSize": 5 },
-    "replset": { "rs_name": "sekshiRepl" }
   }
 }

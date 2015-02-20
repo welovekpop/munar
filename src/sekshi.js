@@ -12,6 +12,7 @@ var util = require("util");
 var fs = require("fs");
 var debug = require('debug')('sekshi:sekshi')
 var logChat = require('debug')('sekshi:chat')
+var mongoose = require('mongoose')
 
 module.exports = Sekshi
 
@@ -22,7 +23,7 @@ function Sekshi(args) {
         debug(msg)
     });
 
-    this.db = null;
+    this.db = mongoose.connect(args.mongo);
 
     this.modules = [];
     this.delimiter = args.delimiter || '!';
