@@ -53,8 +53,6 @@ Socials.prototype.greet = function(user) {
     if(!this.autogreet || this.lastGreeted == user.id || user.username === this.sekshi.getSelf().username || !this.sekshi.isModuleEnabled(this.name))
         return;
 
-    debug('saying hi', user)
-
     this.lastGreeted = user.id;
 
     let greeting = this.greetings[Math.floor(this.greetings.length * Math.random())]

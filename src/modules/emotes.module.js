@@ -23,7 +23,7 @@ Emotes.prototype.sendEmote = function(msg, username) {
         var user = this.sekshi.getUserByName(username, true);
 
         if(user) {
-            this.sekshi.sendChat(['@', user.username, ' ', msg].join(''));
+            this.sekshi.sendChat(`@${user.username} ${msg}`);
             return;
         }
     }
