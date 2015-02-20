@@ -108,6 +108,7 @@ RedditFeed.prototype.runTimer = function() {
         if (this.lastPost && this.bot.isModuleEnabled(this.name)) {
             for(var i = posts.length - 1; i >= 0; i--) {
                 this.bot.sendChat([
+                    '[r/kpop] ',
                     posts[i]["data"]["author"], " posted: ", posts[i]["data"]["title"], ' ', posts[i]["data"]["url"]
                     ].join(''));
             }
