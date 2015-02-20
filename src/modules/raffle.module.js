@@ -1,8 +1,6 @@
 var debug = require('debug')('sekshi:raffle')
 var assign = require('object-assign')
 
-module.exports = Raffle
-
 export default class Raffle {
 
   constructor(sekshi, conf = {}) {
