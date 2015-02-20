@@ -1,19 +1,42 @@
 var readline = require("readline");
 var Sekshi = require("./sekshi");
 var config = require('../config.json')
+const debug = require('debug')('sekshi:app')
+const pkg = require('../package.json')
 
 var sekshi = new Sekshi(config);
 
 sekshi.start(require("../creds.json"));
 
+var onError = () => {
+    debug('connection error')
+    setTimeout(() => {
+        debug('reconnecting...')
+    }, 3000)
+}
+sekshi.on(sekshi.CONN_ERROR, onError)
+sekshi.on(sekshi.LOGIN_ERROR, onError)
+sekshi.on(sekshi.SOCK_ERROR, onError)
+
 sekshi.on(sekshi.CONN_PART, function() {
-    console.error("connection parted");
-    process.exit(1);
+    debug("connection parted");
+
+    sekshi.stop();
+    setTimeout(() => {
+        debug('reconnecting...')
+        sekshi.start(require("../creds.json"));
+    }, 3000)
 });
 
-sekshi.on(sekshi.CONN_WARNING, function(warning) {
-    console.warn("connection warning: " + warning)
+sekshi.on(sekshi.CONN_WARNING, warning => {
+    debug("connection warning", warning)
 });
+
+sekshi.on(sekshi.JOINED_ROOM, err => {
+    if (!err) {
+        sekshi.sendChat('/me SekshiBot v' + pkg.version + ' started!')
+    }
+})
 
 var rl = readline.createInterface(process.stdin, process.stdout);
 
