@@ -13,8 +13,10 @@ export default class Disconnect {
             "dc": sekshi.USERROLE.NONE
         };
 
-        sekshi.on(sekshi.WAITLIST_UPDATE, this.onWaitlistUpdate.bind(this));
-        sekshi.on(sekshi.USER_LEAVE, this.onUserLeave.bind(this));
+        this.onWaitlistUpdate = this.onWaitlistUpdate.bind(this)
+        this.onUserLeave = this.onUserLeave.bind(this)
+        sekshi.on(sekshi.WAITLIST_UPDATE, this.onWaitlistUpdate);
+        sekshi.on(sekshi.USER_LEAVE, this.onUserLeave);
     }
 
     destroy() {

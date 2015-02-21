@@ -15,7 +15,7 @@ function SysMod(sekshi) {
 
 SysMod.prototype.name = "System";
 SysMod.prototype.author = "Sooyou";
-SysMod.prototype.version = "0.9.0";
+SysMod.prototype.version = "0.10.0";
 SysMod.prototype.description = "let's you receive information about modules; reload them; check system stats; and more";
 
 SysMod.prototype.moduleinfo = function(user, modulename) {
@@ -45,14 +45,13 @@ SysMod.prototype.reloadmodules = function(user) {
     this.sekshi.reloadmodules();
 };
 
-SysMod.prototype.listmodules = function(user) {
-    var mods = [];
-
-    for(var i = 0, l = this.sekshi.modules.length; i < l; i++)
-        mods.push(this.sekshi.modules[i].module.name);
-
-    this.sekshi.sendChat(mods.join(" :white_small_square: "));
-};
+SysMod.prototype.listmodules = function (user) {
+    this.sekshi.sendChat(
+        this.sekshi.modules.map(
+            mod => `:${mod.enabled ? 'white_check_mark' : 'small_red_triangle'}: ${mod.module.name}`
+        ).join(' ')
+    )
+}
 
 SysMod.prototype.togglemodule = function(user, modulename) {
     if(!modulename || modulename.length === 0) {

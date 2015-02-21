@@ -3,8 +3,6 @@ function Emotes(sekshi) {
 
     this.permissions = {
         "thatsnono": sekshi.USERROLE.NONE,
-        "uwotm8": sekshi.USERROLE.NONE,
-        "mlady": sekshi.USERROLE.NONE,
         "assc": sekshi.USERROLE.NONE
     };
 }
