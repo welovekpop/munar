@@ -22,6 +22,10 @@ export default class SongLengthSkip {
     sekshi.on(sekshi.ADVANCE, this.onAdvance)
   }
 
+  destroy() {
+    this.sekshi.off(this.sekshi.ADVANCE, this.onAdvance)
+  }
+
   onAdvance(booth, { media }) {
     if (media.duration > this.options.limit) {
       let seconds = this.options.limit % 60

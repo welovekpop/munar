@@ -21,7 +21,7 @@ export default class UserLogger {
   }
 
   destroy() {
-    sekshi.off(sekshi.USER_JOIN, this.onUserJoin)
+    this.sekshi.off(this.sekshi.USER_JOIN, this.onUserJoin)
   }
 
   onUserJoin(user) {

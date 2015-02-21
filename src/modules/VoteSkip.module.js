@@ -24,6 +24,11 @@ export default class VoteSkip {
     sekshi.on(sekshi.ADVANCE, this.onAdvance)
   }
 
+  destroy() {
+    this.sekshi.off(this.sekshi.VOTE, this.onVote)
+    this.sekshi.off(this.sekshi.ADVANCE, this.onAdvance)
+  }
+
   onAdvance() {
     this._skipping = false
   }

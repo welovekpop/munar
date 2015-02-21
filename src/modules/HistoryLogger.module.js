@@ -22,7 +22,7 @@ export default class HistoryLogger {
   }
 
   destroy() {
-    sekshi.off(sekshi.ADVANCE, this.onAdvance)
+    this.sekshi.off(this.sekshi.ADVANCE, this.onAdvance)
   }
 
   onAdvance({}, newPlay, previous) {
