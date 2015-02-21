@@ -20,6 +20,7 @@ export default class Greetings extends SekshiModule {
 
     this.greet = this.greet.bind(this)
     sekshi.on(sekshi.USER_JOIN, this.greet)
+    sekshi.on(sekshi.FRIEND_JOIN, this.greet)
   }
 
   defaultOptions() {
@@ -35,18 +36,16 @@ export default class Greetings extends SekshiModule {
         '/me hugs @'
       ],
       emoji: [
-        ':exclamation:',
         ':purple_heart:',
         ':blue_heart:',
-        ':v:',
-        ':smirk:',
-        ':laughing:'
+        ':v:'
       ]
     }
   }
 
   destroy() {
     this.sekshi.removeListener(this.sekshi.USER_JOIN, this.greet)
+    this.sekshi.removeListener(this.sekshi.FRIEND_JOIN, this.greet)
   }
 
   greetusers(toggle) {
@@ -66,7 +65,7 @@ export default class Greetings extends SekshiModule {
 
     let greeting = greetings[Math.floor(greetings.length * Math.random())]
     let message = greeting.replace(/@/, `@${user.username}`)
-                + (this.sekshi.isFriend(user.id) ? emoji[Math.floor(emoji.length * Math.random())] : '')
+                + (this.sekshi.isFriend(user.id) ? ' ' + emoji[Math.floor(emoji.length * Math.random())] : '')
     setTimeout(this.sekshi.sendChat.bind(this.sekshi, message), 2 * 1000)
   }
 }
