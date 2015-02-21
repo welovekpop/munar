@@ -1,139 +1,91 @@
-var Snoocore = require("snoocore");
-var when = require("when");
-var util = require("util");
+const Snoocore = require('snoocore')
+const debug = require('debug')('sekshi:reddit-feed')
+const Promise = require('promise')
+const SekshiModule = require('../Module')
 
-function RedditFeed(bot) {
-    this.bot = bot;
+export default class RedditFeed extends SekshiModule {
+
+  constructor(sekshi, options) {
+    this.name = 'RedditFeed'
+    this.author = 'schrobby'
+    this.version = '0.3.0'
+    this.description = 'Announces new submissions from a configurable list of subreddits.'
+
+    super(sekshi, options)
 
     this.permissions = {
-        "addsubreddit": bot.USERROLE.MANAGER,
-        "removesubreddit": bot.USERROLE.MANAGER,
-        "listsubreddits": bot.USERROLE.NONE,
-        "setfeedinterval": bot.USERROLE.COHOST
-    };
+      addsubreddit: sekshi.USERROLE.MANAGER,
+      removesubreddit: sekshi.USERROLE.MANAGER,
+      listsubreddits: sekshi.USERROLE.NONE,
+      setfeedinterval: sekshi.USERROLE.COHOST,
+      updatereddit: sekshi.USERROLE.NONE
+    }
 
-    this.timer = -1;
-    this.settings = {
-        "subreddits": ["kpop"],
-        "interval": 300000,
-        "format": "%feed | %title by %submitter | %link"
-    };
-    this.reddit = new Snoocore({ userAgent: "RedditFeed v" + this.version + " by /u/schrobby" });
-    this.lastPost = "";
+    this.reddit = new Snoocore({ userAgent: `RedditFeed v${this.version} by /u/schrobby` })
+    this.lastPost = ''
+    this.timer = setTimeout(this.runTimer.bind(this), 0)
+  }
 
-    if (this.areSettingsValid())
-        this.timer = setTimeout(this.runTimer.bind(this), 0);
-}
+  updatereddit() {
+    clearTimeout(this.timer)
+    this.runTimer()
+  }
 
-RedditFeed.prototype.destroy = function() {
+  defaultOptions() {
+    return {
+      subreddits: [ 'kpop' ],
+      interval: 300000,
+      format: '%feed | %title by %submitter | %link'
+    }
+  }
+
+  destroy() {
     if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = -1;
+      clearTimeout(this.timer)
+      this.timer = null
     }
-}
+  }
 
-RedditFeed.prototype.name = "RedditFeed";
-RedditFeed.prototype.author = "schrobby";
-RedditFeed.prototype.version = "0.2.0";
-RedditFeed.prototype.description = "Announces new submissions from a configurable list of subreddits.";
+  runTimer() {
+    debug('fetching new posts')
+    const subs = this.options.subreddits
+    var posts = []
+    var requests = []
+    var chunk = 50
 
-RedditFeed.prototype.setfeedinterval = function(user, interval) {
-    this.settings["interval"] = interval;
-};
-
-RedditFeed.prototype.addsubreddit = function(user, subreddit) {
-    subreddit = subreddit.toLowerCase();
-    for(var i = this.settings["subreddits"].length - 1; i >= 0; i--) {
-        if(this.settings["subreddits"][i].toLowerCase() === subreddit) {
-            this.bot.sendChat(['@', user.username, " this subreddit is already registered!"].join(''));
-            return;
-        }
+    for (let i = 0, l = subs.length; i < l; i += chunk) {
+      requests.push(subs.slice(i, i + chunk).join('+'))
     }
 
-    this.settings["subreddits"].push(subreddit);
-};
+    let promises = requests.map(uri => {
+      return this.reddit('/r/$subreddit/new')
+        .listing({
+          $subreddit: uri,
+          before: this.lastPost,
+          limit: 100
+        })
+        .then(result => result.children)
+    })
 
-RedditFeed.prototype.removesubreddit = function(user, subreddit) {
-    subreddit = subreddit.toLowerCase();
-    for(var i = this.settings["subreddits"].length - 1; i >= 0; i--) {
-        if(this.settings["subreddits"][i].toLowerCase() === subreddit) {
-            this.settings["subreddits"].splice(i, 1);
-            this.bot.sendChat(['@', user.username, " removed subreddit: ", subreddit].join(''));
-            return;
-        }
-    }
-
-    this.bot.sendChat(['@', user.username, " this subreddit is not registered!"].join(''));
-};
-
-RedditFeed.prototype.listsubreddits = function(user) {
-    var subreddits = ["registered subreddits: "];
-
-    for(var i = this.settings["subreddits"].length - 1; i >= 0; i--) {
-        subreddits.push(this.settings["subreddits"][i]);
-
-        if(i > 0)
-            subreddits.push(" :white_small_square: ");
-    }
-
-    this.bot.sendChat(subreddits.join(''));
-};
-
-RedditFeed.prototype.runTimer = function() {
-    var subs = this.settings["subreddits"];
-    var promises = [];
-    var posts = [];
-    var reqs = [];
-    var chunk = 50;
-
-    for (var i=0, j=subs.length; i<j; i+=chunk) {
-        reqs.push(subs.slice(i, i+chunk).join('+'));
-    }
-
-    reqs.forEach(function(uri) {
-        var promise = this.reddit("/r/$subreddit/new").listing({
-            $subreddit: uri,
-            before: this.lastPost,
-            limit: 100
-        }).then(function(result) {
-            posts = posts.concat(result.children);
-        }).catch(function(error) {
-            console.error(error);
-        });
-
-        promises.push(promise);
-    }.bind(this));
-
-    when.all(promises).then(function() {
-        if (this.lastPost && this.bot.isModuleEnabled(this.name)) {
-            for(var i = posts.length - 1; i >= 0; i--) {
-                this.bot.sendChat(`[r/kpop] ${posts[i].data.author} posted: ` +
-                                  `${posts[i].data.title} https://reddit.com/${posts[i].data.id}`);
-            }
+    Promise.all(promises)
+      .then(results => {
+        let posts = results.reduce((posts, list) => posts.concat(list), [])
+        debug('got new posts', posts.length)
+        if (this.lastPost && this.enabled()) {
+          posts.forEach(post => {
+            this.sekshi.sendChat(`[r/kpop] ${post.data.author} posted: ` +
+                              `${post.data.title} https://reddit.com/${post.data.id}`)
+          })
         }
 
-        if (posts.length > 0)
-            /*@TODO: find a way to reliably get the most recent post */
-            this.lastPost = posts[0].data.name;
+        if (posts.length > 0) {
+          /*@TODO: find a way to reliably get the most recent post */
+          this.lastPost = posts[0].data.name
+        }
 
-        this.timer = setTimeout(this.runTimer.bind(this), this.settings["interval"]);
-    }.bind(this))
+        this.timer = setTimeout(this.runTimer.bind(this), this.options.interval)
+      })
+      .catch(e => { debug('reddit error', e) })
+  }
+
 }
-
-RedditFeed.prototype.areSettingsValid = function(settings) {
-    settings = settings || this.settings;
-    var valid = true;
-
-    Object.keys(this.settings).forEach(function(key) {
-        if (this.settings[key] instanceof Array && this.settings[key].join('').length === 0)
-            valid = false;
-        else if (typeof this.settings[key] === "string" && this.settings[key].length === 0)
-            valid = false;
-        else if (typeof this.settings[key] === "number" && this.settings[key] <= 0)
-            valid = false;
-    }.bind(this));
-
-    return valid;
-}
-
-module.exports = RedditFeed;

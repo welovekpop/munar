@@ -2,19 +2,17 @@ const debug = require('debug')('sekshi:history-logging')
 const assign = require('object-assign')
 const { User, Media, HistoryEntry } = require('../models')
 const Promise = require('promise')
+const SekshiModule = require('../Module')
 
-export default class HistoryLogger {
+export default class HistoryLogger extends SekshiModule {
 
-  constructor(sekshi, options = {}) {
+  constructor(sekshi, options) {
     this.name = 'History Logger'
     this.author = 'ReAnna'
     this.version = '0.3.0'
     this.description = 'Keeps a history of all songs that are played in the room.'
 
-    this.sekshi = sekshi
-    this.options = assign({
-      // no options :D
-    }, options)
+    super(sekshi, options)
 
     // sigh…
     this.onAdvance = this.onAdvance.bind(this)

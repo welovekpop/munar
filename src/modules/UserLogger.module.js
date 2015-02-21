@@ -1,19 +1,17 @@
 const debug = require('debug')('sekshi:user-logging')
 const assign = require('object-assign')
 const { User } = require('../models')
+const SekshiModule = require('../Module')
 
-export default class UserLogger {
+export default class UserLogger extends SekshiModule {
 
-  constructor(sekshi, options = {}) {
+  constructor(sekshi, options) {
     this.name = 'User Logger'
     this.author = 'ReAnna'
     this.version = '0.1.0'
     this.description = 'Keeps track of users who visit the channel.'
 
-    this.sekshi = sekshi
-    this.options = assign({
-      // no options :D
-    }, options)
+    super(sekshi, options)
 
     // sigh…
     this.onUserJoin = this.onUserJoin.bind(this)

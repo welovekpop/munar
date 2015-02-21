@@ -1,11 +1,12 @@
 {
   "name": "sekshi",
   "description": "sekshi is a BOT system developed for We <3 KPOP",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "main": "lib/sekshi",
   "author": "Sooyou",
   "homepage": "xn--xck.moe",
   "dependencies": {
+    "array-findindex": "^0.1.0",
     "babel": "^4.1.1",
     "debug": "*",
     "franc": "*",

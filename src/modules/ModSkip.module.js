@@ -1,26 +1,30 @@
 const assign = require('object-assign')
+const SekshiModule = require('../Module')
 
-export default class ModSkip {
+export default class ModSkip extends SekshiModule {
 
-  constructor(sekshi, options = {}) {
+  constructor(sekshi, options) {
     this.name = 'ModSkip'
     this.author = 'ReAnna'
     this.version = '0.2.0'
     this.description = 'Simple DJ skipping tools'
 
-    this.sekshi = sekshi
-    this.options = assign({
+    super(sekshi, options)
+
+    this.permissions = {
+      skip: sekshi.USERROLE.BOUNCER,
+      lockskip: sekshi.USERROLE.BOUNCER
+    }
+  }
+
+  defaultOptions() {
+    return {
       reasons: {
         kpop: 'This is a Korean music dedicated room, please only play music by Korean artists.',
         history: 'This song is in the history. Please pick another.',
         duration: 'This song is too long. Please pick a shorter one.'
       },
       lockskipPos: 1
-    }, options)
-
-    this.permissions = {
-      skip: sekshi.USERROLE.BOUNCER,
-      lockskip: sekshi.USERROLE.BOUNCER
     }
   }
 

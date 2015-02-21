@@ -1,15 +1,16 @@
-var debug = require('debug')('sekshi:roulette')
-var assign = require('object-assign')
+const debug = require('debug')('sekshi:roulette')
+const assign = require('object-assign')
+const SekshiModule = require('../Module')
 
-export default class Roulette {
+export default class Roulette extends SekshiModule {
 
-  constructor(sekshi, conf = {}) {
+  constructor(sekshi, options) {
     this.name = 'Roulette'
     this.author = 'ReAnna'
     this.version = '0.2.0'
     this.description = 'Runs random raffles for wait list position #1.'
 
-    this.sekshi = sekshi
+    super(sekshi, options)
 
     this.permissions = {
       play: sekshi.USERROLE.NONE,
@@ -17,13 +18,15 @@ export default class Roulette {
       roulette: sekshi.USERROLE.MANAGER
     }
 
-    this.options = assign({
-      duration: 120
-    , minPosition: 6
-    }, conf)
-
     this._running = false
     this._players = []
+  }
+
+  defaultOptions() {
+    return {
+      duration: 120
+    , minPosition: 6
+    }
   }
 
   destroy() {

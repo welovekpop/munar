@@ -1,11 +1,14 @@
-export default class Disconnect {
-    constructor(sekshi) {
+const SekshiModule = require('../Module')
+
+export default class Disconnect extends SekshiModule {
+    constructor(sekshi, options) {
         this.name = "Disconnect";
         this.author = "Sooyou";
         this.version = "0.2.0";
         this.description = "Provides basic moderation tools";
 
-        this.sekshi = sekshi;
+        super(sekshi, options)
+
         this.waitlist = [];
         this.dropped = [];
 

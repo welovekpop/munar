@@ -38,24 +38,24 @@ DEBUG=sekshi:* npm run-script babel-start # only outputs debug information from 
 
 ## Making modules
 
-Sekshi autoloads modules from the `src/modules` directory. Just make sure your file name ends in `.module.js`! Modules should generally look like:
+Sekshi autoloads modules from the `src/modules` directory. Just make sure your file name ends in `.module.js`, and that your module class inherits from `src/Module`! Modules should generally look like:
 
 ```javascript
 // src/modules/MyModule.module.js
 const debug = require('debug')('sekshi:my-module') // replace that last bit with your module name!
+const SekshiModule = require('../Module')
 // <your requires here>
 
-export default class MyModule {
-  constructor(sekshi) {
+export default class MyModule extends SekshiModule {
+  constructor(sekshi, options) {
     // meta
     this.name = 'My Module'
     this.author = 'Me!'
     this.version = '0.1.0'
     this.description = 'This is a module!'
 
-    // some init…
-    this.sekshi = sekshi
-    this.options = {}
+    // initialise the module AFTER you've set meta data!
+    super(sekshi, options)
 
     // commands! For user roles, see the Sooyou/plugged documentation
     this.permissions = {

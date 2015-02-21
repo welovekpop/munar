@@ -1,19 +1,29 @@
 const debug = require('debug')('sekshi:greeting')
 const assign = require('object-assign')
+const SekshiModule = require('../Module')
 
-export default class Greetings {
+export default class Greetings extends SekshiModule {
 
-  constructor(sekshi, options = {}) {
+  constructor(sekshi, options) {
     this.name = 'Greetings'
     this.author = 'Sooyou'
     this.version = '0.1.0'
     this.description = 'Greets users.'
 
-    this.sekshi = sekshi
+    super(sekshi, options)
     this.permissions = {
       greetusers: sekshi.USERROLE.BOUNCER
     }
-    this.options = assign({
+
+    this.autogreet = true
+    this.lastGreeted = -1
+
+    this.greet = this.greet.bind(this)
+    sekshi.on(sekshi.USER_JOIN, this.greet)
+  }
+
+  defaultOptions() {
+    return {
       greetings: [
         'Hai @',
         'Welcome, @!',
@@ -32,17 +42,11 @@ export default class Greetings {
         ':smirk:',
         ':laughing:'
       ]
-    }, options)
-
-    this.autogreet = true
-    this.lastGreeted = -1
-
-    this.greet = this.greet.bind(this)
-    sekshi.on(sekshi.USER_JOIN, this.greet)
+    }
   }
 
   destroy() {
-    this.sekshi.off(this.sekshi.USER_JOIN, this.greet)
+    this.sekshi.removeListener(this.sekshi.USER_JOIN, this.greet)
   }
 
   greetusers(toggle) {

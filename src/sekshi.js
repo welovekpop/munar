@@ -25,16 +25,18 @@ function Sekshi(args) {
         debug(msg)
     });
 
+    this.options = args
+
     this.db = mongoose.connect(args.mongo);
 
-    this.modules = [];
+    this.modules = {};
     this.delimiter = args.delimiter || '!';
     this.modulePath = args.modulePath || path.join(__dirname, "modules");
 
     this._room = args.room
 
     this.loadModules(this.modulePath);
-    this.on(this.CHAT, this.onMessage.bind(this));
+    this.onMessage = this.onMessage.bind(this)
 }
 
 util.inherits(Sekshi, Plugged);
@@ -46,6 +48,8 @@ Sekshi.prototype.start = function(credentials) {
         console.error("error at login: " + err.message);
         return;
     }
+
+    this.on(this.CHAT, this.onMessage);
 
     this.once(this.LOGIN_SUCCESS, function _onLoginSuccess() {
         this.cacheChat(true);
@@ -68,7 +72,7 @@ Sekshi.prototype.start = function(credentials) {
 Sekshi.prototype.stop = function() {
     this.unloadModules(this.modulePath);
 
-    this.logout(function _logout() {
+    this.logout(() => {
         this.removeListener(this.CHAT, this.onMessage);
     });
 };
@@ -82,9 +86,8 @@ Sekshi.prototype.setRoom = function(room) {
     this.connect(this._room);
 };
 
-Sekshi.prototype.parseArguments = function(str, args) {
-    args = args || [];
-    str = str || "";
+Sekshi.prototype.parseArguments = function (str = '') {
+    var args = [];
     var length = str.length;
     var compound = false;       //quoted?
     var sarg = false;           //started argument?
@@ -118,6 +121,8 @@ Sekshi.prototype.parseArguments = function(str, args) {
 
     if (sarg)
         args.push(str.slice(sidx, cidx));
+
+    return args
 };
 
 Sekshi.prototype.reloadmodules = function(modulePath) {
@@ -146,37 +151,40 @@ Sekshi.prototype.onMessage = function(msg) {
     }
 
     if (msg.message.charAt(0) === this.delimiter) {
-        this.deleteMessage(msg.cid);
+        let func = null
+        let user = msg.id === 'sekshi' ? { role: this.USERROLE.HOST }
+                                       : this.getUserByID(msg.id, true)
 
-        var self = this;
-        var args = [];
-        var func = null;
-        var user = msg.id === 'sekshi' ? { role: this.USERROLE.HOST } : self.getUserByID(msg.id, true);
+        // nonexistent user
+        if (!user) return
 
-        if(!user)
-            return;
+        user.role = user.role || this.USERROLE.NONE
 
-        if(typeof user.role === "undefined")
-            user.role = 0;
+        let args = this.parseArguments(msg.message)
 
-        this.parseArguments(msg.message, args);
+        func = args.shift().replace(this.delimiter, '')
+        args.unshift(user)
 
-        func = args.shift().replace(this.delimiter, '');
-        args.unshift(user);
-
-        for (var i = 0, l = self.modules.length; i < l; i++) {
-            if (self.modules[i].enabled && typeof self.modules[i].module[func] === "function") {
-                if (args[0].role >= self.modules[i].module.permissions[func])
-                    self.modules[i].module[func].apply(self.modules[i].module, args);
-                else
-                    self.sendChat(`@${msg.username}: you don't have permission to use this command`, 5 * 1000);
-                break;
+        for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
+            let mod = this.modules[name]
+            if (mod.enabled() && typeof mod[func] === 'function' && mod.permissions.hasOwnProperty(func)) {
+                this.deleteMessage(msg.cid)
+                if (user.role >= mod.permissions[func]) {
+                    mod[func](...args)
+                }
+                else {
+                    this.sendChat(`@${msg.username}: You don't have sufficient permissions to use this command.`, 5 * 1000)
+                }
             }
         }
     } else {
         logChat(msg.username, msg.message)
     }
-};
+}
+
+Sekshi.prototype.getModule = function (name) {
+    return this.modules[name.toLowerCase()]
+}
 
 //get array of module files
 Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
@@ -196,7 +204,7 @@ Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
 
             if (typeof files !== "undefined") {
                 for (var i = 0, l = files.length; i < l; i++)
-                    this.getModuleFiles(path.join(modulePath, files[i]), modules);
+                    modules.push(...this.getModuleFiles(path.join(modulePath, files[i])));
             }
 
         } else if (stat.isFile()) {
@@ -208,43 +216,30 @@ Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
     return modules;
 };
 
-Sekshi.prototype.isModuleEnabled = function(modulename) {
-    modulename = modulename.toLowerCase();
-
-    for(var i = this.modules.length - 1; i >= 0; i--) {
-        if(this.modules[i].module.name.toLowerCase() === modulename)
-            return this.modules[i].enabled;
-    }
+Sekshi.prototype.isModuleEnabled = function (name) {
+    return this.getModule(name).enabled()
 };
 
-Sekshi.prototype.loadModules = function(modulePath) {
-    modulePath = modulePath || this.modulePath;
+Sekshi.prototype.loadModules = function (modulePath) {
+    modulePath = modulePath || this.modulePath
 
-    var moduleFiles = this.getModuleFiles(modulePath);
-    var module = null;
+    this.getModuleFiles(modulePath).forEach(file => {
+        let Module = require(file)
+        let mod = new Module(this, {})
 
-    for (var i = 0, l = moduleFiles.length; i < l; i++) {
-        module = require(moduleFiles[i]);
-
-        this.modules.push({
-            enabled: true,
-            module: new module(this)
-        });
-    }
-};
+        this.modules[mod.name.toLowerCase()] = mod
+    })
+}
 
 Sekshi.prototype.unloadModules = function(modulePath) {
     modulePath = modulePath || this.modulePath;
 
-    for (var i = 0, l = this.modules.length - 1; i < l; i++) {
-        if (typeof this.modules[i].module.destroy !== "undefined")
-            this.modules[i].module.destroy();
+    for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
+        this.modules[name].destroy()
     }
 
-    this.modules = [];
-    var moduleFiles = this.getModuleFiles(modulePath);
-
-    for (var i = 0, l = moduleFiles.length; i < l; i++) {
-        delete require.cache[path.resolve(moduleFiles[i])];
-    }
+    this.modules = {}
+    this.getModuleFiles(modulePath).forEach(file => {
+        delete require.cache[path.resolve(file)]
+    })
 };
