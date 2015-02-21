@@ -38,9 +38,10 @@ DEBUG=sekshi:* npm run-script babel-start # only outputs debug information from 
 
 ## Making modules
 
-Sekshi autoloads modules from the `src/modules` directory. Modules should generally look like:
+Sekshi autoloads modules from the `src/modules` directory. Just make sure your file name ends in `.module.js`! Modules should generally look like:
 
 ```javascript
+// src/modules/MyModule.module.js
 const debug = require('debug')('sekshi:my-module') // replace that last bit with your module name!
 // <your requires here>
 
