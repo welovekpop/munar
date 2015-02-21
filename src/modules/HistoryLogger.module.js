@@ -55,7 +55,7 @@ export default class HistoryLogger {
         debug('time', newPlay.startTime)
         HistoryEntry.create({
           _id: newPlay.historyID
-        , user: user.id
+        , dj: user.id
         , media: media.id
         , time: new Date(newPlay.startTime)
           // heh
