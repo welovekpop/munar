@@ -21,7 +21,7 @@ export default class UserLogger {
   }
 
   destroy() {
-    this.sekshi.off(this.sekshi.USER_JOIN, this.onUserJoin)
+    this.sekshi.removeListener(this.sekshi.USER_JOIN, this.onUserJoin)
   }
 
   onUserJoin(user) {

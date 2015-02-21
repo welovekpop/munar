@@ -23,7 +23,7 @@ export default class HistorySkip {
   }
 
   destroy() {
-    this.sekshi.off(this.sekshi.ADVANCE, this.onAdvance)
+    this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
   }
 
   onAdvance(booth, { media }) {

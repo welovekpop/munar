@@ -25,8 +25,8 @@ export default class VoteSkip {
   }
 
   destroy() {
-    this.sekshi.off(this.sekshi.VOTE, this.onVote)
-    this.sekshi.off(this.sekshi.ADVANCE, this.onAdvance)
+    this.sekshi.removeListener(this.sekshi.VOTE, this.onVote)
+    this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
   }
 
   onAdvance() {
