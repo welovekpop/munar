@@ -1,13 +1,14 @@
 const debug = require('debug')('sekshi:roulette')
 const assign = require('object-assign')
 const SekshiModule = require('../Module')
+const moment = require('moment')
 
 export default class Roulette extends SekshiModule {
 
   constructor(sekshi, options) {
     this.name = 'Roulette'
     this.author = 'ReAnna'
-    this.version = '0.2.0'
+    this.version = '0.4.0'
     this.description = 'Runs random raffles for wait list position #1.'
 
     super(sekshi, options)
@@ -41,21 +42,25 @@ export default class Roulette extends SekshiModule {
 
     debug('starting roulette')
     this._timer = setTimeout(this.onEnd.bind(this), this.options.duration * 1000)
+    const duration = moment.duration(this.options.duration, 'seconds')
+    this.sekshi.sendChat(`@djs ${user.username} started Roulette! Type "!play" (without quotes) to join. You have ${duration.humanize()}!`)
   }
 
   play(user) {
     if (this._running && this._players.indexOf(user) === -1) {
-      debug('new player', user.username)
 
       var waitlist = this.sekshi.getWaitlist()
-        , idx = waitlist.indexOf(user)
+        , idx = waitlist.indexOf(user.id)
       if (idx === -1) {
-        this.sekshi.sendChat(`@${user.username} You need to be in the wait list if you want to join the raffle!`)
+        debug('player not in wait list', user.username)
+        this.sekshi.sendChat(`@${user.username} You need to be in the wait list if you want to join the raffle!`, 10 * 1000)
       }
       else if (idx < this.options.minPosition) {
-        this.sekshi.sendChat(`@${user.username} You can only join the roulette if you are on position ${this.option.minPosition} or higher!`)
+        debug('player too high' /* lol */, user.username)
+        this.sekshi.sendChat(`@${user.username} You can only join the roulette if you are below position ${this.options.minPosition}!`, 10 * 1000)
       }
       else {
+        debug('new player', user.username)
         this._players.push(user)
       }
     }
