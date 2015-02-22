@@ -7,7 +7,7 @@ export default class SongLengthSkip extends SekshiModule {
   constructor(sekshi, options = {}) {
     this.name = 'Song Length Skip'
     this.author = 'ReAnna'
-    this.version = '0.1.0'
+    this.version = '0.1.1'
     this.description = 'Autoskip songs that are too long.'
 
     super(sekshi, options)
@@ -31,7 +31,7 @@ export default class SongLengthSkip extends SekshiModule {
   onAdvance(booth, { media }) {
     if (media.duration > this.options.limit) {
       let seconds = this.options.limit % 60
-      let formatted = `${Math.floor(this.options.limit / 60)} ${seconds < 10 ? `0${seconds}` : seconds}`
+      let formatted = `${Math.floor(this.options.limit / 60)}:${seconds < 10 ? `0${seconds}` : seconds}`
       // TODO get something nicer than this ):
       this.sekshi.onMessage({
         message: `!lockskip "This song is longer than the maximum of ${formatted}. Please pick a shorter one."`,
