@@ -4,7 +4,6 @@ const SekshiModule = require('../Module')
 export default class Links extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'Links'
     this.author = 'ReAnna'
     this.version = '0.1.0'
     this.description = 'Throws links at people.'

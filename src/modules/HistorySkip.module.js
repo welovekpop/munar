@@ -1,11 +1,9 @@
 const debug = require('debug')('sekshi:history-skip')
-const assign = require('object-assign')
 const SekshiModule = require('../Module')
 
 export default class HistorySkip extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'HistorySkip'
     this.author = 'ReAnna'
     this.version = '0.1.0'
     this.description = 'Autoskip songs that have been played recently.'
@@ -15,7 +13,6 @@ export default class HistorySkip extends SekshiModule {
     this._skipping = false
 
     this.onAdvance = this.onAdvance.bind(this)
-    sekshi.on(sekshi.ADVANCE, this.onAdvance)
   }
 
   defaultOptions() {
@@ -24,6 +21,9 @@ export default class HistorySkip extends SekshiModule {
     }
   }
 
+  init() {
+    this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
+  }
   destroy() {
     this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
   }

@@ -5,23 +5,24 @@ const SekshiModule = require('../Module')
 export default class SongLengthSkip extends SekshiModule {
 
   constructor(sekshi, options = {}) {
-    this.name = 'Song Length Skip'
     this.author = 'ReAnna'
     this.version = '0.1.1'
     this.description = 'Autoskip songs that are too long.'
 
     super(sekshi, options)
 
-    this._skipping = false
-
     this.onAdvance = this.onAdvance.bind(this)
-    sekshi.on(sekshi.ADVANCE, this.onAdvance)
   }
 
   defaultOptions() {
     return {
       limit: 7 * 60
     }
+  }
+
+  init() {
+    this._skipping = false
+    this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
   }
 
   destroy() {

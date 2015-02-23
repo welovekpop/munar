@@ -6,7 +6,6 @@ const SekshiModule = require('../Module')
 export default class UserKarma extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'User Karma'
     this.author = 'brookiebeast'
     this.version = '0.1.1'
     this.description = 'Keeps track of users\' earned internet points.'

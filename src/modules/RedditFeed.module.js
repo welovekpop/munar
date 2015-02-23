@@ -6,7 +6,6 @@ const SekshiModule = require('../Module')
 export default class RedditFeed extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'RedditFeed'
     this.author = 'schrobby'
     this.version = '0.3.0'
     this.description = 'Announces new submissions from a configurable list of subreddits.'
@@ -18,17 +17,10 @@ export default class RedditFeed extends SekshiModule {
       removesubreddit: sekshi.USERROLE.MANAGER,
       listsubreddits: sekshi.USERROLE.NONE,
       setfeedinterval: sekshi.USERROLE.COHOST,
-      updatereddit: sekshi.USERROLE.NONE
+      updatereddit: sekshi.USERROLE.MANAGER
     }
 
     this.reddit = new Snoocore({ userAgent: `RedditFeed v${this.version} by /u/schrobby` })
-    this.lastPost = ''
-    this.timer = setTimeout(this.runTimer.bind(this), 0)
-  }
-
-  updatereddit() {
-    clearTimeout(this.timer)
-    this.runTimer()
   }
 
   defaultOptions() {
@@ -39,11 +31,21 @@ export default class RedditFeed extends SekshiModule {
     }
   }
 
+  init() {
+    this.lastPost = ''
+    this.timer = setTimeout(this.runTimer.bind(this), 0)
+  }
+
   destroy() {
     if (this.timer) {
       clearTimeout(this.timer)
       this.timer = null
     }
+  }
+
+  updatereddit() {
+    clearTimeout(this.timer)
+    this.runTimer()
   }
 
   runTimer() {

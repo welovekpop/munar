@@ -4,7 +4,6 @@ const SekshiModule = require('../Module')
 export default class ModSkip extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'ModSkip'
     this.author = 'ReAnna'
     this.version = '0.2.0'
     this.description = 'Simple DJ skipping tools'

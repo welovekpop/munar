@@ -49,9 +49,8 @@ const SekshiModule = require('../Module')
 export default class MyModule extends SekshiModule {
   constructor(sekshi, options) {
     // meta
-    this.name = 'My Module'
     this.author = 'Me!'
-    this.version = '0.1.0'
+    this.version = '0.1.1'
     this.description = 'This is a module!'
 
     // initialise the module AFTER you've set meta data!
@@ -62,10 +61,14 @@ export default class MyModule extends SekshiModule {
       who: sekshi.USERROLE.NONE, // Anyone can use this command!
       why: sekshi.USERROLE.BOUNCER // Only bouncers and up can use this command!
     }
+  }
 
+  // init() will be run when the module is enabled:
+  init() {
     // your own initialisation! Maybe you want to add some event handlers, or start a timer…
   }
 
+  // and destroy() will be run when the module is disabled:
   destroy() {
     // detach any event listeners here, if you have them
   }

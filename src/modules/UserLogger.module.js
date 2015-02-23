@@ -6,18 +6,18 @@ const SekshiModule = require('../Module')
 export default class UserLogger extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'User Logger'
     this.author = 'ReAnna'
     this.version = '0.1.0'
     this.description = 'Keeps track of users who visit the channel.'
 
     super(sekshi, options)
 
-    // sigh…
     this.onUserJoin = this.onUserJoin.bind(this)
-    sekshi.on(sekshi.USER_JOIN, this.onUserJoin)
   }
 
+  init() {
+    this.sekshi.on(this.sekshi.USER_JOIN, this.onUserJoin)
+  }
   destroy() {
     this.sekshi.removeListener(this.sekshi.USER_JOIN, this.onUserJoin)
   }

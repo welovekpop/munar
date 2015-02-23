@@ -5,19 +5,14 @@ const SekshiModule = require('../Module')
 export default class VoteSkip extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'VoteSkip'
     this.author = 'ReAnna'
     this.version = '0.1.0'
     this.description = 'Autoskip songs after a number of mehs.'
 
     super(sekshi, options)
 
-    this._skipping = false
-
     this.onVote = this.onVote.bind(this)
     this.onAdvance = this.onAdvance.bind(this)
-    sekshi.on(sekshi.VOTE, this.onVote)
-    sekshi.on(sekshi.ADVANCE, this.onAdvance)
   }
 
   defaultOptions() {
@@ -26,6 +21,12 @@ export default class VoteSkip extends SekshiModule {
     }
   }
 
+  init() {
+    this._skipping = false
+
+    this.sekshi.on(this.sekshi.VOTE, this.onVote)
+    this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
+  }
   destroy() {
     this.sekshi.removeListener(this.sekshi.VOTE, this.onVote)
     this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
