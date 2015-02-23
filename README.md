@@ -15,7 +15,7 @@ npm install
 1. Put your bot account credentials in a repo root-level file `creds.json` (next to `config.json`), like this:
 
 ```json
-{ "email": "my-bot-account@plug.dj", "password": "t0pS3cr3tP4ssw0rd"
+{ "email": "my-bot-account@plug.dj", "password": "t0pS3cr3tP4ssw0rd" }
 ```
 
 Other config options are not (yet) set in the `config.json` file, but hardcoded in the module files. Please don't hurt me.
