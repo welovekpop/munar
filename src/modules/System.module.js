@@ -4,7 +4,6 @@ const SekshiModule = require('../Module')
 export default class System extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'System'
     this.author = 'Sooyou'
     this.version = '0.11.1'
     this.description = 'Simple tools for module management & system information'
@@ -13,44 +12,57 @@ export default class System extends SekshiModule {
 
     this.permissions = {
       sysinfo: sekshi.USERROLE.COHOST,
-      moduleinfo: sekshi.USERROLE.COHOST,
-      listmodules: sekshi.USERROLE.COHOST,
+      moduleinfo: sekshi.USERROLE.MANAGER,
+      listmodules: sekshi.USERROLE.MANAGER,
       togglemodule: sekshi.USERROLE.COHOST,
       reloadmodules: sekshi.USERROLE.COHOST,
+      reloadmodule: sekshi.USERROLE.MANAGER,
+      enablemodule: sekshi.USERROLE.MANAGER,
+      disablemodule: sekshi.USERROLE.MANAGER,
       exit: sekshi.USERROLE.MANAGER
     }
   }
 
-  moduleinfo(user, modulename) {
-    if(!modulename || modulename.length === 0) {
+  reloadmodule(user, name) {
+    this.sekshi.reloadModule(name)
+  }
+
+  disablemodule(user, name) {
+    this.sekshi.disable(name)
+  }
+  enablemodule(user, name) {
+    this.sekshi.enable(name)
+  }
+
+  moduleinfo(user, name) {
+    if(!name || name.length === 0) {
         this.sekshi.sendChat(`usage: !moduleinfo "modulename"`)
         return;
     }
 
-    const mod = this.sekshi.getModule(modulename)
+    const mod = this.sekshi.getModule(name)
     if (mod) {
       this.sekshi.sendChat(
-        `:${mod.enabled() ? 'small_blue_diamond' : 'small_red_triangle'}: Module info for "${mod.name}" ` +
+        `:${mod.enabled() ? 'small_blue_diamond' : 'small_red_triangle'}: Module info for "${name}" ` +
         `:white_small_square: Version: ${mod.version} ` +
         `:white_small_square: Author: ${mod.author} ` +
         `:white_small_square: Description: ${mod.description}`
       )
     }
     else {
-      this.sekshi.sendChat(`Module "${modulename}" does not exist.`);
+      this.sekshi.sendChat(`Module "${name}" does not exist.`);
     }
   }
 
   reloadmodules(user) {
-    this.sekshi.reloadmodules()
+    this.sekshi.reloadModules()
   }
 
   listmodules(user) {
-    let text = []
-    for (let name in this.sekshi.modules) if (this.sekshi.modules.hasOwnProperty(name)) {
-      let mod = this.sekshi.modules[name]
-      text.push(`${mod.name} ${mod.enabled() ? '✔' : '✘'}`)
-    }
+    const text = this.sekshi.getAvailableModules().map(name => {
+      const mod = this.sekshi.getModule(name)
+      return `${name} ${mod && mod.enabled() ? '✔' : '✘'}`
+    })
     this.sekshi.sendChat(text.sort().join(', '), 20 * 1000)
   }
 

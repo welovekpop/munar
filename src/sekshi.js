@@ -1,18 +1,11 @@
-/*****************************/
-/* Bot created for We <3 KPOP*/
-/*          on plug.dj.      */
-/*                           */
-/*          join at:         */
-/*    play.welovekpop.club   */
-/*****************************/
-
-var Plugged = require("plugged");
-var path = require("path");
-var util = require("util");
-var fs = require("fs");
-var debug = require('debug')('sekshi:sekshi')
-var logChat = require('debug')('sekshi:chat')
-var mongoose = require('mongoose')
+const Plugged = require('plugged')
+const path = require('path')
+const util = require('util')
+const fs = require('fs')
+const debug = require('debug')('sekshi:sekshi')
+const logChat = require('debug')('sekshi:chat')
+const mongoose = require('mongoose')
+const find = require('array-find')
 
 const unescape = require('unescape')
 
@@ -30,18 +23,18 @@ function Sekshi(args) {
     this.db = mongoose.connect(args.mongo);
 
     this.modules = {};
+    this.files = new Map()
     this.delimiter = args.delimiter || '!';
     this.modulePath = args.modulePath || path.join(__dirname, "modules");
 
     this._room = args.room
 
-    this.loadModules(this.modulePath);
     this.onMessage = this.onMessage.bind(this)
 }
 
 util.inherits(Sekshi, Plugged);
 
-Sekshi.prototype.start = function(credentials) {
+Sekshi.prototype.start = function (credentials) {
     try {
         this.login(credentials);
     } catch (err) {
@@ -54,6 +47,7 @@ Sekshi.prototype.start = function(credentials) {
     this.once(this.LOGIN_SUCCESS, function _onLoginSuccess() {
         this.cacheChat(true);
         this.connect(this._room);
+        this.loadModules()
     });
 
     this.once(this.LOGIN_ERROR, function _onLoginError(err) {
@@ -67,24 +61,24 @@ Sekshi.prototype.start = function(credentials) {
             process.exit(1);
         }
     });
-};
+}
 
-Sekshi.prototype.stop = function() {
+Sekshi.prototype.stop = function () {
     this.unloadModules(this.modulePath);
 
     this.logout(() => {
         this.removeListener(this.CHAT, this.onMessage);
     });
-};
+}
 
-Sekshi.prototype.setDelimiter = function(delimiter) {
-    this.delimiter = delimiter;
-};
+Sekshi.prototype.setDelimiter = function (delimiter) {
+    this.delimiter = delimiter
+}
 
 Sekshi.prototype.setRoom = function(room) {
-    this._room = room;
-    this.connect(this._room);
-};
+    this._room = room
+    this.connect(this._room)
+}
 
 Sekshi.prototype.parseArguments = function (str = '') {
     var args = [];
@@ -125,10 +119,10 @@ Sekshi.prototype.parseArguments = function (str = '') {
     return args
 };
 
-Sekshi.prototype.reloadmodules = function(modulePath) {
-    this.unloadModules(modulePath);
-    this.loadModules(modulePath);
-};
+Sekshi.prototype.reloadModules = function () {
+    this.unloadModules()
+    this.loadModules()
+}
 
 Sekshi.prototype.lockskipDJ = function (id, position, cb) {
     this.skipDJ(id, e => {
@@ -187,13 +181,13 @@ Sekshi.prototype.getModule = function (name) {
 }
 
 //get array of module files
-Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
+Sekshi.prototype.getModuleFiles = function(modulePath) {
     if (!fs.existsSync(modulePath)) {
         console.log(modulePath + " does not exist!");
         return [];
     }
 
-    modules = modules || [];
+    let modules = [];
     var stat = fs.statSync(modulePath);
 
     if (typeof stat === "undefined") {
@@ -216,30 +210,77 @@ Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
     return modules;
 };
 
-Sekshi.prototype.isModuleEnabled = function (name) {
-    return this.getModule(name).enabled()
-};
-
-Sekshi.prototype.loadModules = function (modulePath) {
-    modulePath = modulePath || this.modulePath
-
-    this.getModuleFiles(modulePath).forEach(file => {
-        let Module = require(file)
-        let mod = new Module(this, {})
-
-        this.modules[mod.name.toLowerCase()] = mod
-    })
+Sekshi.prototype.getAvailableModules = function () {
+    return this.getModuleFiles(this.modulePath)
+        .map(file => file.match(/\/([^\/]+?)\.module\.js$/)[1])
 }
 
-Sekshi.prototype.unloadModules = function(modulePath) {
-    modulePath = modulePath || this.modulePath;
+Sekshi.prototype.getModulePath = function (name) {
+    name = find(this.getAvailableModules(), avail => avail.toLowerCase() === name.toLowerCase())
+    return name ? path.join(this.modulePath, `${name}.module.js`) : null
+}
 
+Sekshi.prototype.moduleExists = function (name) {
+    return this.getModulePath(name) !== null
+}
+
+// disable a module
+Sekshi.prototype.disable = function (name) {
+    debug('disable', name)
+    const mod = this.getModule(name)
+    if (mod) {
+        mod.disable()
+    }
+    this._unloadModule(name)
+}
+
+Sekshi.prototype.enable = function (name) {
+    debug('enable', name)
+    if (this.moduleExists(name)) {
+        this._loadModule(name).enable()
+    }
+}
+
+Sekshi.prototype.loadModules = function () {
+    debug('load all')
+    this.getAvailableModules().forEach(this._loadModule, this)
+}
+
+Sekshi.prototype.unloadModules = function() {
+    debug('unload all')
     for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
-        this.modules[name].destroy()
+        this._unloadModule(name)
+    }
+}
+
+Sekshi.prototype.reloadModule = function (name) {
+    this._unloadModule(name)
+    this._loadModule(name)
+}
+
+Sekshi.prototype._loadModule = function (name) {
+    debug('load', name)
+    const lName = name.toLowerCase()
+    let mod = this.modules[lName]
+    if (!mod) {
+        const Module = require(this.getModulePath(name))
+        mod = new Module(this, {})
+        this.modules[lName] = mod
     }
 
-    this.modules = {}
-    this.getModuleFiles(modulePath).forEach(file => {
-        delete require.cache[path.resolve(file)]
-    })
-};
+    // TODO make configurable
+    mod.enable()
+
+    return mod
+}
+
+Sekshi.prototype._unloadModule = function (name) {
+    debug('unload', name)
+    const mod = this.getModule(name)
+    if (mod) {
+        mod.destroy()
+    }
+    const file = this.getModulePath(name)
+    delete require.cache[path.resolve(file)]
+    delete this.modules[name.toLowerCase()]
+}

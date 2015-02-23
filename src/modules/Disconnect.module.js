@@ -13,30 +13,32 @@ const Disconnections = mongoose.modelNames().indexOf('Disconnections') === -1
 
 export default class Disconnect extends SekshiModule {
   constructor(sekshi, options) {
-    this.name = 'Disconnect'
     this.author = 'Sooyou'
     this.version = '1.0.0'
-    this.description = 'Provides basic moderation tools'
+    this.description = 'Puts disconnected users back at their original wait list spot.'
 
     super(sekshi, options)
-
-    this.waitlist = []
-    this.dropped = []
 
     this.permissions = {
       dc: sekshi.USERROLE.NONE
     }
 
+    this.Disconnection = Disconnections
+
     this.onWaitlistUpdate = this.onWaitlistUpdate.bind(this)
     this.onUserLeave = this.onUserLeave.bind(this)
-    sekshi.on(sekshi.WAITLIST_UPDATE, this.onWaitlistUpdate)
-    sekshi.on(sekshi.USER_LEAVE, this.onUserLeave)
   }
 
   defaultOptions() {
     return {
       timeLimit: 10 * 60 // minutes
     }
+  }
+
+  init() {
+    this.waitlist = []
+    this.sekshi.on(this.sekshi.WAITLIST_UPDATE, this.onWaitlistUpdate)
+    this.sekshi.on(this.sekshi.USER_LEAVE, this.onUserLeave)
   }
 
   destroy() {

@@ -1,13 +1,13 @@
 const SekshiModule = require('../Module')
+const debug = require('debug')('sekshi:misc')
 const findIndex = require('array-findindex')
 
 export default class Misc extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'Misc'
     this.author = 'Sooyou'
     this.version = '0.2.0'
-    this.description = 'Provides basic moderation tools'
+    this.description = 'Provides miscellaneous tools'
 
     super(sekshi, options)
 

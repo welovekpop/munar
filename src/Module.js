@@ -3,30 +3,33 @@ const assign = require('object-assign')
 export default class Module {
 
   constructor(sekshi, options = {}) {
-    if (typeof this.name !== 'string') {
-      throw new Error('Modules have to have a name')
-    }
-
     this.sekshi = sekshi
     this.options = assign({}, this.defaultOptions(), options)
     this.permissions = {}
 
-    this._enabled = true
+    this._enabled = false
   }
 
   defaultOptions() {
     return {}
   }
 
+  init() {
+  }
   destroy() {
   }
 
   enable() {
-    this._enabled = true
+    if (!this.enabled()) {
+      this._enabled = true
+      this.init()
+    }
   }
   disable() {
-    this.destroy()
-    this._enabled = false
+    if (this.enabled()) {
+      this.destroy()
+      this._enabled = false
+    }
   }
   enabled() {
     return this._enabled

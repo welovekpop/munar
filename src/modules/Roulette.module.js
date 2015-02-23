@@ -6,7 +6,6 @@ const moment = require('moment')
 export default class Roulette extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.name = 'Roulette'
     this.author = 'ReAnna'
     this.version = '0.4.0'
     this.description = 'Runs random raffles for wait list position #1.'
@@ -18,9 +17,6 @@ export default class Roulette extends SekshiModule {
       players: sekshi.USERROLE.NONE,
       roulette: sekshi.USERROLE.MANAGER
     }
-
-    this._running = false
-    this._players = []
   }
 
   defaultOptions() {
@@ -28,6 +24,11 @@ export default class Roulette extends SekshiModule {
       duration: 120
     , minPosition: 6
     }
+  }
+
+  init() {
+    this._running = false
+    this._players = []
   }
 
   destroy() {
