@@ -23,6 +23,7 @@ function Sekshi(args) {
     this.db = mongoose.connect(args.mongo);
 
     this.modules = {};
+    this._availableModules = []
     this.delimiter = args.delimiter || '!';
     this.modulePath = args.modulePath || path.join(__dirname, "modules");
 
@@ -209,9 +210,14 @@ Sekshi.prototype.getModuleFiles = function(modulePath) {
     return modules;
 };
 
-Sekshi.prototype.getAvailableModules = function () {
-    return this.getModuleFiles(this.modulePath)
+Sekshi.prototype.updateAvailableModules = function () {
+    debug('updateAvailableModules')
+    return this._availableModules = this.getModuleFiles(this.modulePath)
         .map(file => file.match(/\/([^\/]+?)\.module\.js$/)[1])
+}
+
+Sekshi.prototype.getAvailableModules = function () {
+    return this._availableModules
 }
 
 Sekshi.prototype.getModulePath = function (name) {
@@ -242,6 +248,7 @@ Sekshi.prototype.enable = function (name) {
 
 Sekshi.prototype.loadModules = function () {
     debug('load all')
+    this.updateAvailableModules()
     this.getAvailableModules().forEach(this._loadModule, this)
 }
 
