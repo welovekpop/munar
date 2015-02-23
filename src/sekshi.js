@@ -23,7 +23,6 @@ function Sekshi(args) {
     this.db = mongoose.connect(args.mongo);
 
     this.modules = {};
-    this.files = new Map()
     this.delimiter = args.delimiter || '!';
     this.modulePath = args.modulePath || path.join(__dirname, "modules");
 
@@ -231,13 +230,13 @@ Sekshi.prototype.disable = function (name) {
     if (mod) {
         mod.disable()
     }
-    this._unloadModule(name)
 }
 
 Sekshi.prototype.enable = function (name) {
     debug('enable', name)
-    if (this.moduleExists(name)) {
-        this._loadModule(name).enable()
+    const mod = this.getModule(name)
+    if (mod) {
+        mod.enable()
     }
 }
 
@@ -254,8 +253,19 @@ Sekshi.prototype.unloadModules = function() {
 }
 
 Sekshi.prototype.reloadModule = function (name) {
+    let mod = this.getModule(name)
+    let enabled = false
+    if (mod) {
+        enabled = mod.enabled()
+        mod = null
+    }
+
     this._unloadModule(name)
     this._loadModule(name)
+
+    if (enabled) {
+        this.getModule(name).enable()
+    }
 }
 
 Sekshi.prototype._loadModule = function (name) {

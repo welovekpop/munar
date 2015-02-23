@@ -25,13 +25,16 @@ export default class System extends SekshiModule {
 
   reloadmodule(user, name) {
     this.sekshi.reloadModule(name)
+    this.sekshi.sendChat(`@${user.username} Reloaded module "${name}".`)
   }
 
   disablemodule(user, name) {
     this.sekshi.disable(name)
+    this.sekshi.sendChat(`@${user.username} Module "${name}" disabled.`)
   }
   enablemodule(user, name) {
     this.sekshi.enable(name)
+    this.sekshi.sendChat(`@${user.username} Module "${name}" enabled.`)
   }
 
   moduleinfo(user, name) {
@@ -56,6 +59,7 @@ export default class System extends SekshiModule {
 
   reloadmodules(user) {
     this.sekshi.reloadModules()
+    this.sekshi.sendChat(`@${user.username} Reloaded all modules.`)
   }
 
   listmodules(user) {
