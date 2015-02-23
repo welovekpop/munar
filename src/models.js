@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 
-export const User = mongoose.model('User', {
+const userSchema = new Schema({
   _id: Number
 , username: String
 , slug: String
@@ -17,6 +17,25 @@ export const User = mongoose.model('User', {
 , visits: { type: Number, default: 1 }
 , karma: { type: Number, default: 1 }
 })
+
+userSchema.static('fromPlugUser', function (plugUser) {
+  const descr = {
+    _id: plugUser.id
+  , username: plugUser.username
+  , slug: plugUser.slug
+  , level: plugUser.level
+  , role: plugUser.role
+  , gRole: plugUser.gRole
+  , joined: new Date(plugUser.joined)
+  , avatar: plugUser.avatarID
+  , badge: plugUser.badge
+  }
+
+  return User.findById(plugUser.id).exec()
+    .then(user => user || User.create(descr))
+})
+
+export const User = mongoose.model('User', userSchema)
 
 const mediaSchema = new Schema({
   author: String

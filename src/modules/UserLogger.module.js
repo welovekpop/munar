@@ -24,27 +24,10 @@ export default class UserLogger extends SekshiModule {
 
   onUserJoin(user) {
     debug('join', `${user.username} (${user.id})`)
-    const descr = {
-      _id: user.id
-    , username: user.username
-    , slug: user.slug
-    , level: user.level
-    , role: user.role
-    , gRole: user.gRole
-    , joined: new Date(user.joined)
-    , avatar: user.avatarID
-    , badge: user.badge
-    , lastVisit: new Date()
-    }
-    User.findById(user.id).exec()
-      .then(user => {
-        if (!user) {
-          debug('new user', descr.username)
-          return User.create(descr)
-        }
-        debug('returning user', user.username)
-        user.set('visits', user.get('visits') + 1)
-        return user.set(descr).save()
-      })
+    User.fromPlugUser(user.id).then(user => {
+      user.set('visits', user.get('visits') + 1)
+      user.set('lastVisit', new Date())
+      return user.save()
+    })
   }
 }

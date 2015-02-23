@@ -72,28 +72,11 @@ export default class UserKarma extends SekshiModule {
     }
 
     debug('karma bump', `${other.username} (${other.id})`)
-    const descr = {
-      _id: other.id
-    , username: other.username
-    , slug: other.slug
-    , level: other.level
-    , role: other.role
-    , gRole: other.gRole
-    , joined: new Date(other.joined)
-    , avatar: other.avatarID
-    , badge: other.badge
-    , lastVisit: new Date()
-    }
-    User.findById(other.id).exec()
-      .then(usar => {
-        if (!usar) {
-          debug ('no one to karma bump')
-          return User.create(descr)
-        }
-        debug('returning user', usar.username)
-        debug('current karma', usar.get('karma'))
-        return usar.set('karma', usar.get('karma') + 1).save()
-      })
+    User.fromPlugUser(other.id).then(target => {
+      if (target) {
+        return target.set('karma', target.get('karma') + 1).save()
+      }
+    })
   }
 
   thump(user, username) {
@@ -115,27 +98,10 @@ export default class UserKarma extends SekshiModule {
     }
 
     debug('karma thump', `${other.username} (${other.id})`)
-    const descr = {
-      _id: other.id
-    , username: other.username
-    , slug: other.slug
-    , level: other.level
-    , role: other.role
-    , gRole: other.gRole
-    , joined: new Date(other.joined)
-    , avatar: other.avatarID
-    , badge: other.badge
-    , lastVisit: new Date()
-    }
-    User.findById(other.id).exec()
-      .then(usar => {
-        if (!usar) {
-          debug ('no one to karma thump')
-          return User.create(descr)
-        }
-        debug('returning user', usar.username)
-        debug('current karma', usar.get('karma'))
-        return usar.set('karma', usar.get('karma') - 1).save()
-      })
+    User.fromPlugUser(other.id).then(target => {
+      if (target) {
+        return target.set('karma', target.get('karma') - 1).save()
+      }
+    })
   }
 }
