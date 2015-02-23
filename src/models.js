@@ -15,6 +15,7 @@ export const User = mongoose.model('User', {
 , badge: String
 , lastVisit: Date
 , visits: { type: Number, default: 1 }
+, karma: { type: Number, default: 1 }
 })
 
 const mediaSchema = new Schema({
