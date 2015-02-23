@@ -8,7 +8,7 @@ export default class UserKarma extends SekshiModule {
   constructor(sekshi, options) {
     this.name = 'User Karma'
     this.author = 'brookiebeast'
-    this.version = '0.1.0'
+    this.version = '0.1.1'
     this.description = 'Keeps track of users\' earned internet points.'
 
     super(sekshi, options)
@@ -72,7 +72,7 @@ export default class UserKarma extends SekshiModule {
     }
 
     debug('karma bump', `${other.username} (${other.id})`)
-    User.fromPlugUser(other.id).then(target => {
+    User.fromPlugUser(other).then(target => {
       if (target) {
         return target.set('karma', target.get('karma') + 1).save()
       }
@@ -98,7 +98,7 @@ export default class UserKarma extends SekshiModule {
     }
 
     debug('karma thump', `${other.username} (${other.id})`)
-    User.fromPlugUser(other.id).then(target => {
+    User.fromPlugUser(other).then(target => {
       if (target) {
         return target.set('karma', target.get('karma') - 1).save()
       }
