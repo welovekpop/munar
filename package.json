@@ -1,7 +1,7 @@
 {
   "name": "sekshi",
   "description": "sekshi is a BOT system developed for We <3 KPOP",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "main": "lib/sekshi",
   "author": "Sooyou",
   "homepage": "xn--xck.moe",
@@ -12,7 +12,7 @@
     "moment": "^2.9.0",
     "mongoose": "*",
     "object-assign": "^2.0.0",
-    "plugged": "*",
+    "plugged": "PlugLynn/plugged#edits",
     "promise": "^6.1.0",
     "snoocore": "*",
     "unescape": "^0.1.1",
