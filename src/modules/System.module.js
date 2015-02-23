@@ -6,7 +6,7 @@ export default class System extends SekshiModule {
   constructor(sekshi, options) {
     this.name = 'System'
     this.author = 'Sooyou'
-    this.version = '0.11.0'
+    this.version = '0.11.1'
     this.description = 'Simple tools for module management & system information'
 
     super(sekshi, options)
@@ -20,7 +20,6 @@ export default class System extends SekshiModule {
       exit: sekshi.USERROLE.MANAGER
     }
   }
-
 
   moduleinfo(user, modulename) {
     if(!modulename || modulename.length === 0) {
@@ -47,11 +46,12 @@ export default class System extends SekshiModule {
   }
 
   listmodules(user) {
-    this.sekshi.sendChat(
-      this.sekshi.modules.map(
-        mod => `:${mod.enabled ? 'white_check_mark' : 'small_red_triangle'}: ${mod.module.name}`
-      ).join(' ')
-    )
+    let text = []
+    for (let name in this.sekshi.modules) if (this.sekshi.modules.hasOwnProperty(name)) {
+      let mod = this.sekshi.modules[name]
+      text.push(`${mod.name} ${mod.enabled() ? '✔' : '✘'}`)
+    }
+    this.sekshi.sendChat(text.sort().join(', '), 20 * 1000)
   }
 
   togglemodule(user, modulename) {
