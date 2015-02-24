@@ -162,7 +162,9 @@ Sekshi.prototype.onMessage = function(msg) {
         for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
             let mod = this.modules[name]
             if (mod.enabled() && typeof mod[func] === 'function' && mod.permissions.hasOwnProperty(func)) {
-                this.deleteMessage(msg.cid)
+                if (mod.ninjaVanish.indexOf(func) !== -1) {
+                    this.deleteMessage(msg.cid)
+                }
                 if (user.role >= mod.permissions[func]) {
                     mod[func](...args)
                 }
