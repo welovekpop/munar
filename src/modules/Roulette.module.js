@@ -7,7 +7,7 @@ export default class Roulette extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.4.0'
+    this.version = '0.4.1'
     this.description = 'Runs random raffles for wait list position #1.'
 
     super(sekshi, options)
@@ -78,7 +78,7 @@ export default class Roulette extends SekshiModule {
     this._timer = null
     var winner = this._players[Math.floor(Math.random() * this._players.length)]
     debug('winner', winner.username)
-    this.sekshi.sendChat(`Roulette winner: @${winner.username}. Congratulations!`)
+    this.sekshi.sendChat(`Roulette winner: @${winner.username}. Congratulations! https://i.imgur.com/TXKz7mt.gif`)
     this.sekshi.moveDJ(winner.id, 0, () => {
       debug('winner moved')
     })
