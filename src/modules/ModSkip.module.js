@@ -20,7 +20,7 @@ export default class ModSkip extends SekshiModule {
     return {
       reasons: {
         kpop: 'This is a Korean music dedicated room, please only play music by Korean artists.',
-        history: 'This song is in the history. Please pick another.',
+        history: 'This song is in the history. Please play a different one.',
         duration: 'This song is too long. Please pick a shorter one.'
       },
       lockskipPos: 1
