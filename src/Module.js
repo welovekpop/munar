@@ -6,6 +6,7 @@ export default class Module {
     this.sekshi = sekshi
     this.options = assign({}, this.defaultOptions(), options)
     this.permissions = {}
+    this.ninjaVanish = []
 
     this._enabled = false
   }
