@@ -167,7 +167,7 @@ Sekshi.prototype.reloadModules = function () {
 
 Sekshi.prototype.lockskipDJ = function (id, position, cb) {
     this.skipDJ(id, e => {
-        if (e) cb(e)
+        if (e) cb && cb(e)
         else this.moveDJ(id, position, cb)
     })
 }
