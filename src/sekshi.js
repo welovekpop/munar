@@ -1,38 +1,63 @@
 const Plugged = require('plugged')
 const path = require('path')
-const util = require('util')
+const { inherits } = require('util')
 const fs = require('fs')
 const debug = require('debug')('sekshi:sekshi')
 const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const find = require('array-find')
-
-const unescape = require('unescape')
+const _unescape = require('./_unescape')
 
 module.exports = Sekshi
 
 function Sekshi(args) {
-    Sekshi.super_.call(this);
+    Sekshi.super_.call(this)
 
-    this.invokeLogger(function(msg, verbosity, color) {
+    this.invokeLogger((msg, verbosity, color) => {
         debug(msg)
-    });
+    })
 
     this.options = args
 
     this.db = mongoose.connect(args.mongo);
 
-    this.modules = {};
+    this.modules = {}
     this._availableModules = []
-    this.delimiter = args.delimiter || '!';
-    this.modulePath = args.modulePath || path.join(__dirname, "modules");
+    this.delimiter = args.delimiter || '!'
+    this.modulePath = args.modulePath || path.join(__dirname, 'modules')
 
     this._room = args.room
 
     this.onMessage = this.onMessage.bind(this)
+
+    this.addUnescapeListeners()
 }
 
-util.inherits(Sekshi, Plugged);
+inherits(Sekshi, Plugged)
+
+// ugly hack to deal with plug.dj's mildly insane html escaping behaviour
+Sekshi.prototype.addUnescapeListeners = function () {
+    const unescapeUser = user => {
+        user.username = _unescape(user.username)
+        user.blurb && (user.blurb = _unescape(user.blurb))
+    }
+
+    // these handlers are added before any other handlers,
+    // hopefully EventEmitter will always fire them in
+    // that same order!
+    this.on(this.USER_JOIN, unescapeUser)
+    this.on(this.ADVANCE, ({}, { media }) => {
+        media.author = _unescape(media.author)
+        media.title = _unescape(media.title)
+    })
+    this.on(this.CHAT, chat => {
+        chat.username = _unescape(chat.username)
+        chat.message = _unescape(chat.message)
+    })
+    this.on(this.JOINED_ROOM, () => {
+        this.state.room.users.forEach(unescapeUser)
+    })
+}
 
 Sekshi.prototype.start = function (credentials) {
     try {
@@ -129,14 +154,6 @@ Sekshi.prototype.lockskipDJ = function (id, position, cb) {
         if (e) cb(e)
         else this.moveDJ(id, position, cb)
     })
-}
-
-// this might be a bit brittle
-// it's to handle users with fancy chars in their names, but this does mean that
-// if we actually try to send &amp;, it will come out as & instead
-// TODO maybe fix this in SooYou/plugged?
-Sekshi.prototype.sendChat = function (data) {
-    return Sekshi.super_.prototype.sendChat.call(this, unescape(data))
 }
 
 Sekshi.prototype.onMessage = function(msg) {
