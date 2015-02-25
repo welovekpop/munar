@@ -79,7 +79,24 @@ export default class Emotes extends SekshiModule {
   emotes({ username }) {
     debug('listing emotes')
     Emote.find({}).exec().then(
-      emotes => { this.sekshi.sendChat(`@${username} Emotes: ${emotes.map(e => e.id).join(', ')}`, 20 * 1000) },
+      emotes => {
+        const MSG_INTERVAL = 600
+        let message = `@${username} Emotes: `
+        let messages = []
+        debug('got emotes', emotes.length)
+        emotes.forEach(e => {
+          if (message.length + e.id.length > 250) {
+            messages.push(message)
+            message = ''
+          }
+          message += e.id + ', '
+        })
+        messages.push(message.substr(0, message.length - 2))
+        debug('sending messages', messages.length)
+        messages.forEach((msg, i) => {
+          setTimeout(() => { this.sekshi.sendChat(msg, 20 * 1000 - i * MSG_INTERVAL) }, i * MSG_INTERVAL)
+        })
+      },
       err => { debug('error', err) }
     )
   }
