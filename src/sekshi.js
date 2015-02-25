@@ -59,6 +59,22 @@ Sekshi.prototype.addUnescapeListeners = function () {
     })
 }
 
+// Override Plugged#getUserByName with a case insensitive version
+Sekshi.prototype.getUserByName = function (username, checkCache = false) {
+    username = username.toLowerCase()
+
+    if (username === this.state.self.username.toLowerCase())
+        return this.state.self
+
+    let user = find(this.state.room.users, user => user.username.toLowerCase() === username)
+
+    if (checkCache && !user) {
+        user = find(this.state.usercache, user => user.username.toLowerCase() === username)
+    }
+
+    return user || null
+}
+
 Sekshi.prototype.start = function (credentials) {
     try {
         this.login(credentials);
