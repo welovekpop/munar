@@ -80,3 +80,9 @@ export const Vote = mongoose.model('Vote', {
 , history: { type: String, ref: 'HistoryEntry' }
 , time: { type: Date, default: Date.now }
 })
+
+export const Grab = mongoose.model('Grab', {
+  user: { type: Number, ref: 'User' }
+, history: { type: String, ref: 'HistoryEntry' }
+, time: { type: Date, default: Date.now }
+})

@@ -87,7 +87,7 @@ export default class HistoryLogger extends SekshiModule {
         { direction: direction, time: Date.now() },
         { upsert: true }
       ).exec().then(
-        vote => { debug('saved vote', `${id} – ${direction}`) },
+        vote => { debug('saved vote', id, direction) },
         err  => { debug('vote-err', err) }
       )
     }
@@ -95,8 +95,15 @@ export default class HistoryLogger extends SekshiModule {
 
   onGrab(uid) {
     debug('grab', uid)
-    if (this._currentEntry) {
-      // todo
+    if (this._currentEntry && this._grabs.indexOf(uid) === -1) {
+      this._grabs.push(uid);
+      Grab.create({
+        history: this._currentEntry.id,
+        user: uid
+      }).then(
+        grab => { debug('saved grab', uid) },
+        err  => { debug('grab-err', err) }
+      )
     }
   }
 }
