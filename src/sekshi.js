@@ -6,7 +6,7 @@ const debug = require('debug')('sekshi:sekshi')
 const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const find = require('array-find')
-const _unescape = require('./_unescape')
+const unescape = require('ent/decode')
 
 module.exports = Sekshi
 
@@ -38,8 +38,8 @@ inherits(Sekshi, Plugged)
 // ugly hack to deal with plug.dj's mildly insane html escaping behaviour
 Sekshi.prototype.addUnescapeListeners = function () {
     const unescapeUser = user => {
-        user.username = _unescape(user.username)
-        user.blurb && (user.blurb = _unescape(user.blurb))
+        user.username = unescape(user.username)
+        user.blurb && (user.blurb = unescape(user.blurb))
     }
 
     // these handlers are added before any other handlers,
@@ -47,12 +47,12 @@ Sekshi.prototype.addUnescapeListeners = function () {
     // that same order!
     this.on(this.USER_JOIN, unescapeUser)
     this.on(this.ADVANCE, ({}, { media }) => {
-        media.author = _unescape(media.author)
-        media.title = _unescape(media.title)
+        media.author = unescape(media.author)
+        media.title = unescape(media.title)
     })
     this.on(this.CHAT, chat => {
-        chat.username = _unescape(chat.username)
-        chat.message = _unescape(chat.message)
+        chat.username = unescape(chat.username)
+        chat.message = unescape(chat.message)
     })
     this.on(this.JOINED_ROOM, () => {
         this.state.room.users.forEach(unescapeUser)
