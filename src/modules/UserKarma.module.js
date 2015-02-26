@@ -23,7 +23,7 @@ export default class UserKarma extends SekshiModule {
     if (username && username.charAt(0) === '@') username = username.slice(1)
     if (username) {
       // let other = this.sekshi.getUserByName(username, true)
-      User.findOne({ name: username }).exec()
+      User.findOne({ username }).exec()
       .then(usar => {
         if (!usar) {
           debug('No one to Karma')
@@ -51,7 +51,7 @@ export default class UserKarma extends SekshiModule {
     }
   }
 
-  bump(user, username, reason) {
+  bump(user, username, ...reason) {
     if (!username) {
       debug('karma bump no username')
       this.sekshi.sendChat(`@${user.username} You must provide a user to bump`)
@@ -74,7 +74,7 @@ export default class UserKarma extends SekshiModule {
     User.fromPlugUser(other).then(target => {
       if (target) {
         if (reason) {
-          this.sekshi.sendChat(`@${user.username} bumped @${other.username}\'s karma ${reason}`)
+          this.sekshi.sendChat(`@${user.username} bumped @${other.username}\'s karma ${reason.join(' ')}`)
         } else {
           this.sekshi.sendChat(`@${user.username} bumped @${other.username}\'s karma!`)
         }
@@ -83,7 +83,7 @@ export default class UserKarma extends SekshiModule {
     })
   }
 
-  thump(user, username, reason) {
+  thump(user, username, ...reason) {
     if (!username) {
       debug('karma thump no username')
       this.sekshi.sendChat(`@${user.username} You must provide a user to thump`)
@@ -105,7 +105,7 @@ export default class UserKarma extends SekshiModule {
     User.fromPlugUser(other).then(target => {
       if (target) {
         if (reason) {
-          this.sekshi.sendChat(`@${user.username} thumped @${other.username}\'s karma ${reason}`)
+          this.sekshi.sendChat(`@${user.username} thumped @${other.username}\'s karma ${reason.join(' ')}`)
         } else {
           this.sekshi.sendChat(`@${user.username} thumped @${other.username}\'s karma!`)
         }
