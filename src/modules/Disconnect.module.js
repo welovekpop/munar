@@ -31,7 +31,7 @@ export default class Disconnect extends SekshiModule {
 
   defaultOptions() {
     return {
-      timeLimit: 10 * 60 // minutes
+      timeLimit: 2 * 60 // minutes
     }
   }
 
@@ -78,7 +78,7 @@ export default class Disconnect extends SekshiModule {
           const limit = moment().subtract(this.options.timeLimit, 'minutes')
           const maxDuration = moment.duration(this.options.timeLimit, 'minutes').humanize()
           if (time.isBefore(limit)) {
-            this.sekshi.sendChat(`@${user.username} Your last disconnect was too long (${time.fromNow(true)}) ago. Disconnects are only valid for ${maxDuration}.`)
+            this.sekshi.sendChat(`@${user.username} Your last disconnect was too long ago (${time.fromNow(true)}). Disconnects are only valid for ${maxDuration}.`)
             return
           }
           this.sekshi.sendChat(`:white_check_mark: @${user.username} disconnected ${time.fromNow()} ` +

@@ -26,7 +26,7 @@ export default class Links extends SekshiModule {
   }
 
   gh() {
-    this.sekshi.sendChat('SekshiBot is open source! Check https://github.com/welovekpop for more :)')
+    this.sekshi.sendChat('SekshiBot is on Github! Check out https://github.com/welovekpop for code and goodies :)')
   }
 
 }
