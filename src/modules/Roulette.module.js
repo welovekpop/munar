@@ -15,6 +15,7 @@ export default class Roulette extends SekshiModule {
     this.permissions = {
       play: sekshi.USERROLE.NONE,
       players: sekshi.USERROLE.NONE,
+      lastplayed: sekshi.USERROLE.BOUNCER,
       roulette: sekshi.USERROLE.MANAGER
     }
 
@@ -31,6 +32,7 @@ export default class Roulette extends SekshiModule {
   init() {
     this._running = false
     this._players = []
+    this._lastPlayed = false
   }
 
   destroy() {
@@ -47,6 +49,8 @@ export default class Roulette extends SekshiModule {
     this._timer = setTimeout(this.onEnd.bind(this), this.options.duration * 1000)
     const duration = moment.duration(this.options.duration, 'seconds')
     this.sekshi.sendChat(`@djs ${user.username} started Roulette! Type "!play" (without quotes) to join. You have ${duration.humanize()}!`)
+
+    this._lastPlayed = moment()
   }
 
   play(user) {
@@ -73,6 +77,15 @@ export default class Roulette extends SekshiModule {
     debug('players', this._players.length)
     this.sekshi.sendChat('Roulette players: ' +
                          this._players.map(user => user.username).join(' | '))
+  }
+
+  lastplayed(user) {
+    if (this._lastPlayed) {
+      this.sekshi.sendChat(`@${user.username} The last roulette was started ${this._lastPlayed.calendar()} (${this._lastPlayed.fromNow()}).`)
+    }
+    else {
+      this.sekshi.sendChat(`@${user.username} I don't remember playing roulette!`)
+    }
   }
 
   onEnd() {
