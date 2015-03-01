@@ -1,25 +1,66 @@
 const os = require('os')
 const SekshiModule = require('../Module')
+const { exec } = require('child_process')
+const debug = require('debug')('sekshi:system')
+const request = require('request')
+const fs = require('fs')
 
 export default class System extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'Sooyou'
-    this.version = '0.11.1'
+    this.version = '0.12.0'
     this.description = 'Simple tools for module management & system information'
 
     super(sekshi, options)
 
     this.permissions = {
       sysinfo: sekshi.USERROLE.COHOST,
+      githubfetch: sekshi.USERROLE.COHOST,
+      togglemodule: sekshi.USERROLE.COHOST, // deprecated
+      reloadmodules: sekshi.USERROLE.COHOST, // deprecated
       moduleinfo: sekshi.USERROLE.MANAGER,
       listmodules: sekshi.USERROLE.MANAGER,
-      togglemodule: sekshi.USERROLE.COHOST,
-      reloadmodules: sekshi.USERROLE.COHOST,
       reloadmodule: sekshi.USERROLE.MANAGER,
       enablemodule: sekshi.USERROLE.MANAGER,
       disablemodule: sekshi.USERROLE.MANAGER,
       exit: sekshi.USERROLE.MANAGER
+    }
+  }
+
+  githubfetch(user) {
+    const sekshi = this.sekshi
+
+    exec(`git pull`, (e, stdout, stderr) => {
+      if (e) {
+        debug('git pull-err', e)
+        sendDebug(stderr)
+      }
+      else {
+        exec(`npm run-script babel`, (e, stdout, stderr) => {
+          if (e) {
+            debug('babel-err', e)
+            sendDebug(stderr)
+          }
+          else {
+            sekshi.sendChat(`@${user.username} Updated!`)
+          }
+        })
+      }
+    })
+    function sendDebug(stderr) {
+      request.post('http://hastebin.com/documents', { body: stderr }, (e, _, body) => {
+        if (!e) {
+          body = JSON.parse(body)
+          console.log(body)
+          sekshi.sendChat(`@${user.username} Something went wrong while updating from Github. ` +
+                          `See http://hastebin.com/${body.key}.txt for more.`)
+        }
+        else {
+          sekshi.sendChat(`@${user.username} Whoops! Something went wrong, and I couldn't post debug `
+                          `information to hastebin. Please check the logs manually!`)
+        }
+      })
     }
   }
 
