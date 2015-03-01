@@ -31,7 +31,8 @@ export default class HistorySkip extends SekshiModule {
   onAdvance(booth, { media }) {
     this.sekshi.getRoomHistory((e, history) => {
       if (e) return debug('error loading history', e)
-      if (history.some(item => item.media.format === media.format && item.media.cid === media.cid)) {
+      if (history.slice(0, this.options.limit)
+                 .some(item => item.media.format === media.format && item.media.cid === media.cid)) {
         let dj = this.sekshi.getCurrentDJ()
         this.sekshi.onMessage({
           id: 'sekshi',
