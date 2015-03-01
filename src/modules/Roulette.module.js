@@ -7,7 +7,7 @@ export default class Roulette extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.4.1'
+    this.version = '0.4.2'
     this.description = 'Runs random raffles for wait list position #1.'
 
     super(sekshi, options)
@@ -15,7 +15,7 @@ export default class Roulette extends SekshiModule {
     this.permissions = {
       play: sekshi.USERROLE.NONE,
       players: sekshi.USERROLE.NONE,
-      lastplayed: sekshi.USERROLE.BOUNCER,
+      lastroulette: sekshi.USERROLE.BOUNCER,
       roulette: sekshi.USERROLE.MANAGER
     }
 
@@ -79,7 +79,7 @@ export default class Roulette extends SekshiModule {
                          this._players.map(user => user.username).join(' | '))
   }
 
-  lastplayed(user) {
+  lastroulette(user) {
     if (this._lastPlayed) {
       this.sekshi.sendChat(`@${user.username} The last roulette was started ${this._lastPlayed.calendar()} (${this._lastPlayed.fromNow()}).`)
     }
