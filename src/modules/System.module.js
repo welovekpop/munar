@@ -5,7 +5,7 @@ export default class System extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'Sooyou'
-    this.version = '0.11.1'
+    this.version = '0.12.0'
     this.description = 'Simple tools for module management & system information'
 
     super(sekshi, options)
@@ -29,8 +29,13 @@ export default class System extends SekshiModule {
   }
 
   disablemodule(user, name) {
-    this.sekshi.disable(name)
-    this.sekshi.sendChat(`@${user.username} Module "${name}" disabled.`)
+    if (name.toLowerCase() === 'system') {
+      this.sekshi.sendChat(`@${user.username} Cannot disable the System module.`)
+    }
+    else {
+      this.sekshi.disable(name)
+      this.sekshi.sendChat(`@${user.username} Module "${name}" disabled.`)
+    }
   }
   enablemodule(user, name) {
     this.sekshi.enable(name)
@@ -45,15 +50,15 @@ export default class System extends SekshiModule {
 
     const mod = this.sekshi.getModule(name)
     if (mod) {
-      this.sekshi.sendChat(
-        `:${mod.enabled() ? 'small_blue_diamond' : 'small_red_triangle'}: Module info for "${name}" ` +
-        `:white_small_square: Version: ${mod.version} ` +
-        `:white_small_square: Author: ${mod.author} ` +
-        `:white_small_square: Description: ${mod.description}`
-      )
+      [ `:small_blue_diamond: Module info for "${name}"`,
+        `:white_small_square: Status: ${mod.enabled() ? 'enabled' : 'disabled'}`,
+        `:white_small_square: Version: ${mod.version}`,
+        `:white_small_square: Author: ${mod.author}`,
+        `:white_small_square: Description: ${mod.description}`,
+      ].forEach(this.sekshi.sendChat, this.sekshi)
     }
     else {
-      this.sekshi.sendChat(`Module "${name}" does not exist.`);
+      this.sekshi.sendChat(`@${user.username} Module "${name}" does not exist.`);
     }
   }
 
@@ -98,7 +103,7 @@ export default class System extends SekshiModule {
   }
 
   exit(user) {
-    this.sekshi.unloadModules()
-    process.exit(0)
+    this.sekshi.sendChat(`@${user.username} okay... </3 T_T`)
+    this.sekshi.stop()
   }
 }
