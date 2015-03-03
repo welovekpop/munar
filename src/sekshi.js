@@ -121,44 +121,70 @@ Sekshi.prototype.setRoom = function(room) {
     this.connect(this._room)
 }
 
+// Parses space-separated chat command arguments.
+// single words become single arguments.
+//    word → [ 'word ']
+// strings surrounded by double quotes become single arguments.
+//    "quoted words" word → [ 'quoted words', 'word' ]
+// strings prefixed with "@" are matched to the online user list.
+// if any online user's name matches the string, it will be passed instead.
+// this is so that you don't need quotes around usernames with spaces.
+//    @Online User parameter @Offline User → [ 'Online User', 'parameter', '@Offline', 'User' ]
+//
+// feature-bugs:
+// if you forget to close a quoted string it will go until the end of the line (might be unexpected)
+// if you forget to add a space after a quoted string, the rest will be read as a separate parameter
 Sekshi.prototype.parseArguments = function (str = '') {
-    var args = [];
-    var length = str.length;
-    var compound = false;       //quoted?
-    var sarg = false;           //started argument?
-    var sidx = 0;               //start index
-    var cidx = 0;               //current index
+    let args = []
+    let i = 0
+    let chunk
 
-    // rule1: every non quoted word is a single argument
-    // rule2: quoted words are meant to be a single argument
-    while (cidx < length) {
-        if (!sarg && str[cidx] !== ' ') {
+    let usernames = str.indexOf('@') !== -1 // might contain a username
+        ? [ this.getSelf(), ...this.getUsers() ].map(u => u.username)
+        : []
 
-            if (str[cidx] === '"') {
-                sidx = ++cidx;
-                compound = true;
-            } else {
-                sidx = cidx;
-            }
-
-            sarg = true;
-        } else if (sarg && !compound && str[cidx] === ' ') {
-            args.push(str.slice(sidx, cidx));
-            sarg = false;
-        } else if (sarg && compound && str[cidx] === '"') {
-            args.push(str.slice(sidx, cidx));
-            compound = false;
-            sarg = false;
+    while (chunk = str.slice(i)) {
+        // separator
+        if (chunk.charAt(0) === ' ') {
+            i++
+            continue
         }
-
-        cidx++;
+        // quoted string
+        else if (chunk.charAt(0) === '"') {
+            let end = chunk.indexOf('"', 1)
+            // end of param string
+            if (end === -1) {
+                args.push(chunk.slice(1))
+                break
+            }
+            args.push(chunk.slice(1, end))
+            i += end + 1
+            continue
+        }
+        // possible username
+        else if (chunk.charAt(0) === '@') {
+            let username = find(usernames,
+                                name => chunk.slice(1, name.length + 1).toLowerCase() === name.toLowerCase())
+            if (username) {
+                args.push(username)
+                i += `@${username}`.length
+                continue
+            }
+        }
+        // single parameter word
+        let end = chunk.indexOf(' ')
+        // end of param string
+        if (end === -1) {
+            args.push(chunk)
+            break
+        }
+        args.push(chunk.slice(0, end))
+        i += end + 1
+        continue
     }
 
-    if (sarg)
-        args.push(str.slice(sidx, cidx));
-
     return args
-};
+}
 
 Sekshi.prototype.reloadModules = function () {
     this.unloadModules()
