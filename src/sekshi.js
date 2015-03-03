@@ -104,12 +104,22 @@ Sekshi.prototype.start = function (credentials) {
     });
 }
 
-Sekshi.prototype.stop = function () {
-    this.unloadModules(this.modulePath);
+Sekshi.prototype.stop = function (cb) {
+    this.unloadModules(this.modulePath)
 
-    this.logout(() => {
-        this.removeListener(this.CHAT, this.onMessage);
-    });
+    this.logout()
+    // should *probably* also wait for this before callback-ing
+    mongoose.disconnect()
+
+    this.once(this.LOGOUT_SUCCESS, () => {
+        this.removeAllListeners()
+        cb()
+    })
+    this.once(this.LOGOUT_ERROR, e => {
+        // might have to close some other stuff here too
+        this.removeAllListeners()
+        cb(e)
+    })
 }
 
 Sekshi.prototype.setDelimiter = function (delimiter) {
