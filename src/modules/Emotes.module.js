@@ -30,6 +30,8 @@ export default class Emotes extends SekshiModule {
       e: sekshi.USERROLE.NONE
     }
 
+    this.ninjaVanish = [ 'addemote' ]
+
     this.Emote = Emote
   }
 
