@@ -215,7 +215,7 @@ Sekshi.prototype.onMessage = function(msg) {
 
         let args = this.parseArguments(msg.message)
 
-        func = args.shift().replace(this.delimiter, '')
+        func = args.shift().replace(this.delimiter, '').toLowerCase()
         args.unshift(user)
 
         for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
