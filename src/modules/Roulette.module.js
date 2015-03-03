@@ -16,7 +16,7 @@ export default class Roulette extends SekshiModule {
       play: sekshi.USERROLE.NONE,
       players: sekshi.USERROLE.NONE,
       lastroulette: sekshi.USERROLE.BOUNCER,
-      roulette: sekshi.USERROLE.MANAGER
+      roulette: sekshi.USERROLE.BOUNCER
     }
 
     this.ninjaVanish = [ 'play' ]
