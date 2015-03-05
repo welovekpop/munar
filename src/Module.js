@@ -36,4 +36,16 @@ export default class Module {
     return this._enabled
   }
 
+  getOption(name) {
+    return this.options[name]
+  }
+  setOption(name, value) {
+    if (name in this.options) {
+      this.options[name] = value
+    }
+  }
+  getOptions() {
+    return this.options
+  }
+
 }
