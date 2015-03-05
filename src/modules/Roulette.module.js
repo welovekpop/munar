@@ -7,7 +7,7 @@ export default class Roulette extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.5.0'
+    this.version = '0.5.1'
     this.description = 'Runs random raffles for wait list position #1.'
 
     super(sekshi, options)
@@ -50,7 +50,7 @@ export default class Roulette extends SekshiModule {
     this._timer = setTimeout(this.onEnd.bind(this), this.options.duration * 1000)
     const duration = moment.duration(this.options.duration, 'seconds')
     this.sekshi.sendChat(`@djs ${user.username} started Roulette! ` +
-                         `The winner will be moved to spot ${this.options.winnerPosition - 1} in the wait list.` +
+                         `The winner will be moved to spot ${this.options.winnerPosition} in the wait list.` +
                          ` Type "!play" (without quotes) to join. You have ${duration.humanize()}!`)
 
     this._lastPlayed = moment()
