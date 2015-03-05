@@ -8,7 +8,7 @@ export default class Config extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '1.0.0'
+    this.version = '1.1.0'
     this.description = 'Keeps module configuration.'
 
     super(sekshi, options)
@@ -20,6 +20,7 @@ export default class Config extends SekshiModule {
     }
 
     this.onModuleLoaded = this.onModuleLoaded.bind(this)
+    this.onModuleUnloaded = this.onModuleUnloaded.bind(this)
   }
 
   defaultOptions() {
@@ -32,14 +33,19 @@ export default class Config extends SekshiModule {
     this._createConfigDir()
 
     this.sekshi.on('moduleloaded', this.onModuleLoaded)
+    this.sekshi.on('moduleunloaded', this.onModuleUnloaded)
   }
   destroy() {
     this.sekshi.removeListener('moduleloaded', this.onModuleLoaded)
+    this.sekshi.removeListener('moduleunloaded', this.onModuleUnloaded)
   }
 
   onModuleLoaded(mod, name) {
     // best parameter order?!
-    this._load(name, mod)
+    this._load(name.toLowerCase(), mod)
+  }
+  onModuleUnloaded(mod, name) {
+    this._save(name.toLowerCase(), mod)
   }
 
   _dir() {
