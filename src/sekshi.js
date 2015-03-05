@@ -5,6 +5,8 @@ const fs = require('fs')
 const debug = require('debug')('sekshi:sekshi')
 const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
+const Promise = require('promise')
+const { User } = require('./models')
 const find = require('array-find')
 const unescape = require('ent/decode')
 
@@ -101,6 +103,9 @@ Sekshi.prototype.start = function (credentials) {
             console.error(err.message);
             process.exit(1);
         }
+
+        Promise.all(this.getUsers().map(user => User.fromPlugUser(user)))
+            .then(users => { debug('updated users', users.length) })
     });
 }
 
