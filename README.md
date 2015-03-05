@@ -1,5 +1,7 @@
 # SekshiBot
-Plug.dj room bot for WE ♥ KPOP
+Modular plug.dj room bot for [WE ♥ KPOP](https://plug.dj/loves-kpop).
+
+![SekshiBot](https://i.imgur.com/NzTEsiU.png)
 
 ## Installation
 
