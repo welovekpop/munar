@@ -109,10 +109,11 @@ Sekshi.prototype.start = function (credentials) {
     });
 }
 
-Sekshi.prototype.stop = function () {
-    this.unloadModules(this.modulePath);
+Sekshi.prototype.stop = function (cb) {
+    this.unloadModules()
 
-    this.logout(() => {
+    this.logout()
+    this.once(this.LOGOUT_SUCCESS, () => {
         this.removeListener(this.CHAT, this.onMessage);
     });
 }
@@ -354,10 +355,15 @@ Sekshi.prototype._loadModule = function (name) {
     // TODO make configurable
     mod.enable()
 
+    // the event is fired on nextTick so modules can simply listen for "moduleloaded"
+    // and get events for *all* the modules when loadModules() is called, even for those
+    // that register earlier
+    process.nextTick(() => { this.emit('moduleloaded', mod, lName) })
+
     return mod
 }
 
-Sekshi.prototype._unloadModule = function (name) {
+Sekshi.prototype._unloadModule = function (name, fireEvent = true) {
     debug('unload', name)
     const mod = this.getModule(name)
     if (mod) {
@@ -366,4 +372,6 @@ Sekshi.prototype._unloadModule = function (name) {
     const file = this.getModulePath(name)
     delete require.cache[path.resolve(file)]
     delete this.modules[name.toLowerCase()]
+
+    process.nextTick(() => { this.emit('moduleunloaded', mod, name.toLowerCase()) })
 }
