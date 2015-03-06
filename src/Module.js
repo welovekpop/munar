@@ -1,4 +1,5 @@
 const assign = require('object-assign')
+const find = require('array-find')
 
 export default class Module {
 
@@ -36,12 +37,18 @@ export default class Module {
     return this._enabled
   }
 
+  _getOptionName(name) {
+    const names = Object.keys(this.options)
+    const lname = name.toLowerCase()
+    return find(names, n => n.toLowerCase() == lname) || name
+  }
   getOption(name) {
-    return this.options[name]
+    return this.options[this._getOptionName(name)]
   }
   setOption(name, value) {
-    if (name in this.options) {
-      this.options[name] = value
+    const oname = this._getOptionName(name)
+    if (oname in this.options) {
+      this.options[oname] = value
     }
   }
   getOptions() {
