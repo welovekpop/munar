@@ -5,7 +5,7 @@ export default class ModSkip extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.2.0'
+    this.version = '0.2.1'
     this.description = 'Simple DJ skipping tools'
 
     super(sekshi, options)
@@ -21,7 +21,10 @@ export default class ModSkip extends SekshiModule {
       reasons: {
         kpop: 'This is a Korean music dedicated room, please only play music by Korean artists.',
         history: 'This song is in the history. Please play a different one.',
-        duration: 'This song is too long. Please pick a shorter one.'
+        duration: 'This song is too long. Please pick a shorter one.',
+        quality: 'The audio quality of this song is less than ideal. Please pick a better quality one.',
+        outro: 'Skipping the rest of this song!',
+        op: 'This song has been played a lot recently. Please play a different one.'
       },
       lockskipPos: 1
     }
