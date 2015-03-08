@@ -14,7 +14,7 @@
     "moment": "^2.9.0",
     "mongoose": "*",
     "object-assign": "^2.0.0",
-    "plugged": "PlugLynn/plugged#edits",
+    "plugged": "welovekpop/plugged#edits",
     "promise": "^6.1.0",
     "snoocore": "*",
     "unescape": "^0.1.1",
