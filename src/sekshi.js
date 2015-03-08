@@ -113,9 +113,18 @@ Sekshi.prototype.stop = function (cb) {
     this.unloadModules()
 
     this.logout()
+    // should *probably* also wait for this before callback-ing
+    mongoose.disconnect()
+
     this.once(this.LOGOUT_SUCCESS, () => {
-        this.removeListener(this.CHAT, this.onMessage);
-    });
+        this.removeAllListeners()
+        cb()
+    })
+    this.once(this.LOGOUT_ERROR, e => {
+        // might have to close some other stuff here too
+        this.removeAllListeners()
+        cb(e)
+    })
 }
 
 Sekshi.prototype.setDelimiter = function (delimiter) {
