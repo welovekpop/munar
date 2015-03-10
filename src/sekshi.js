@@ -12,6 +12,12 @@ const unescape = require('ent/decode')
 
 module.exports = Sekshi
 
+// these are fine-tuned to fit pretty much exactly within plug.dj's rate limiting scheme,
+// while also being really simple
+const CHAT_INTERVAL = 150
+const CHAT_BACKOFF_INC = 60
+const CHAT_BACKOFF_MAX = 700
+
 function Sekshi(args) {
     Sekshi.super_.call(this)
 
@@ -33,6 +39,11 @@ function Sekshi(args) {
     this.onMessage = this.onMessage.bind(this)
 
     this.addUnescapeListeners()
+
+    this._chatQueue = []
+    this._lastMessage = 0
+    this._chatTimer = false
+    this._chatBackoff = CHAT_INTERVAL
 }
 
 inherits(Sekshi, Plugged)
@@ -75,6 +86,37 @@ Sekshi.prototype.getUserByName = function (username, checkCache = false) {
     }
 
     return user || null
+}
+
+Sekshi.prototype.sendChat = function (message, autodelete) {
+    const MAX_LENGTH = 256
+    while (message.length >= MAX_LENGTH) {
+        this._chatQueue.push([ message.slice(0, MAX_LENGTH), autodelete ])
+        message = message.slice(MAX_LENGTH)
+    }
+    this._chatQueue.push([ message, autodelete ])
+    if (!this._chatTimer) {
+        this._processChatQueue()
+    }
+}
+
+Sekshi.prototype._processChatQueue = function () {
+    if (this._chatQueue.length > 0) {
+        if (this._lastMessage + this._chatBackoff <= Date.now()) {
+            Plugged.prototype.sendChat.call(this, ...this._chatQueue.shift())
+            this._lastMessage = Date.now()
+            if (this._chatBackoff < CHAT_BACKOFF_MAX) {
+                this._chatBackoff += CHAT_BACKOFF_INC
+            }
+        }
+        setTimeout(() => this._processChatQueue(), this._chatBackoff + 1)
+        this._chatTimer = true
+    }
+
+    if (this._chatQueue.length === 0) {
+        this._chatTimer = false
+        this._chatBackoff = CHAT_INTERVAL
+    }
 }
 
 Sekshi.prototype.start = function (credentials) {
