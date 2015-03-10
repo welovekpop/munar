@@ -13,12 +13,10 @@ npm install
 
 ## Configuration
 
-1. Put your room name in the "room" property in `config.json`
-1. Put your bot account credentials in a repo root-level file `creds.json` (next to `config.json`), like this:
-
-```json
-{ "email": "my-bot-account@plug.dj", "password": "t0pS3cr3tP4ssw0rd" }
-```
+1. Copy `config.json.example` to `config.json`
+1. Update your room name in the "room" property in `config.json`
+1. Copy `creds.json.example` to `creds.json`
+1. Update your bot account credentials in `creds.json`, like this:
 
 Other config options are not (yet) set in the `config.json` file, but hardcoded in the module files. Please don't hurt me.
 
