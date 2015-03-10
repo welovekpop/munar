@@ -15,8 +15,9 @@ npm install
 
 1. Copy `config.json.example` to `config.json`
 1. Update your room name in the "room" property in `config.json`
+1. Update/set any other configs necessary
 1. Copy `creds.json.example` to `creds.json`
-1. Update your bot account credentials in `creds.json`, like this:
+1. Update your bot account credentials in `creds.json`
 
 Other config options are not (yet) set in the `config.json` file, but hardcoded in the module files. Please don't hurt me.
 
