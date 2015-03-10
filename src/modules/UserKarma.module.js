@@ -14,6 +14,7 @@ export default class UserKarma extends SekshiModule {
 
     this.permissions = {
       karma: sekshi.USERROLE.NONE,
+      karmawhores: sekshi.USERROLE.NONE,
       bump: sekshi.USERROLE.NONE,
       thump: sekshi.USERROLE.NONE
     }
@@ -49,6 +50,16 @@ export default class UserKarma extends SekshiModule {
         return usar
       })
     }
+  }
+
+  karmawhores(user) {
+    User.find().sort({karma:-1}).limit(5).exec().then(userlist => {
+      this.sekshi.sendChat(`@${user.username} Karma Leaderboard:`)
+      var rank = 0;
+      for (var i = 0; i < userlist.length; ++i) {
+        this.sekshi.sendChat(`${++rank} - @${userlist[i].username} : ${userlist[i].karma}`)
+      };
+    })
   }
 
   bump(user, username, ...reason) {
