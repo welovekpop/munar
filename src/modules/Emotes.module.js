@@ -16,7 +16,7 @@ const cleanId = id => id.toLowerCase()
 export default class Emotes extends SekshiModule {
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '1.0.0'
+    this.version = '1.0.1'
     this.description = 'adds several emoticons as well as gifs and webms'
 
     super(sekshi, options)
@@ -80,9 +80,8 @@ export default class Emotes extends SekshiModule {
 
   emotes({ username }) {
     debug('listing emotes')
-    Emote.find({}).exec().then(
+    Emote.find({}).sort('id').exec().then(
       emotes => {
-        const MSG_INTERVAL = 600
         let message = `@${username} Emotes: `
         let messages = []
         debug('got emotes', emotes.length)
@@ -94,9 +93,8 @@ export default class Emotes extends SekshiModule {
           message += e.id + ', '
         })
         messages.push(message.substr(0, message.length - 2))
-        debug('sending messages', messages.length)
         messages.forEach((msg, i) => {
-          setTimeout(() => { this.sekshi.sendChat(msg, 20 * 1000 - i * MSG_INTERVAL) }, i * MSG_INTERVAL)
+          this.sekshi.sendChat(msg, 20 * 1000)
         })
       },
       err => { debug('error', err) }
