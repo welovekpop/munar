@@ -7,7 +7,7 @@ export default class HistoryLogger extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.3.0'
+    this.version = '0.3.1'
     this.description = 'Keeps a history of all songs that are played in the room.'
 
     super(sekshi, options)
@@ -32,7 +32,10 @@ export default class HistoryLogger extends SekshiModule {
 
     let currentMedia = sekshi.getCurrentMedia()
     let dj = sekshi.getCurrentDJ()
-    if (!currentMedia || !dj) return
+    if (!currentMedia) return
+
+    // just to be sure?
+    if (!dj) dj = { id: null }
 
     let media = Media.findOne({ format: currentMedia.format, cid: currentMedia.cid }).exec()
       .then(media => media || Media.create({
@@ -43,24 +46,21 @@ export default class HistoryLogger extends SekshiModule {
       , image: currentMedia.image
       , duration: currentMedia.duration
       }))
-    let user = User.findById(dj.id).exec()
 
-    Promise.all([ media, user ])
-      .then(([ media, user ]) => {
-        debug('dj', `${user.username} (${user.id})`)
-        debug('media', `${media.fullTitle} (${media.id})`)
-        debug('time', newPlay.startTime)
-        HistoryEntry.create({
-          _id: newPlay.historyID
-        , dj: user.id
-        , media: media.id
-        , time: new Date(newPlay.startTime)
-          // heh
-        , score: { positive: 0, negative: 0, grabs: 0, listeners: 0 }
-        })
+    media.then(media => {
+      debug('media', `${media.fullTitle} (${media.id})`)
+      debug('time', newPlay.startTime)
+      HistoryEntry.create({
+        _id: newPlay.historyID,
+        dj: dj.id,
+        media: media.id,
+        time: new Date(newPlay.startTime),
+        // heh
+        score: { positive: 0, negative: 0, grabs: 0, listeners: 0 }
       })
-      .catch(e => {
-        debug('err', e)
-      })
+    })
+    .then(null, e => {
+      debug('err', e)
+    })
   }
 }
