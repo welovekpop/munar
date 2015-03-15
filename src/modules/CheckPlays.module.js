@@ -1,5 +1,6 @@
 const SekshiModule = require('../Module')
 const debug = require('debug')('sekshi:check-plays')
+const assign = require('object-assign')
 const { Media, HistoryEntry } = require('../models')
 const moment = require('moment')
 
@@ -28,14 +29,15 @@ export default class CheckPlays extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.1.0'
+    this.version = '0.2.0'
     this.description = 'Provides staff with some statistics on media plays.'
 
     super(sekshi, options)
 
     this.permissions = {
       lastplayed: sekshi.USERROLE.RESIDENTDJ,
-      playcount: sekshi.USERROLE.RESIDENTDJ
+      playcount: sekshi.USERROLE.RESIDENTDJ,
+      mostplayed: sekshi.USERROLE.RESIDENTDJ
     }
   }
 
@@ -92,5 +94,35 @@ export default class CheckPlays extends SekshiModule {
       }
     )
     .then(null, e => { debug('media-err', e) })
+  }
+
+  mostplayed(user, amount = 3) {
+    if (typeof amount === 'string' && /^\d+$/.test(amount)) {
+      amount = parseInt(amount, 10)
+    }
+    // find most played songs
+    HistoryEntry.aggregate()
+      .group({ _id: '$media', count: { $sum: 1 } })
+      .sort({ count: -1 })
+      .project('_id count')
+      .limit(amount)
+      .exec()
+      .then(mostPlayed => {
+        // find media documents for the most played songs
+        const mediaIds = mostPlayed.map(hist => hist._id)
+        const playcounts = {}
+        mostPlayed.forEach(h => { playcounts[h._id] = h.count })
+
+        this.sekshi.sendChat(`@${user.username} Most played songs:`)
+        return Media.where('_id').in(mediaIds).select('_id author title').lean().exec()
+          .then(medias => {
+            medias.map(m => assign(m, { plays: playcounts[m._id] }))
+              .sort((a, b) => a.plays > b.plays ? -1 : 1) // good enough!
+              .forEach((m, i) => {
+                this.sekshi.sendChat(`#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`)
+              })
+          })
+      })
+      .then(null, e => console.error(e))
   }
 }
