@@ -2,6 +2,7 @@ const debug = require('debug')('sekshi:history-logging')
 const { User, Media, HistoryEntry } = require('../models')
 const Promise = require('promise')
 const SekshiModule = require('../Module')
+const moment = require('moment')
 
 export default class HistoryLogger extends SekshiModule {
 
@@ -48,13 +49,14 @@ export default class HistoryLogger extends SekshiModule {
       }))
 
     media.then(media => {
+      const startTime = moment.utc(newPlay.startTime, 'YYYY-MM-DD HH:mm:ss')
       debug('media', `${media.fullTitle} (${media.id})`)
-      debug('time', newPlay.startTime)
+      debug('time', startTime.format())
       HistoryEntry.create({
         _id: newPlay.historyID,
         dj: dj.id,
         media: media.id,
-        time: new Date(newPlay.startTime),
+        time: +startTime,
         // heh
         score: { positive: 0, negative: 0, grabs: 0, listeners: 0 }
       })

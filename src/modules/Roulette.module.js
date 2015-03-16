@@ -122,7 +122,7 @@ export default class Roulette extends SekshiModule {
     RouletteHistory.findOne({}).select('time').sort({ time: -1 }).exec()
       .then(lastRoulette => {
         if (lastRoulette && lastRoulette.time) {
-          const lastPlayed = moment(lastRoulette.time)
+          const lastPlayed = moment(lastRoulette.time).utc()
           this.sekshi.sendChat(`@${user.username} The last roulette was started ${lastPlayed.calendar()} (${lastPlayed.fromNow()}).`)
         }
         else {
