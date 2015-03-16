@@ -44,7 +44,7 @@ export default class CheckPlays extends SekshiModule {
   lastplayed() {
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
-    const currentStart = moment(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
+    const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
     Media.findOne({ format: currentMedia.format, cid: currentMedia.cid }).exec().then(
       media => HistoryEntry.findOne({ media: media.id })
                            .where('time').lt(+currentStart)
@@ -70,7 +70,7 @@ export default class CheckPlays extends SekshiModule {
     const since = moment().subtract(hours, 'hours')
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
-    const currentStart = moment(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
+    const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
 
     Media.findOne({ format: currentMedia.format, cid: currentMedia.cid }).exec().then(
       media => HistoryEntry.find({ media: media.id })
@@ -86,7 +86,7 @@ export default class CheckPlays extends SekshiModule {
           const mostRecent = results[results.length - 1]
           const djText = mostRecent.dj ? ` by ${mostRecent.dj.username}` : ''
           this.sekshi.sendChat(`This song was played ${times(playcount)} over the last ${days(hours)}, ` +
-                               `most recently ${moment(mostRecent.time).fromNow()}${djText}.`)
+                               `most recently ${moment(mostRecent.time).utc().fromNow()}${djText}.`)
         }
         else {
           this.sekshi.sendChat(`This song hasn't been played in the last ${days(hours)}.`)
