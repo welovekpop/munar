@@ -10,6 +10,18 @@ const SPANS = {
   m: 24 * 30
 }
 
+function spanToTime(span) {
+  if (span === 'f') {
+    return moment(0)
+  }
+
+  let hours = span in SPANS ? SPANS[span] : span
+  if (typeof hours === 'string' && /^\d+$/.test(hours)) {
+    hours = parseInt(hours, 10)
+  }
+  return moment().subtract(hours, 'hours')
+}
+
 function times(x) {
   return x === 1 ? 'once'
        : x === 2 ? 'twice'
@@ -18,7 +30,7 @@ function times(x) {
 }
 
 function days(h) {
-  if (h < 24 || (h < 48 && h % 24 !== 0)) {
+  if (h <= 24 || (h < 48 && h % 24 !== 0)) {
     return h === 1 ? 'hour' : `${h} hours`
   }
   const x = Math.floor(h / 24)
@@ -29,7 +41,7 @@ export default class CheckPlays extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.2.0'
+    this.version = '0.3.0'
     this.description = 'Provides staff with some statistics on media plays.'
 
     super(sekshi, options)
@@ -41,7 +53,7 @@ export default class CheckPlays extends SekshiModule {
     }
   }
 
-  lastplayed() {
+  lastplayed(user) {
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
     const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
@@ -51,23 +63,23 @@ export default class CheckPlays extends SekshiModule {
                            .sort('-time')
                            .populate('dj')
                            .exec()
-    ).then(
-      mostRecent => {
-        if (mostRecent) {
-          this.sekshi.sendChat(`This song was played ${moment(mostRecent.time).fromNow()}` +
-                               (mostRecent.dj ? ` by ${mostRecent.dj.username}.` : '.'))
-        }
-        else {
-          this.sekshi.sendChat(`This song hasn't been played before.`)
-        }
-      },
-      e => { debug('media-err', e) }
-    )
+    ).then(mostRecent => {
+      if (mostRecent) {
+        let text = `@${user.username} This song was played ${moment(mostRecent.time).fromNow()}`
+        if (mostRecent.dj) text += ` by ${mostRecent.dj.username}`
+        this.sekshi.sendChat(`${text}.`)
+      }
+      else {
+        this.sekshi.sendChat(`@${user.username} This song hasn't been played before.`)
+      }
+    })
+    .then(null, e => { debug('media-err', e) })
   }
 
   playcount(user, span = 'w') {
-    const hours = span in SPANS ? SPANS[span] : span
-    const since = moment().subtract(hours, 'hours')
+    const allTime = span === 'f'
+    const since = spanToTime(span)
+    const hours = moment().diff(since, 'hours')
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
     const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
@@ -84,26 +96,52 @@ export default class CheckPlays extends SekshiModule {
 
         if (playcount > 0) {
           const mostRecent = results[results.length - 1]
-          const djText = mostRecent.dj ? ` by ${mostRecent.dj.username}` : ''
-          this.sekshi.sendChat(`This song was played ${times(playcount)} over the last ${days(hours)}, ` +
-                               `most recently ${moment(mostRecent.time).utc().fromNow()}${djText}.`)
+
+          let text = `@${user.username} This song was played ${times(playcount)}`
+          if (!allTime) text += ` over the past ${days(hours)}`
+          text += `, most recently ${moment(mostRecent.time).utc().fromNow()}`
+          if (mostRecent.dj) text += ` by ${mostRecent.dj.username}`
+
+          this.sekshi.sendChat(`${text}.`)
         }
         else {
-          this.sekshi.sendChat(`This song hasn't been played in the last ${days(hours)}.`)
+          this.sekshi.sendChat(`@${user.username} This song hasn't been played ` +
+                               (allTime ? `before.` : `in the last ${days(hours)}.`))
         }
       }
     )
     .then(null, e => { debug('media-err', e) })
   }
 
-  mostplayed(user, amount = 3) {
+  mostplayed(user, amount = 3, time = 'f') {
+    // !mostplayed can take 1, 2, or no parameters.
+    // without parameters, it shows the top 3 most played songs
+    // ever. With one parameter, it shows the top N most played
+    // songs ever, *except* if the parameter is a letter (d, w, m, f),
+    // in which case it shows the top 3 most played songs over the
+    // given time span. With two parameters, it shows the top N
+    // most played songs over the given time span.
+    //   !mostplayed
+    //   !mostplayed 5
+    //   !mostplayed w
+    //   !mostplayed 5 d
     if (typeof amount === 'string' && /^\d+$/.test(amount)) {
       amount = parseInt(amount, 10)
     }
+    // !mostplayed (d|w|m|f)
+    if (typeof amount === 'string') {
+      time = amount
+      amount = 3
+    }
+
+    const since = spanToTime(time)
+    const hours = moment().diff(since, 'hours')
+    const allTime = time === 'f'
     // find most played songs
     HistoryEntry.aggregate()
+      .match({ time: { $gte: since.toDate() } })
       .group({ _id: '$media', count: { $sum: 1 } })
-      .sort({ count: -1 })
+      .sort('-count _id')
       .project('_id count')
       .limit(amount)
       .exec()
@@ -113,7 +151,9 @@ export default class CheckPlays extends SekshiModule {
         const playcounts = {}
         mostPlayed.forEach(h => { playcounts[h._id] = h.count })
 
-        this.sekshi.sendChat(`@${user.username} Most played songs:`)
+        let title = `@${user.username} Most played songs`
+        if (!allTime) title += ` over the last ${days(hours)}`
+        this.sekshi.sendChat(`${title}:`)
         return Media.where('_id').in(mediaIds).select('_id author title').lean().exec()
           .then(medias => {
             medias.map(m => assign(m, { plays: playcounts[m._id] }))
