@@ -37,7 +37,7 @@ function days(h) {
   return x === 1 ? 'day' : `${x} days`
 }
 
-export default class CheckPlays extends SekshiModule {
+export default class MediaStats extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
