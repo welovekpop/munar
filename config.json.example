@@ -1,7 +1,4 @@
 {
-  "room": "more-tests",
-  "mongo": "mongodb://localhost/sekshi",
-  "redditfeed": {
-    "subreddit": "kpop"
-  }
+  "room": "my-favourite-room",
+  "mongo": "mongodb://localhost/mydatabase"
 }

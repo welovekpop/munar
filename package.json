@@ -1,10 +1,16 @@
 {
-  "name": "sekshi",
-  "description": "sekshi is a BOT system developed for We <3 KPOP",
+  "name": "sekshibot",
+  "description": "Modular plug.dj room bot for WE ♥ KPOP",
   "version": "0.9.1",
   "main": "lib/sekshi",
   "author": "Sooyou",
-  "homepage": "xn--xck.moe",
+  "contributors": [
+    "brookiebeast",
+    "faw",
+    "PlugLynn <PlugLynn@Hushmail.com>",
+    "schrobby"
+  ],
+  "homepage": "http://welovekpop.club?p=420",
   "dependencies": {
     "array-find": "^0.1.1",
     "array-findindex": "^0.1.0",
