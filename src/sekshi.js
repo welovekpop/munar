@@ -403,9 +403,6 @@ Sekshi.prototype.loadModule = function (name) {
         this.modules[lName] = mod
     }
 
-    // TODO make configurable
-    mod.enable()
-
     // the event is fired on nextTick so modules can simply listen for "moduleloaded"
     // and get events for *all* the modules when loadModules() is called, even for those
     // that register earlier
