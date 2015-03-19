@@ -5,7 +5,7 @@ export default class ModSkip extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.2.1'
+    this.version = '0.3.0'
     this.description = 'Simple DJ skipping tools'
 
     super(sekshi, options)
@@ -26,8 +26,13 @@ export default class ModSkip extends SekshiModule {
         outro: 'Skipping the rest of this song!',
         op: 'This song has been played a lot recently. Please play a different one.'
       },
-      lockskipPos: 1
+      lockskipPos: 1,
+      cooldown: 7 // seconds
     }
+  }
+
+  init() {
+    this._lastSkip = 0
   }
 
   _skipMessage(user, reason = false) {
@@ -44,13 +49,19 @@ export default class ModSkip extends SekshiModule {
   }
 
   skip(user, reason) {
-    this.sekshi.sendChat(this._skipMessage(user, reason))
-    this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
+    if (Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
+      this._lastSkip = Date.now()
+      this.sekshi.sendChat(this._skipMessage(user, reason))
+      this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
+    }
   }
 
   lockskip(user, reason) {
-    this.sekshi.sendChat(this._skipMessage(user, reason))
-    this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
+    if (Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
+      this._lastSkip = Date.now()
+      this.sekshi.sendChat(this._skipMessage(user, reason))
+      this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
+    }
   }
 
 }
