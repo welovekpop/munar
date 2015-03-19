@@ -5,17 +5,17 @@ export default class System extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'Sooyou'
-    this.version = '0.12.0'
+    this.version = '1.0.0'
     this.description = 'Simple tools for module management & system information'
 
     super(sekshi, options)
 
     this.permissions = {
-      sysinfo: sekshi.USERROLE.COHOST,
-      moduleinfo: sekshi.USERROLE.MANAGER,
       listmodules: sekshi.USERROLE.MANAGER,
-      togglemodule: sekshi.USERROLE.COHOST,
       reloadmodules: sekshi.USERROLE.COHOST,
+      moduleinfo: sekshi.USERROLE.MANAGER,
+      unloadmodule: sekshi.USERROLE.MANAGER,
+      loadmodule: sekshi.USERROLE.MANAGER,
       reloadmodule: sekshi.USERROLE.MANAGER,
       enablemodule: sekshi.USERROLE.MANAGER,
       disablemodule: sekshi.USERROLE.MANAGER,
@@ -24,8 +24,32 @@ export default class System extends SekshiModule {
   }
 
   reloadmodule(user, name) {
-    this.sekshi.reloadModule(name)
-    this.sekshi.sendChat(`@${user.username} Reloaded module "${name}".`)
+    try {
+      this.sekshi.reloadModule(name)
+      this.sekshi.sendChat(`@${user.username} Reloaded module "${name}".`)
+    }
+    catch (e) {
+      this.sekshi.sendChat(`@${user.username} Could not reload "${name}": ${e.message}`)
+    }
+  }
+
+  unloadmodule(user, name) {
+    try {
+      this.sekshi.unloadModule(name)
+      this.sekshi.sendChat(`@${user.username} Unloaded module "${name}."`)
+    }
+    catch (e) {
+      this.sekshi.sendChat(`@${user.username} Could not unload "${name}": ${e.message}`)
+    }
+  }
+  loadmodule(user, name) {
+    try {
+      this.sekshi.loadModule(name)
+      this.sekshi.sendChat(`@${user.username} Loaded module "${name}".`)
+    }
+    catch (e) {
+      this.sekshi.sendChat(`@${user.username} Could not load "${name}": ${e.message}`)
+    }
   }
 
   disablemodule(user, name) {
@@ -73,33 +97,6 @@ export default class System extends SekshiModule {
       return `${name} ${mod && mod.enabled() ? '✔' : '✘'}`
     })
     this.sekshi.sendChat(text.sort().join(', '), 20 * 1000)
-  }
-
-  togglemodule(user, modulename) {
-    if(!modulename || modulename.length === 0) {
-      this.sekshi.sendChat(`usage: !togglemodule "modulename"`);
-      return;
-    }
-
-    const mod = this.sekshi.getModule(modulename)
-    if (mod) {
-      if (mod.enabled()) {
-        mod.disable()
-      }
-      else {
-        mod.enable()
-      }
-      this.sekshi.sendChat(`@${user.username} :white_check_mark: ${mod.name} ` +
-                           `${mod.enabled() ? 'enabled' : 'disabled'}`)
-    }
-  }
-
-  sysinfo(user) {
-    this.sekshi.sendChat(
-      `OS: ${os.type()} ${os.release()} :white_small_square: Platform: ${os.platform()} ` +
-      `:white_small_square: Architecture: ${os.arch()} :white_small_square: Uptime: ${os.uptime()} ` +
-      `:white_small_square: load: ${os.loadavg()}`
-    )
   }
 
   exit(user) {

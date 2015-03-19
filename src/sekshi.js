@@ -367,13 +367,13 @@ Sekshi.prototype.enable = function (name) {
 Sekshi.prototype.loadModules = function () {
     debug('load all')
     this.updateAvailableModules()
-    this.getAvailableModules().forEach(this._loadModule, this)
+    this.getAvailableModules().forEach(this.loadModule, this)
 }
 
 Sekshi.prototype.unloadModules = function() {
     debug('unload all')
     for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
-        this._unloadModule(name)
+        this.unloadModule(name)
     }
 }
 
@@ -385,15 +385,15 @@ Sekshi.prototype.reloadModule = function (name) {
         mod = null
     }
 
-    this._unloadModule(name)
-    this._loadModule(name)
+    this.unloadModule(name)
+    this.loadModule(name)
 
     if (enabled) {
         this.getModule(name).enable()
     }
 }
 
-Sekshi.prototype._loadModule = function (name) {
+Sekshi.prototype.loadModule = function (name) {
     debug('load', name)
     const lName = name.toLowerCase()
     let mod = this.modules[lName]
@@ -414,7 +414,7 @@ Sekshi.prototype._loadModule = function (name) {
     return mod
 }
 
-Sekshi.prototype._unloadModule = function (name, fireEvent = true) {
+Sekshi.prototype.unloadModule = function (name) {
     debug('unload', name)
     const mod = this.getModule(name)
     if (mod) {
