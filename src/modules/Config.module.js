@@ -88,8 +88,7 @@ export default class Config extends SekshiModule {
     }
     catch (e) {
       // default "config"
-      // not quite perfect, possibly!
-      mod.enable()
+      mod.disable()
     }
   }
 
