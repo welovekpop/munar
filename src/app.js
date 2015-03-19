@@ -1,4 +1,4 @@
-const Sekshi = require('./sekshi')
+const Sekshi = require('./Sekshi')
 const config = require('../config.json')
 const debug = require('debug')('sekshi:app')
 const pkg = require('../package.json')
