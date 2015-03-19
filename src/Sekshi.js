@@ -331,8 +331,8 @@ export default class Sekshi extends Plugged {
     // that register earlier
     process.nextTick(() => { this.emit('moduleloaded', mod, lName) })
 
-    // enable system module by default
-    if (lName === 'system') mod.enable()
+    // enable system modules by default
+    if (lName === 'system' || lName === 'config') mod.enable()
 
     return mod
   }
