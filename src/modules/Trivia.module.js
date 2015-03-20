@@ -11,7 +11,7 @@ export default class Trivia extends SekshiModule {
   constructor(sekshi, options) {
     this.author = 'WE ♥ KPOP'
     this.version = '0.0.0'
-    this.description = 'Trivia!'
+    this.description = ''
 
     super(sekshi, options)
 
@@ -46,18 +46,11 @@ export default class Trivia extends SekshiModule {
 
   // Chat Commands
   trivia(user, test = false) {
-    this._running = true
-    this._history = []
-    this._points = {}
     this.sekshi.sendChat(`[Trivia] @everyone ${user.username} started Trivia!`)
-    this.sekshi.on(this.sekshi.CHAT, this.onChat)
-
-    this._load()
-      .then(questions => {
-        this.sekshi.sendChat(`Loaded ${questions.length} questions. First question in 5 seconds!`)
-        setTimeout(this.nextQuestion.bind(this), 5 * 1000)
-      })
-      .catch(e => console.error(e))
+    this.startTrivia().then(() => {
+      this.sekshi.sendChat(`Loaded ${this._questions.length} questions. First question in 5 seconds!`)
+      setTimeout(this.nextQuestion.bind(this), 5 * 1000)
+    })
   }
 
   trivquit(user) {
@@ -92,6 +85,16 @@ export default class Trivia extends SekshiModule {
     }
   }
 
+  startTrivia() {
+    this._running = true
+    this._history = []
+    this._points = {}
+    this.sekshi.on(this.sekshi.CHAT, this.onChat)
+
+    return this._load()
+      .catch(e => console.error(e))
+  }
+
   // public api
   nextQuestion() {
     if (this._running) {
@@ -100,8 +103,9 @@ export default class Trivia extends SekshiModule {
         question = this._questions[Math.floor(Math.random() * this._questions.length)]
       } while (this._history.indexOf(question) !== -1)
 
-      this.askQuestion(question)
+      return this.askQuestion(question)
     }
+    return Promise.reject(new Error('Trivia is not running'))
   }
 
   askQuestion(question) {
