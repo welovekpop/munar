@@ -7,7 +7,7 @@ export default class UserKarma extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'brookiebeast'
-    this.version = '0.1.1'
+    this.version = '0.1.2'
     this.description = 'Keeps track of users\' earned internet points.'
 
     super(sekshi, options)
@@ -57,7 +57,7 @@ export default class UserKarma extends SekshiModule {
       this.sekshi.sendChat(`@${user.username} Karma Leaderboard:`)
       var rank = 0;
       for (var i = 0; i < userlist.length; ++i) {
-        this.sekshi.sendChat(`${++rank} - @${userlist[i].username} : ${userlist[i].karma}`)
+        this.sekshi.sendChat(`${++rank} - ${userlist[i].username} : ${userlist[i].karma}`)
       };
     })
   }
