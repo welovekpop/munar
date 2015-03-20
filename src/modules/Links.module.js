@@ -13,7 +13,8 @@ export default class Links extends SekshiModule {
     this.permissions = {
       fb: sekshi.USERROLE.NONE,
       web: sekshi.USERROLE.NONE,
-      gh: sekshi.USERROLE.NONE
+      gh: sekshi.USERROLE.NONE,
+      help: sekshi.USERROLE.NONE
     }
   }
 
@@ -27,6 +28,10 @@ export default class Links extends SekshiModule {
 
   gh() {
     this.sekshi.sendChat('SekshiBot is on Github! Check out https://github.com/welovekpop for code and goodies :)')
+  },
+
+  help(user) {
+    this.sekshi.sendChat(`@${user.username} SekshiBot commands can be found on our website. http://welovekpop.club/?p=420`)
   }
 
 }

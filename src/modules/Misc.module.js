@@ -12,8 +12,7 @@ export default class Misc extends SekshiModule {
     super(sekshi, options)
 
     this.permissions = {
-      eta: sekshi.USERROLE.NONE,
-      help: sekshi.USERROLE.NONE
+      eta: sekshi.USERROLE.NONE
     }
   }
 
@@ -28,10 +27,6 @@ export default class Misc extends SekshiModule {
     else {
       this.sekshi.sendChat(`@${user.username} Your turn is in around ${position * 4} minutes!`)
     }
-  }
-
-  help(user) {
-    this.sekshi.sendChat(`@${user.username} For more help or information, check out our website: http://welovekpop.club`)
   }
 
 }
