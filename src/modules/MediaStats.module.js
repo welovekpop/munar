@@ -41,7 +41,7 @@ export default class MediaStats extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.3.0'
+    this.version = '0.4.0'
     this.description = 'Provides staff with some statistics on media plays.'
 
     super(sekshi, options)
@@ -53,44 +53,87 @@ export default class MediaStats extends SekshiModule {
     }
   }
 
-  lastplayed(user) {
-    const currentMedia = this.sekshi.getCurrentMedia()
-    if (!currentMedia) return
+  // public API
+  getRecentPlays(media, span = 'w') {
+    const query = typeof media === 'string'
+      ? { cid: media }
+      : { cid: media.cid }
+
+    const since = spanToTime(span)
+    const hours = moment().diff(since, 'hours')
     const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
-    Media.findOne({ format: currentMedia.format, cid: currentMedia.cid }).exec().then(
+    return Media.findOne(query).exec().then(
+      media => HistoryEntry.find({ media: media.id })
+                           .where('time').gte(since.toDate()).lt(currentStart.toDate())
+                           .sort('+time')
+                           .populate('dj')
+                           .exec()
+    )
+  }
+
+  getMostPlayed(amount = 3, time = 'f') {
+    const since = spanToTime(time)
+    const hours = moment().diff(since, 'hours')
+    const allTime = time === 'f'
+    // find most played songs
+    return HistoryEntry.aggregate()
+      .match({ time: { $gte: since.toDate() } })
+      .group({ _id: '$media', count: { $sum: 1 } })
+      .sort('-count _id')
+      .project('_id count')
+      .limit(amount)
+      .exec()
+      .then(mostPlayed => {
+        // find media documents for the most played songs
+        const mediaIds = mostPlayed.map(hist => hist._id)
+        const playcounts = {}
+        mostPlayed.forEach(h => { playcounts[h._id] = h.count })
+        return Media.where('_id').in(mediaIds).lean().exec()
+          .then(medias => medias.map(m => assign(m, { plays: playcounts[m._id] })))
+          .then(medias => medias.sort((a, b) => a.plays > b.plays ? -1 : 1)) // good enough!
+      })
+  }
+
+  getLastPlay(media) {
+    const query = typeof media === 'string'
+      ? { cid: media }
+      : { cid: media.cid }
+
+    const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
+    return Media.findOne(query).lean().exec().then(
       media => HistoryEntry.findOne({ media: media.id })
-                           .where('time').lt(+currentStart)
+                           .where('time').lt(currentStart.toDate())
                            .sort('-time')
                            .populate('dj')
                            .exec()
-    ).then(mostRecent => {
-      if (mostRecent) {
-        let text = `@${user.username} This song was played ${moment(mostRecent.time).fromNow()}`
-        if (mostRecent.dj) text += ` by ${mostRecent.dj.username}`
-        this.sekshi.sendChat(`${text}.`)
+    )
+  }
+
+  // chat commands
+  lastplayed(user) {
+    const currentMedia = this.sekshi.getCurrentMedia()
+    if (!currentMedia) return
+    this.getLastPlay(currentMedia).then(
+      mostRecent => {
+        if (mostRecent) {
+          let text = `@${user.username} This song was played ${moment(mostRecent.time).fromNow()}`
+          if (mostRecent.dj) text += ` by ${mostRecent.dj.username}`
+          this.sekshi.sendChat(`${text}.`)
+        }
+        else {
+          this.sekshi.sendChat(`@${user.username} This song hasn't been played before.`)
+        }
       }
-      else {
-        this.sekshi.sendChat(`@${user.username} This song hasn't been played before.`)
-      }
-    })
+    )
     .then(null, e => { debug('media-err', e) })
   }
 
   playcount(user, span = 'w') {
+    const hours = moment().diff(spanToTime(span), 'hours')
     const allTime = span === 'f'
-    const since = spanToTime(span)
-    const hours = moment().diff(since, 'hours')
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
-    const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
-
-    Media.findOne({ format: currentMedia.format, cid: currentMedia.cid }).exec().then(
-      media => HistoryEntry.find({ media: media.id })
-                           .where('time').gt(+since).lt(+currentStart)
-                           .sort('+time')
-                           .populate('dj')
-                           .exec()
-    ).then(
+    this.getRecentPlays(currentMedia, span).then(
       results => {
         const playcount = results.length
 
@@ -138,31 +181,16 @@ export default class MediaStats extends SekshiModule {
     const hours = moment().diff(since, 'hours')
     const allTime = time === 'f'
     // find most played songs
-    HistoryEntry.aggregate()
-      .match({ time: { $gte: since.toDate() } })
-      .group({ _id: '$media', count: { $sum: 1 } })
-      .sort('-count _id')
-      .project('_id count')
-      .limit(amount)
-      .exec()
-      .then(mostPlayed => {
-        // find media documents for the most played songs
-        const mediaIds = mostPlayed.map(hist => hist._id)
-        const playcounts = {}
-        mostPlayed.forEach(h => { playcounts[h._id] = h.count })
-
-        let title = `@${user.username} Most played songs`
-        if (!allTime) title += ` over the last ${days(hours)}`
-        this.sekshi.sendChat(`${title}:`)
-        return Media.where('_id').in(mediaIds).select('_id author title').lean().exec()
-          .then(medias => {
-            medias.map(m => assign(m, { plays: playcounts[m._id] }))
-              .sort((a, b) => a.plays > b.plays ? -1 : 1) // good enough!
-              .forEach((m, i) => {
-                this.sekshi.sendChat(`#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`)
-              })
-          })
-      })
-      .then(null, e => console.error(e))
+    let title = `@${user.username} Most played songs`
+    if (!allTime) title += ` over the last ${days(hours)}`
+    this.sekshi.sendChat(`${title}:`)
+    this.getMostPlayed(amount, time).then(
+      medias => {
+        medias.forEach((m, i) => {
+          this.sekshi.sendChat(`#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`)
+        })
+      },
+      e => { this.sekshi.sendChat(`ERR: ${e.message}`) }
+    )
   }
 }
