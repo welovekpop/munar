@@ -5,7 +5,7 @@ export default class Links extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.1.0'
+    this.version = '0.1.1'
     this.description = 'Throws links at people.'
 
     super(sekshi, options)
@@ -28,10 +28,10 @@ export default class Links extends SekshiModule {
 
   gh() {
     this.sekshi.sendChat('SekshiBot is on Github! Check out https://github.com/welovekpop for code and goodies :)')
-  },
+  }
 
   help(user) {
-    this.sekshi.sendChat(`@${user.username} SekshiBot commands can be found on our website. http://welovekpop.club/?p=420`)
+    this.sekshi.sendChat(`@${user.username} SekshiBot commands can be found on our website. http://welovekpop.club/sekshibot`)
   }
 
 }
