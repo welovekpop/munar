@@ -41,7 +41,7 @@ export default class MediaStats extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.4.0'
+    this.version = '0.4.1'
     this.description = 'Provides staff with some statistics on media plays.'
 
     super(sekshi, options)
@@ -101,7 +101,7 @@ export default class MediaStats extends SekshiModule {
 
     const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
     return Media.findOne(query).lean().exec().then(
-      media => HistoryEntry.findOne({ media: media.id })
+      media => HistoryEntry.findOne({ media: media._id })
                            .where('time').lt(currentStart.toDate())
                            .sort('-time')
                            .populate('dj')
