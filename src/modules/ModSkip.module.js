@@ -5,7 +5,7 @@ export default class ModSkip extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'ReAnna'
-    this.version = '0.3.0'
+    this.version = '0.3.1'
     this.description = 'Simple DJ skipping tools'
 
     super(sekshi, options)
@@ -48,18 +48,18 @@ export default class ModSkip extends SekshiModule {
     }
   }
 
-  skip(user, reason) {
+  skip(user, ...reason) {
     if (Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
-      this.sekshi.sendChat(this._skipMessage(user, reason))
+      this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
     }
   }
 
-  lockskip(user, reason) {
+  lockskip(user, ...reason) {
     if (Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
-      this.sekshi.sendChat(this._skipMessage(user, reason))
+      this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
     }
   }
