@@ -14,7 +14,7 @@ const Disconnections = mongoose.modelNames().indexOf('Disconnections') === -1
 export default class Disconnect extends SekshiModule {
   constructor(sekshi, options) {
     this.author = 'Sooyou'
-    this.version = '1.0.0'
+    this.version = '1.0.1'
     this.description = 'Puts disconnected users back at their original wait list spot.'
 
     super(sekshi, options)
@@ -26,6 +26,7 @@ export default class Disconnect extends SekshiModule {
     this.Disconnection = Disconnections
 
     this.onWaitlistUpdate = this.onWaitlistUpdate.bind(this)
+    this.onWaitlistLock = this.onWaitlistLock.bind(this)
     this.onUserLeave = this.onUserLeave.bind(this)
   }
 
@@ -38,16 +39,25 @@ export default class Disconnect extends SekshiModule {
   init() {
     this.waitlist = []
     this.sekshi.on(this.sekshi.WAITLIST_UPDATE, this.onWaitlistUpdate)
+    this.sekshi.on(this.sekshi.DJ_LIST_LOCKED, this.onWaitlistLock)
     this.sekshi.on(this.sekshi.USER_LEAVE, this.onUserLeave)
   }
 
   destroy() {
     this.sekshi.removeListener(this.sekshi.WAITLIST_UPDATE, this.onWaitlistUpdate)
+    this.sekshi.removeListener(this.sekshi.DJ_LIST_LOCKED, this.onWaitlistLock)
     this.sekshi.removeListener(this.sekshi.USER_LEAVE, this.onUserLeave)
   }
 
   onWaitlistUpdate(oldWaitlist, newWaitlist) {
     this.waitlist = oldWaitlist
+  }
+
+  onWaitlistLock(e) {
+    if (e.clearWaitlist) {
+      debug('wait list cleared, invalidating disconnects')
+      Disconnections.remove({}).exec()
+    }
   }
 
   onUserLeave(user) {
