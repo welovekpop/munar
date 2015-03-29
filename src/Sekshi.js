@@ -218,7 +218,10 @@ export default class Sekshi extends Plugged {
     let chunk
 
     let usernames = str.indexOf('@') !== -1 // might contain a username
-      ? [ this.getSelf(), ...this.getUsers() ].map(u => u.username)
+      ? [ this.getSelf(), ...this.getUsers() ]
+          .map(u => u.username)
+          // longest usernames first
+          .sort((a, b) => a.length > b.length ? -1 : 1)
       : []
 
     while (chunk = str.slice(i)) {
