@@ -268,10 +268,30 @@ export default class Sekshi extends Plugged {
   }
 
   lockskipDJ(id, position, cb) {
-    this.skipDJ(id, e => {
-      if (e) cb && cb(e)
-      else this.moveDJ(id, position, cb)
-    })
+    const skipDJ = Promise.denodeify(this.skipDJ.bind(this))
+    const addToWaitlist = Promise.denodeify(this.addToWaitlist.bind(this))
+    const moveDJ = Promise.denodeify(this.moveDJ.bind(this))
+    const setLock = Promise.denodeify(this.setLock.bind(this))
+
+    if (this.doesWaitlistCycle()) {
+      skipDJ(id)
+        .then(() => moveDJ(id, position))
+        .nodeify(cb)
+    }
+    else {
+      let locked = this.isWaitlistLocked()
+      // DJ cycle is off
+      // first, lock the wait list so no-one can steal the 50th spot before the DJ is put back
+      setLock(true, false)
+        // then skip & add the DJ again
+        .then(() => skipDJ(id))
+        .then(() => addToWaitlist(id))
+        .then(() => moveDJ(id, position))
+        // and finally revert to the old wait list lock status
+        .then(() => setLock(locked, false),
+              () => setLock(locked, false))
+        .nodeify(cb)
+    }
   }
 
   getModule(name) {
