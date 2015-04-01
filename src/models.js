@@ -50,6 +50,16 @@ mediaSchema.virtual('fullTitle').get(function () { return `${this.author} – ${
 
 export const Media = mongoose.model('Media', mediaSchema)
 
+const karmaSchema = new Schema({
+  date: { type: Date, default: Date.now }
+, target: { type: Number, ref: 'User' }
+, reason: String
+, amount: { type: Number, default: 1 }
+, giver: { type: Number, ref: 'User' }
+})
+
+export const Karma = mongoose.model('Karma', karmaSchema)
+
 export const HistoryEntry = mongoose.model('HistoryEntry', {
   _id: String
 , media: { type: ObjectId, ref: 'Media' }
