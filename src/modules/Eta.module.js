@@ -1,13 +1,13 @@
 const SekshiModule = require('../Module')
-const debug = require('debug')('sekshi:misc')
+const debug = require('debug')('sekshi:eta')
 const findIndex = require('array-findindex')
 
 export default class Misc extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'Sooyou'
-    this.version = '0.2.0'
-    this.description = 'Provides miscellaneous tools'
+    this.version = '0.3.0'
+    this.description = 'Provides an estimation of when people get to play their song.'
 
     super(sekshi, options)
 
@@ -18,11 +18,14 @@ export default class Misc extends SekshiModule {
 
   eta(user) {
     if (user.id === this.sekshi.getCurrentDJ().id) {
-      this.sekshi.sendChat(`@${user.username} Your turn is right now!`)
+      return this.sekshi.sendChat(`@${user.username} Your turn is right now!`)
     }
     const position = findIndex(this.sekshi.getWaitlist(), uid => user.id === uid)
     if (position === 0) {
       this.sekshi.sendChat(`@${user.username} Your turn is next!`)
+    }
+    else if (position === -1) {
+      this.sekshi.sendChat(`@${user.username} You're not in the wait list!`)
     }
     else {
       this.sekshi.sendChat(`@${user.username} Your turn is in around ${position * 4} minutes!`)
