@@ -9,7 +9,7 @@ export default class UserKarma extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'brookiebeast'
-    this.version = '0.3.0'
+    this.version = '0.4.0'
     this.description = 'Keeps track of users\' earned internet points.'
 
     super(sekshi, options)
@@ -80,28 +80,37 @@ export default class UserKarma extends SekshiModule {
     const allTime = time === 'f'
 
     Karma.aggregate()
-    .match({ date: { $gte: since.toDate() } })
-    .group({ _id: "$target", karma: { $sum: "$amount" } })
-    .sort({ karma: -1 }).exec().then(karmaList => {
-      if (karmaList.length === 0) {
-        this.sekshi.sendChat(`@${user.username} none of you like each other T_T`)
-      } else {
-        let title = `@${user.username} Karma leaders`
-        if (!allTime) title += ` over the last ${utils.days(hours)}`
-        this.sekshi.sendChat(`${title}:`)
-        let rank = 0
-        let l = Math.min(karmaList.length, 5)
-        for (let i = 0; i < l; ++i) {
-          let karma = karmaList[i]['karma']
-          User.findById(karmaList[i]['_id']).exec().then(usar => {
-            this.sekshi.sendChat(`${++rank} - ${usar.username}: ${karma}`)
-          })
+      .match({ date: { $gte: since.toDate() } })
+      .group({ _id: "$target", karma: { $sum: "$amount" } })
+      .sort({ karma: -1 })
+      .limit(5)
+      .exec()
+      .then(karmaList => {
+        if (karmaList.length === 0) {
+          this.sekshi.sendChat(`@${user.username} none of you like each other T_T`)
         }
-      }
-    },
-    err => {
-      debug(`${err}`)
-    })
+        else {
+          let karmas = {}
+          karmaList.forEach(k => { karmas[k._id] = k.karma })
+          User.where('_id').in(karmaList.map(k => k._id)).lean().exec()
+            .then(users => users.map(u => assign(u, { karma: karmas[u._id] })))
+            .then(users => users.sort((a, b) => a.karma > b.karma ? -1 : 1))
+            .then(
+              users => {
+                let title = `@${user.username} Karma leaders`
+                if (!allTime) title += ` over the last ${utils.days(hours)}`
+                this.sekshi.sendChat(`${title}:`)
+                users.forEach((u, rank) => {
+                  this.sekshi.sendChat(`${rank + 1} - ${u.username}: ${u.karma}`)
+                })
+              },
+              err => {}
+            )
+        }
+      },
+      err => {
+        debug(`${err}`)
+      })
   }
 
   bump(user, username, ...reason) {
