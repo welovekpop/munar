@@ -134,16 +134,6 @@ export default class Sekshi extends Plugged {
         // TODO move to UserLogger module
         Promise.all(this.getUsers().map(user => User.fromPlugUser(user)))
           .then(users => { debug('updated users', users.length) })
-
-        // migrate all existing Users to new karma
-        User.find().exec().then(list => {
-          for (var i = 0; i < list.length; ++i) {
-            let history = new Karma({target: list[i].id, giver: 0, amount: list[i].karma - 1, date: new Date(0) })
-            history.save()
-            list[i].karma = 1 // reset, so we don't blow up the karmas
-            list[i].save()
-          }
-        })
       }
       cb && cb(err)
     })
