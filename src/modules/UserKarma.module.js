@@ -238,23 +238,24 @@ export default class UserKarma extends SekshiModule {
 
   fistbump(user) {
     Karma.find({ reason: { $ne: null } }).where('amount').gt(0).populate('giver').exec().then( reasonList => {
-      let reason = ''
-      if (reasonList.length > 0) {
-        reason = ` "${reasonList[Math.floor(Math.random() * reasonList.length)]}"`
+      debug(reasonList)
+      if (reasonList.length === 0) {
+        this.sekshi.sendChat(`@${user.username} no one can explain your mysterious allure.`)
       }
-      this.sekshi.sendChat(`@${user.username} you were bumped by @${chosen.giver.username}` +
-                           `${reason} ${moment(chosen.date).fromNow()}`)
+      let chosen = reasonList[Math.floor(Math.random() * reasonList.length)]
+      this.sekshi.sendChat(`@${user.username}, you were bumped by @${chosen.giver.username} ` +
+                           `"${chosen.reason}" ${moment(chosen.date).fromNow()}`)
     })
   }
 
   fistthump(user) {
     Karma.find({ reason: { $ne: null } }).where('amount').lt(0).populate('giver').exec().then( reasonList => {
-      let reason = ''
-      if (reasonList.length > 0) {
-        reason = ` "${reasonList[Math.floor(Math.random() * reasonList.length)]}"`
+      if (reasonList.length === 0) {
+        this.sekshi.sendChat(`@${user.username} no reason was ever given.`)
       }
-      this.sekshi.sendChat(`@${user.username} you were thumped by @${chosen.giver.username}` +
-                           `${reason} ${moment(chosen.date).fromNow()}`)
+      let chosen = reasonList[Math.floor(Math.random() * reasonList.length)]
+      this.sekshi.sendChat(`@${user.username}, you were thumped by @${chosen.giver.username} ` +
+                           `"${chosen.reason}" ${moment(chosen.date).fromNow()}`)
     })
   }
 }
