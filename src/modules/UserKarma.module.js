@@ -9,7 +9,7 @@ export default class UserKarma extends SekshiModule {
 
   constructor(sekshi, options) {
     this.author = 'brookiebeast'
-    this.version = '0.1.3'
+    this.version = '0.2.0'
     this.description = 'Keeps track of users\' earned internet points.'
 
     super(sekshi, options)
@@ -234,9 +234,8 @@ export default class UserKarma extends SekshiModule {
             this.sekshi.sendChat(`@${user.username} no one can explain your mysterious allure.`)
       }
       let chosen = reasonList[Math.floor(Math.random() * reasonList.length)]
-      let now = moment()
-      let hours = moment().diff(moment(chosen.date), 'hours')
-      this.sekshi.sendChat(`@${user.username}, you were bumped by @${chosen.giver.username} "${chosen.reason}" ${utils.days(hours)} ago`)
+      this.sekshi.sendChat(`@${user.username}, you were bumped by @${chosen.giver.username} ` +
+                           `"${chosen.reason}" ${moment(chosen.date).fromNow()}`)
     })
   }
 
@@ -246,9 +245,8 @@ export default class UserKarma extends SekshiModule {
             this.sekshi.sendChat(`@${user.username} cuz yolo bro.`)
       }
       let chosen = reasonList[Math.floor(Math.random() * reasonList.length)]
-      let now = moment()
-      let hours = moment().diff(moment(chosen.date), 'hours')
-      this.sekshi.sendChat(`@${user.username}, you were thumped by @${chosen.giver.username} "${chosen.reason}" ${utils.days(hours)} ago`)
+      this.sekshi.sendChat(`@${user.username}, you were thumped by @${chosen.giver.username} ` +
+                           `"${chosen.reason}" ${moment(chosen.date).fromNow()}`)
     })
   }
 }
