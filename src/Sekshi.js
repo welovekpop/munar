@@ -6,7 +6,6 @@ const debug = require('debug')('sekshi:sekshi')
 const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const Promise = require('promise')
-const { User, Karma } = require('./models')
 const find = require('array-find')
 const unescape = require('ent/decode')
 
@@ -127,16 +126,7 @@ export default class Sekshi extends Plugged {
 
     this.on(this.CHAT, this.onMessage)
 
-    this.once(this.JOINED_ROOM, err => {
-      if (!err) {
-        // ensure that users who are already online are entered into the
-        // database
-        // TODO move to UserLogger module
-        Promise.all(this.getUsers().map(user => User.fromPlugUser(user)))
-          .then(users => { debug('updated users', users.length) })
-      }
-      cb && cb(err)
-    })
+    if (cb) this.once(this.JOINED_ROOM, cb)
   }
 
   stop(cb) {
