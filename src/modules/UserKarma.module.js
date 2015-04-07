@@ -188,7 +188,7 @@ export default class UserKarma extends SekshiModule {
     const allTime = time === 'f'
 
     Karma.aggregate()
-    .match({ target: user.id, date: { $gte: since.toDate() } })
+    .match({ target: user.id, giver: { $ne: 0 }, date: { $gte: since.toDate() } })
     .group({ _id: "$giver", karma: { $sum: "$amount" } })
     .sort({ karma: -1 }).exec().then(karmaList => {
       if (karmaList.length === 0) {
@@ -215,7 +215,7 @@ export default class UserKarma extends SekshiModule {
     const allTime = time === 'f'
 
     Karma.aggregate()
-    .match({ giver: user.id, date: { $gte: since.toDate() } })
+    .match({ giver: user.id, target: { $ne: 0 }, date: { $gte: since.toDate() } })
     .group({ _id: "$target", karma: { $sum: "$amount" } })
     .sort({ karma: -1 }).exec().then(karmaList => {
       if (karmaList.length === 0) {
