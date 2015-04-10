@@ -20,8 +20,7 @@ const userSchema = new Schema({
 
 userSchema.static('fromPlugUser', function (plugUser) {
   const descr = {
-    _id: plugUser.id
-  , username: plugUser.username
+    username: plugUser.username
   , slug: plugUser.slug
   , level: plugUser.level
   , role: plugUser.role
@@ -31,8 +30,7 @@ userSchema.static('fromPlugUser', function (plugUser) {
   , badge: plugUser.badge
   }
 
-  return User.findById(plugUser.id).exec()
-    .then(user => user || User.create(descr))
+  return User.findByIdAndUpdate(plugUser.id, { $set: descr }, { upsert: true }).exec()
 })
 
 export const User = mongoose.model('User', userSchema)
