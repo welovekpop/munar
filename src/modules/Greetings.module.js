@@ -4,11 +4,11 @@ const SekshiModule = require('../Module')
 export default class Greetings extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'Sooyou'
     this.version = '0.1.0'
     this.description = 'Greets users.'
-
-    super(sekshi, options)
 
     this.permissions = {
       greetusers: sekshi.USERROLE.BOUNCER

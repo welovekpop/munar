@@ -4,11 +4,11 @@ const SekshiModule = require('../Module')
 export default class System extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'Sooyou'
     this.version = '1.0.0'
     this.description = 'Simple tools for module management & system information'
-
-    super(sekshi, options)
 
     this.permissions = {
       listmodules: sekshi.USERROLE.MANAGER,

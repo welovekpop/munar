@@ -6,11 +6,11 @@ const SekshiModule = require('../Module')
 export default class RedditFeed extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'schrobby'
     this.version = '0.3.0'
     this.description = 'Announces new submissions from a configurable list of subreddits.'
-
-    super(sekshi, options)
 
     this.permissions = {
       addsubreddit: sekshi.USERROLE.MANAGER,

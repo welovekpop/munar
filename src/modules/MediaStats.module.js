@@ -8,11 +8,11 @@ const utils = require('../utils')
 export default class MediaStats extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '0.4.1'
     this.description = 'Provides staff with some statistics on media plays.'
-
-    super(sekshi, options)
 
     this.permissions = {
       lastplayed: sekshi.USERROLE.RESIDENTDJ,

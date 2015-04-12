@@ -18,11 +18,11 @@ const RouletteHistory = mongoose.modelNames().indexOf('Roulette') === -1
 export default class Roulette extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '1.1.0'
     this.description = 'Runs random raffles for wait list position #1.'
-
-    super(sekshi, options)
 
     this.permissions = {
       play: sekshi.USERROLE.NONE,

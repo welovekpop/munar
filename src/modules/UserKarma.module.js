@@ -8,11 +8,11 @@ const utils = require('../utils')
 export default class UserKarma extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'brookiebeast'
     this.version = '0.4.0'
     this.description = 'Keeps track of users\' earned internet points.'
-
-    super(sekshi, options)
 
     this.permissions = {
       karma: sekshi.USERROLE.NONE,

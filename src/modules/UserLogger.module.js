@@ -7,11 +7,11 @@ const Promise = require('promise')
 export default class UserLogger extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '0.1.0'
     this.description = 'Keeps track of users who visit the channel.'
-
-    super(sekshi, options)
 
     this.onUserJoin = this.onUserJoin.bind(this)
   }

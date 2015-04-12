@@ -4,11 +4,11 @@ const SekshiModule = require('../Module')
 export default class Links extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '0.1.1'
     this.description = 'Throws links at people.'
-
-    super(sekshi, options)
 
     this.permissions = {
       fb: sekshi.USERROLE.NONE,

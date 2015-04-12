@@ -7,11 +7,11 @@ const assign = require('object-assign')
 export default class Config extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '1.1.0'
     this.description = 'Keeps module configuration.'
-
-    super(sekshi, options)
 
     this.permissions = {
       set: sekshi.USERROLE.MANAGER,

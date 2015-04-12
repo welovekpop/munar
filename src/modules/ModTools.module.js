@@ -4,11 +4,11 @@ const debug = require('debug')('sekshi:mod-tools')
 export default class ModTools extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '1.0.0'
     this.description = 'Provides moderation commands on the bot so you don\'t have to deal with plug\'s moderator UI.'
-
-    super(sekshi, options)
 
     this.permissions = {
       clearwaitlist: sekshi.USERROLE.MANAGER,

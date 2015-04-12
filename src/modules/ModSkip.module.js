@@ -4,11 +4,11 @@ const SekshiModule = require('../Module')
 export default class ModSkip extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '0.3.1'
     this.description = 'Simple DJ skipping tools'
-
-    super(sekshi, options)
 
     this.permissions = {
       skip: sekshi.USERROLE.BOUNCER,

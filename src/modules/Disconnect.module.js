@@ -13,11 +13,11 @@ const Disconnections = mongoose.modelNames().indexOf('Disconnections') === -1
 
 export default class Disconnect extends SekshiModule {
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'Sooyou'
     this.version = '1.0.1'
     this.description = 'Puts disconnected users back at their original wait list spot.'
-
-    super(sekshi, options)
 
     this.permissions = {
       dc: sekshi.USERROLE.NONE
