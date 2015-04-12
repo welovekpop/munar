@@ -17,7 +17,14 @@ export default class ModTools extends SekshiModule {
       move: sekshi.USERROLE.BOUNCER,
       ban: sekshi.USERROLE.BOUNCER,
       mute: sekshi.USERROLE.BOUNCER,
-      unmute: sekshi.USERROLE.BOUNCER
+      unmute: sekshi.USERROLE.BOUNCER,
+      eatshit: sekshi.USERROLE.COHOST
+    }
+  }
+
+  defaultOptions() {
+    return {
+      eatshitDelay: 20
     }
   }
 
@@ -100,6 +107,18 @@ export default class ModTools extends SekshiModule {
     this.sekshi.setLock(false, false, e => {
       if (e) debug('unlock-err', e)
     })
+  }
+
+  eatshit(user, targetName, duration = 'd') {
+    const target = this.sekshi.getUserByName(targetName)
+    if (target) {
+      const emotes = this.sekshi.getModule('emotes')
+      emotes && emotes.emote(user, 'eatshit', target.username)
+      this.mute(user, targetName)
+      setTimeout(() => {
+        this.ban(user, targetName, duration)
+      }, this.options.eatshitDelay * 1000)
+    }
   }
 
 }
