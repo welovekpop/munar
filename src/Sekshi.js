@@ -164,6 +164,12 @@ export default class Sekshi extends Plugged {
 
       // nonexistent user
       if (!user) return
+      // Somehow plug decided to not handle chat levels on the server side, so if people
+      // work around the client side chat level restriction, we can still get messages
+      // from people whose level is below the minimum chat level for the room -.-
+      if ('level' in user && user.level < this.getRoomMeta().minChatLevel) {
+        return
+      }
 
       user.role = user.role || this.USERROLE.NONE
 
