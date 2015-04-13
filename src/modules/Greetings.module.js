@@ -27,7 +27,9 @@ export default class Greetings extends SekshiModule {
         'Heyho @',
         'Hej @',
         '안녕, @!',
-        'Hi @'
+        'Hi @',
+        '你好, @!',
+        'こんにちは, @!'
       ],
       emoji: [
         ':purple_heart:',
