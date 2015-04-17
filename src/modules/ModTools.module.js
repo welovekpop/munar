@@ -7,7 +7,7 @@ export default class ModTools extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.0'
+    this.version = '1.1.0'
     this.description = 'Provides moderation commands on the bot so you don\'t have to deal with plug\'s moderator UI.'
 
     this.permissions = {
@@ -18,7 +18,7 @@ export default class ModTools extends SekshiModule {
       ban: sekshi.USERROLE.BOUNCER,
       mute: sekshi.USERROLE.BOUNCER,
       unmute: sekshi.USERROLE.BOUNCER,
-      eatshit: sekshi.USERROLE.COHOST
+      eatshit: sekshi.USERROLE.BOUNCER
     }
   }
 
