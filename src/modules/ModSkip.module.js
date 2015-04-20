@@ -35,21 +35,23 @@ export default class ModSkip extends SekshiModule {
     this._lastSkip = 0
   }
 
-  _skipMessage(user, reason = false) {
-    if (reason && this.options.reasons.hasOwnProperty(reason)) {
+  getSkipMessage(reason) {
+    if (this.options.reasons.hasOwnProperty(reason)) {
       reason = this.options.reasons[reason]
     }
-    if (reason) {
-      let dj = this.sekshi.getCurrentDJ()
-      return `@${dj.username} ${reason}`
-    }
-    else {
-      return `/me ${user.username} used skip!`
-    }
+    let dj = this.sekshi.getCurrentDJ()
+    return `@${dj.username} ${reason}`
+  }
+
+  _skipMessage(user, reason = false) {
+    return reason
+      ? this.getSkipMessage(reason)
+      : `/me ${user.username} used skip!`
   }
 
   skip(user, ...reason) {
-    if (Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
+    let isSekshi = user === this.sekshi.getSelf()
+    if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
@@ -57,7 +59,8 @@ export default class ModSkip extends SekshiModule {
   }
 
   lockskip(user, ...reason) {
-    if (Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
+    let isSekshi = user === this.sekshi.getSelf()
+    if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
