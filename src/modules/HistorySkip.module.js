@@ -36,8 +36,9 @@ export default class HistorySkip extends SekshiModule {
     let dj = this.sekshi.getCurrentDJ()
     const modSkip = this.sekshi.getModule('modskip')
 
-    // nobody is playing anymore
-    if (!dj) return
+    // nobody is playing anymore, or the skip module is
+    // not loaded
+    if (!dj || !modSkip) return
 
     this.sekshi.getRoomHistory((e, history) => {
       if (e) return debug('error loading history', e)
@@ -45,16 +46,11 @@ export default class HistorySkip extends SekshiModule {
                  .some(item => item.media.format === media.format && item.media.cid === media.cid)) {
         this._skipCount[dj.id] = (this._skipCount[dj.id] || 0) + 1
         if (this._skipCount[dj.id] >= this.options.autoremove) {
-          if (modSkip) {
-            this.sekshi.sendChat(modSkip._skipMessage(this.sekshi.getSelf(), 'history'))
-          }
+          this.sekshi.sendChat(modSkip.getSkipMessage('history'))
           this.sekshi.removeDJ(dj.id)
         }
         else {
-          this.sekshi.onMessage({
-            id: 'sekshi',
-            message: `!lockskip history`
-          })
+          modSkip.lockskip(this.sekshi.getSelf(), 'history')
         }
       }
       else {
