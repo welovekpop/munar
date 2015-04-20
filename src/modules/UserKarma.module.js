@@ -11,7 +11,7 @@ export default class UserKarma extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'brookiebeast'
-    this.version = '0.4.0'
+    this.version = '0.4.1'
     this.description = 'Keeps track of users\' earned internet points.'
 
     this.permissions = {
@@ -237,7 +237,7 @@ export default class UserKarma extends SekshiModule {
   }
 
   fistbump(user) {
-    Karma.find({ reason: { $ne: null } }).where('amount').gt(0).populate('giver').exec().then( reasonList => {
+    Karma.find({ target: user.id, reason: { $ne: null } }).where('amount').gt(0).populate('giver').exec().then( reasonList => {
       debug(reasonList)
       if (reasonList.length === 0) {
         this.sekshi.sendChat(`@${user.username} no one can explain your mysterious allure.`)
@@ -249,7 +249,7 @@ export default class UserKarma extends SekshiModule {
   }
 
   fistthump(user) {
-    Karma.find({ reason: { $ne: null } }).where('amount').lt(0).populate('giver').exec().then( reasonList => {
+    Karma.find({ target: user.id, reason: { $ne: null } }).where('amount').lt(0).populate('giver').exec().then( reasonList => {
       if (reasonList.length === 0) {
         this.sekshi.sendChat(`@${user.username} no reason was ever given.`)
       }
