@@ -130,7 +130,7 @@ export default class UserKarma extends SekshiModule {
     }
 
     debug('karma bump', `${other.username} (${other.id})`)
-    User.fromPlugUser(other).then(target => {
+    User.findById(other.id).then(target => {
       if (target) {
         if (reason && reason.length > 0) {
           this.sekshi.sendChat(`@${user.username} bumped @${other.username}\'s karma ${reason.join(' ')}`)
@@ -164,7 +164,7 @@ export default class UserKarma extends SekshiModule {
       this.sekshi.sendChat(`@${user.username} You\'re weird.`)
     }
 
-    User.fromPlugUser(other).then(target => {
+    User.findById(other.id).then(target => {
       if (target) {
         if (reason && reason.length > 0) {
           this.sekshi.sendChat(`@${user.username} thumped @${other.username}\'s karma ${reason.join(' ')}`)
