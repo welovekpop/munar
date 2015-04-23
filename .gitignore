@@ -1,3 +1,5 @@
 node_modules
 creds.json
 config.json
+lib
+.config
