@@ -18,10 +18,12 @@ export default class UserLogger extends SekshiModule {
 
   init() {
     this.sekshi.on(this.sekshi.USER_JOIN, this.onUserJoin)
-    // ensure that users who are already online are entered into the
-    // database
-    Promise.all(this.sekshi.getUsers().map(User.fromPlugUser))
-      .then(users => { debug('updated users', users.length) })
+    this.sekshi.on(this.sekshi.JOINED_ROOM, () => {
+      // ensure that users who are already online are entered into the
+      // database
+      Promise.all(this.sekshi.getUsers().map(User.fromPlugUser))
+        .then(users => { debug('updated users', users.length) })
+    })
   }
   destroy() {
     this.sekshi.removeListener(this.sekshi.USER_JOIN, this.onUserJoin)
