@@ -31,7 +31,7 @@ export default class UserLogger extends SekshiModule {
 
   onUserJoin(user) {
     debug('join', `${user.username} (${user.id})`)
-    User.fromPlugUser(user.id).then(user => {
+    User.fromPlugUser(user).then(user => {
       user.set('visits', user.get('visits') + 1)
       user.set('lastVisit', new Date())
       return user.save()
