@@ -1,7 +1,7 @@
 {
   "name": "sekshibot",
   "description": "Modular plug.dj room bot for WE ♥ KPOP",
-  "version": "0.10.4",
+  "version": "0.11.0-beta",
   "main": "lib/Sekshi",
   "author": "Sooyou",
   "contributors": [
@@ -16,12 +16,11 @@
     "array-findindex": "^0.1.0",
     "babel": "^4.1.1",
     "debug": "*",
-    "ent": "^2.2.0",
     "moment": "^2.9.0",
     "mongoose": "3.8.x",
     "object-assign": "^2.0.0",
     "once": "^1.3.1",
-    "plugged": "welovekpop/plugged#edits",
+    "plugged": "1.x",
     "promise": "^6.1.0",
     "snoocore": "*",
     "unescape": "^0.1.1",

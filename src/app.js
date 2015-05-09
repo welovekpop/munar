@@ -45,13 +45,13 @@ function start() {
     onError(e)
   })
 
-  sekshi.on(sekshi.JOINED_ROOM, err => {
-    if (!err && process.argv[2] !== 'silent') {
+  sekshi.on(sekshi.JOINED_ROOM, room => {
+    if (room && process.argv[2] !== 'silent') {
       sekshi.sendChat(`/me SekshiBot v${pkg.version} started!`)
     }
-    else {
+    else if (!room) {
       console.error('join error')
-      onError(err)
+      onError({})
     }
   })
 }
