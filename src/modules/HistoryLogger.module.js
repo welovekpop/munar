@@ -27,6 +27,8 @@ export default class HistoryLogger extends SekshiModule {
     const sekshi = this.sekshi
 
     if (previous && previous.historyID && previous.score) {
+      previous.score.listeners = sekshi.getUsers().length
+
       HistoryEntry.update({ _id: previous.historyID },
                           { $set: { score: previous.score } }).exec()
     }
