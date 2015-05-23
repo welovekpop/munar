@@ -21,7 +21,7 @@ export default class Roulette extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '2.0.0'
+    this.version = '2.1.0'
     this.description = 'Runs random raffles for a set wait list position (probably #1/#2).'
 
     this.permissions = {
@@ -30,6 +30,7 @@ export default class Roulette extends SekshiModule {
       players: sekshi.USERROLE.NONE,
       lastroulette: sekshi.USERROLE.BOUNCER,
       roulette: sekshi.USERROLE.BOUNCER,
+      stoproulette: sekshi.USERROLE.BOUNCER,
       luckybastards: sekshi.USERROLE.BOUNCER
     }
 
@@ -141,6 +142,17 @@ export default class Roulette extends SekshiModule {
         }
       })
       .then(null, notPlayed)
+  }
+
+  stoproulette(user) {
+    if (this._running) {
+      clearTimeout(this._timer)
+      this._timer = null
+      this._roulette = null
+      this._players = []
+      this._running = false
+      this.sekshi.sendChat(`@${user.username} stopped roulette!`)
+    }
   }
 
   luckybastards(user, amount = 5) {
