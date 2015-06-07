@@ -1,4 +1,3 @@
-const os = require('os')
 const SekshiModule = require('../Module')
 
 export default class System extends SekshiModule {
