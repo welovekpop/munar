@@ -24,6 +24,7 @@ export default class Sekshi extends Plugged {
     this._room = args.room
 
     this.onMessage = this.onMessage.bind(this)
+    this.onUserUpdate = this.onUserUpdate.bind(this)
   }
 
   _log(msg, verbosity, color) {
@@ -40,6 +41,7 @@ export default class Sekshi extends Plugged {
     })
 
     this.on(this.CHAT, this.onMessage)
+    this.on(this.USER_UPDATE, this.onUserUpdate)
 
     if (cb) this.once(this.JOINED_ROOM, cb)
   }
@@ -64,6 +66,20 @@ export default class Sekshi extends Plugged {
   setRoom(room) {
     this.options.room = room
     this.connect(room)
+  }
+
+  // updates user name, avatar and level
+  onUserUpdate(update) {
+    const user = this.getUserByID(update.id)
+    assign(user, update)
+    User.findById(user.id).then(model => {
+      model.set({
+        level: update.level
+      , avatar: update.avatarID
+      , username: update.username
+      })
+      model.save()
+    })
   }
 
   onMessage(msg) {
