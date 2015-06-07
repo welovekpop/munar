@@ -14,7 +14,7 @@
   "dependencies": {
     "array-find": "^0.1.1",
     "array-findindex": "^0.1.0",
-    "babel": "^4.1.1",
+    "babel": "5.x",
     "debug": "*",
     "moment": "^2.9.0",
     "mongoose": "3.8.x",
