@@ -7,6 +7,8 @@ const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const Promise = require('promise')
 const find = require('array-find')
+const assign = require('object-assign')
+const { User } = require('./models')
 
 export default class Sekshi extends Plugged {
   constructor(args) {
@@ -72,7 +74,7 @@ export default class Sekshi extends Plugged {
   onUserUpdate(update) {
     const user = this.getUserByID(update.id)
     assign(user, update)
-    User.findById(user.id).then(model => {
+    User.findById(user.id).exec().then(model => {
       model.set({
         level: update.level
       , avatar: update.avatarID
