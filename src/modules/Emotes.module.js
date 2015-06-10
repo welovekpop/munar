@@ -15,11 +15,11 @@ const cleanId = id => id.toLowerCase()
 
 export default class Emotes extends SekshiModule {
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '1.0.1'
     this.description = 'adds several emoticons as well as gifs and webms'
-
-    super(sekshi, options)
 
     this.permissions = {
       thatsnono: sekshi.USERROLE.NONE,

@@ -7,11 +7,11 @@ const moment = require('moment')
 export default class HistoryLogger extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '0.3.1'
     this.description = 'Keeps a history of all songs that are played in the room.'
-
-    super(sekshi, options)
 
     this.onAdvance = this.onAdvance.bind(this)
   }
@@ -27,6 +27,8 @@ export default class HistoryLogger extends SekshiModule {
     const sekshi = this.sekshi
 
     if (previous && previous.historyID && previous.score) {
+      previous.score.listeners = sekshi.getUsers().length
+
       HistoryEntry.update({ _id: previous.historyID },
                           { $set: { score: previous.score } }).exec()
     }

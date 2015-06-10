@@ -5,11 +5,11 @@ const findIndex = require('array-findindex')
 export default class Misc extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'Sooyou'
     this.version = '0.3.0'
     this.description = 'Provides an estimation of when people get to play their song.'
-
-    super(sekshi, options)
 
     this.permissions = {
       eta: sekshi.USERROLE.NONE

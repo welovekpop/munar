@@ -7,11 +7,11 @@ const assign = require('object-assign')
 export default class Config extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '1.1.0'
     this.description = 'Keeps module configuration.'
-
-    super(sekshi, options)
 
     this.permissions = {
       set: sekshi.USERROLE.MANAGER,
@@ -112,14 +112,26 @@ export default class Config extends SekshiModule {
       this.sekshi.sendChat(`@${user.username} Could not find module "${ns}"`)
     }
   }
+
   get(user, ns, option) {
-    ns = ns.toLowerCase()
-    let mod = this.sekshi.getModule(ns)
-    if (mod) {
-      this.sekshi.sendChat(`@${user.username} "${ns}.${option}": ${mod.getOption(option)}`)
-    }
-    else {
-      this.sekshi.sendChat(`@${user.username} Could not find module "${ns}"`)
+   if (ns) {
+        ns = ns.toLowerCase()
+        let mod = this.sekshi.getModule(ns)
+        if (mod) {
+          if (option) {
+            this.sekshi.sendChat(`@${user.username} "${ns}.${option}": ${mod.getOption(option)}`)
+          }
+          else {
+            let options = mod.getOptions()
+            debug('all options', options)
+            for (var option in options) {
+              this.sekshi.sendChat(`@${user.username} ${ns}.${option}: ${options[option]}`)
+            }
+          }
+        }
+        else {
+          this.sekshi.sendChat(`@${user.username} Could not find module "${ns}"`)
+        }
     }
   }
 

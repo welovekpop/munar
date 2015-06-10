@@ -3,7 +3,7 @@ const assign = require('object-assign')
 const SekshiModule = require('../Module')
 const moment = require('moment')
 const mongoose = require('mongoose')
-const { User } = require('../models')
+const { User, HistoryEntry } = require('../models')
 
 const RouletteHistory = mongoose.modelNames().indexOf('Roulette') === -1
   ? mongoose.model('Roulette', {
@@ -18,11 +18,11 @@ const RouletteHistory = mongoose.modelNames().indexOf('Roulette') === -1
 export default class Roulette extends SekshiModule {
 
   constructor(sekshi, options) {
-    this.author = 'ReAnna'
-    this.version = '1.1.0'
-    this.description = 'Runs random raffles for wait list position #1.'
-
     super(sekshi, options)
+
+    this.author = 'ReAnna'
+    this.version = '2.1.0'
+    this.description = 'Runs random raffles for a set wait list position (probably #1/#2).'
 
     this.permissions = {
       play: sekshi.USERROLE.NONE,
@@ -30,6 +30,7 @@ export default class Roulette extends SekshiModule {
       players: sekshi.USERROLE.NONE,
       lastroulette: sekshi.USERROLE.BOUNCER,
       roulette: sekshi.USERROLE.BOUNCER,
+      stoproulette: sekshi.USERROLE.BOUNCER,
       luckybastards: sekshi.USERROLE.BOUNCER
     }
 
@@ -41,7 +42,8 @@ export default class Roulette extends SekshiModule {
   defaultOptions() {
     return {
       duration: 120
-    , minPosition: 6
+    , minPosition: 4
+    , timeout: 20 * 60 // seconds
     , winnerPosition: 2
     }
   }
@@ -93,8 +95,18 @@ export default class Roulette extends SekshiModule {
         this.sekshi.sendChat(`@${user.username} You can only join the roulette if you are below position ${this.options.minPosition}!`, 10 * 1000)
       }
       else {
-        debug('new player', user.username)
-        this._players.push(user)
+        let diff = moment.duration(this.options.timeout, 'seconds')
+        this._userDJedRecently(user.id).then(did => {
+          if (did) {
+            this.sekshi.sendChat(
+              `@${user.username} You can only join the roulette if ` +
+              `you haven't DJ'd in the past ${diff.humanize()}!`
+            )
+          }
+          else {
+            this._players.push(user)
+          }
+        })
       }
     }
   }
@@ -130,6 +142,17 @@ export default class Roulette extends SekshiModule {
         }
       })
       .then(null, notPlayed)
+  }
+
+  stoproulette(user) {
+    if (this._running) {
+      clearTimeout(this._timer)
+      this._timer = null
+      this._roulette = null
+      this._players = []
+      this._running = false
+      this.sekshi.sendChat(`@${user.username} stopped roulette!`)
+    }
   }
 
   luckybastards(user, amount = 5) {
@@ -175,4 +198,19 @@ export default class Roulette extends SekshiModule {
     RouletteHistory.create(roulette)
     this._players = []
   }
+
+  _userDJedRecently(id) {
+    return HistoryEntry
+      .where('dj').equals(id)
+      .where('time').gt(Date.now() - this.options.timeout * 1000)
+      .count().exec()
+      .then(
+        // user DJed recently if there is at least one play in
+        // the last X minutes
+        count => count > 0,
+        // assume user didn't DJ recently on error
+        e => false
+      )
+  }
+
 }

@@ -4,11 +4,11 @@ const debug = require('debug')('sekshi:stuck-skip')
 export default class StuckSkip extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '1.0.0'
     this.description = 'Skips songs when plug.dj forgets to push advance messages.'
-
-    super(sekshi, options)
 
     this.onAdvance = this.onAdvance.bind(this)
     this._skip = this._skip.bind(this)

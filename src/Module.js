@@ -42,15 +42,18 @@ export default class Module {
     const lname = name.toLowerCase()
     return find(names, n => n.toLowerCase() == lname) || name
   }
+
   getOption(name) {
     return this.options[this._getOptionName(name)]
   }
+
   setOption(name, value) {
     const oname = this._getOptionName(name)
     if (oname in this.options) {
       this.options[oname] = value
     }
   }
+
   getOptions() {
     return this.options
   }

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const assign = require('object-assign')
 
 const { Schema } = mongoose
 const { ObjectId } = Schema.Types
@@ -20,8 +21,7 @@ const userSchema = new Schema({
 
 userSchema.static('fromPlugUser', function (plugUser) {
   const descr = {
-    _id: plugUser.id
-  , username: plugUser.username
+    username: plugUser.username
   , slug: plugUser.slug
   , level: plugUser.level
   , role: plugUser.role
@@ -31,8 +31,10 @@ userSchema.static('fromPlugUser', function (plugUser) {
   , badge: plugUser.badge
   }
 
-  return User.findById(plugUser.id).exec()
-    .then(user => user || User.create(descr))
+  return User.findById(plugUser.id).exec().then(doc => {
+    if (!doc) return User.create(assign(descr, { _id: plugUser.id }))
+    else      return doc.set(descr).save()
+  })
 })
 
 export const User = mongoose.model('User', userSchema)

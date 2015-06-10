@@ -4,11 +4,11 @@ const find = require('array-find')
 export default class Rules extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '0.1.0'
     this.description = 'Adds a !rule command that tells people specific rules from the room description.'
-
-    super(sekshi, options)
 
     this.permissions = {
       rule: sekshi.USERROLE.NONE

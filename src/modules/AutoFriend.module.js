@@ -4,11 +4,11 @@ const debug = require('debug')('sekshi:auto-friend')
 export default class AutoFriend extends SekshiModule {
 
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     this.author = 'ReAnna'
     this.version = '1.0.0'
     this.description = 'Just wants to be friends with everyone.'
-
-    super(sekshi, options)
 
     this.onRequest = this.onRequest.bind(this)
     sekshi.on(sekshi.FRIEND_REQUEST, this.onRequest)

@@ -7,13 +7,7 @@ const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const Promise = require('promise')
 const find = require('array-find')
-const unescape = require('ent/decode')
-
-// these are fine-tuned to fit pretty much exactly within plug.dj's rate limiting scheme,
-// while also being really simple
-const CHAT_INTERVAL = 150
-const CHAT_BACKOFF_INC = 60
-const CHAT_BACKOFF_MAX = 700
+const { User } = require('./models')
 
 export default class Sekshi extends Plugged {
   constructor(args) {
@@ -31,88 +25,11 @@ export default class Sekshi extends Plugged {
     this._room = args.room
 
     this.onMessage = this.onMessage.bind(this)
-
-    this._addUnescapeListeners()
-
-    this._chatQueue = []
-    this._lastMessage = 0
-    this._chatTimer = false
-    this._chatBackoff = CHAT_INTERVAL
+    this.onUserUpdate = this.onUserUpdate.bind(this)
   }
 
   _log(msg, verbosity, color) {
     debug(msg)
-  }
-
-  // ugly hack to deal with plug.dj's mildly insane html escaping behaviour
-  _addUnescapeListeners() {
-    const unescapeUser = user => {
-      user.username = unescape(user.username)
-      user.blurb && (user.blurb = unescape(user.blurb))
-    }
-
-    // these handlers are added before any other handlers,
-    // hopefully EventEmitter will always fire them in
-    // that same order!
-    this.on(this.USER_JOIN, unescapeUser)
-    this.on(this.ADVANCE, ({}, { media }) => {
-      media.author = unescape(media.author)
-      media.title = unescape(media.title)
-    })
-    this.on(this.CHAT, chat => {
-      chat.username = unescape(chat.username)
-      chat.message = unescape(chat.message)
-    })
-    this.on(this.JOINED_ROOM, () => {
-      this.state.room.users.forEach(unescapeUser)
-    })
-  }
-
-  // Override Plugged#getUserByName with a case insensitive version
-  getUserByName(username, checkCache = false) {
-    username = username.toLowerCase()
-
-    if (username === this.getSelf().username.toLowerCase())
-      return this.getSelf()
-
-    let user = find(this.getUsers(), user => user.username.toLowerCase() === username)
-
-    if (checkCache && !user) {
-      user = find(this.state.usercache, user => user.username.toLowerCase() === username)
-    }
-
-    return user || null
-  }
-
-  sendChat(message, autodelete = false) {
-    const MAX_LENGTH = 256
-    while (message.length >= MAX_LENGTH) {
-      this._chatQueue.push([ message.slice(0, MAX_LENGTH), autodelete ])
-      message = message.slice(MAX_LENGTH)
-    }
-    this._chatQueue.push([ message, autodelete ])
-    if (!this._chatTimer) {
-      this._processChatQueue()
-    }
-  }
-
-  _processChatQueue() {
-    if (this._chatQueue.length > 0) {
-      if (this._lastMessage + this._chatBackoff <= Date.now()) {
-        Plugged.prototype.sendChat.call(this, ...this._chatQueue.shift())
-        this._lastMessage = Date.now()
-        if (this._chatBackoff < CHAT_BACKOFF_MAX) {
-          this._chatBackoff += CHAT_BACKOFF_INC
-        }
-      }
-      setTimeout(() => this._processChatQueue(), this._chatBackoff + 1)
-      this._chatTimer = true
-    }
-
-    if (this._chatQueue.length === 0) {
-      this._chatTimer = false
-      this._chatBackoff = CHAT_INTERVAL
-    }
   }
 
   start(creds, cb) {
@@ -125,6 +42,7 @@ export default class Sekshi extends Plugged {
     })
 
     this.on(this.CHAT, this.onMessage)
+    this.on(this.USER_UPDATE, this.onUserUpdate)
 
     if (cb) this.once(this.JOINED_ROOM, cb)
   }
@@ -151,6 +69,28 @@ export default class Sekshi extends Plugged {
     this.connect(room)
   }
 
+  // updates user name, avatar and level
+  onUserUpdate(update) {
+    const user = this.getUserByID(update.id)
+    if (!user) return
+    User.findById(user.id).exec().then(model => {
+      if (!model) return
+      if (update.level) {
+        user.level = update.level
+        model.set('level', update.level)
+      }
+      if (update.avatarID) {
+        user.avatarID = update.avatarID
+        model.set('avatar', update.avatarID)
+      }
+      if (update.username) {
+        user.username = update.username
+        model.set('username', update.username)
+      }
+      model.save()
+    })
+  }
+
   onMessage(msg) {
     if (!this.getCurrentRoomStats()) {
       return
@@ -164,6 +104,12 @@ export default class Sekshi extends Plugged {
 
       // nonexistent user
       if (!user) return
+      // Somehow plug decided to not handle chat levels on the server side, so if people
+      // work around the client side chat level restriction, we can still get messages
+      // from people whose level is below the minimum chat level for the room -.-
+      if ('level' in user && user.level < this.getRoomMeta().minChatLevel) {
+        return
+      }
 
       user.role = user.role || this.USERROLE.NONE
 
