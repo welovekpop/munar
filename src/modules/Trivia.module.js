@@ -1,6 +1,7 @@
 const TriviaCore = require('./TriviaCore')
 const Promise = require('promise')
 const request = require('request')
+const assign = require('object-assign')
 
 function normalizeAnswer(a) {
   return a.toLowerCase().replace(/\s+/g, ' ')
@@ -18,7 +19,6 @@ export default class Trivia extends TriviaCore {
     this.permissions = {
       trivia: sekshi.USERROLE.MANAGER,
       trivquit: sekshi.USERROLE.MANAGER,
-      skipquestion: sekshi.USERROLE.BOUNCER,
       trivpoints: sekshi.USERROLE.BOUNCER
     }
   }
@@ -31,7 +31,37 @@ export default class Trivia extends TriviaCore {
   }
 
   defaultOptions() {
-    return super.defaultOptions()
+    return assign(super.defaultOptions(), {
+      points: 3
+    })
+  }
+
+  nextQuestion() {
+    const target = this.options.points
+    super.nextQuestion().then(({ winner, question }) => {
+      if (winner) {
+        this.addPoints(winner)
+        if (this.getPoints(winner) >= target) {
+          this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly and reached ${target} points!` +
+                               ` Congratulations! :D`)
+          this.sekshi.moveDJ(winner.id, 1)
+          this.stopTrivia()
+        }
+        else {
+          this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly! Next question in 5 seconds!`)
+          setTimeout(() => this.nextQuestion(), 5 * 1000)
+        }
+      }
+      else {
+        this.sekshi.sendChat(`[Trivia] Nobody answered correctly! ` +
+                             `The right answer was "${question.answers[0]}". Next question in 5 seconds!`)
+        setTimeout(() => this.nextQuestion(), 5 * 1000)
+      }
+    }).catch(e => {
+      this.sekshi.sendChat(`[Trivia] Something went wrong! Stopping trivia before I explode... :boom:`)
+      this.stopTrivia()
+      console.error('trivia', e)
+    })
   }
 
   // Chat Commands
@@ -39,20 +69,16 @@ export default class Trivia extends TriviaCore {
     this.sekshi.sendChat(`[Trivia] @everyone ${user.username} started Trivia!`)
     this.startTrivia().then(() => {
       this.sekshi.sendChat(`Loaded ${this.questions.length} questions. First question in 5 seconds!`)
-      setTimeout(this.nextQuestion.bind(this), 5 * 1000)
+      setTimeout(() => this.nextQuestion(), 5 * 1000)
     })
   }
 
   trivquit(user) {
-    if (this._running) {
-      this._running = false
-      clearTimeout(this._timeout)
-      clearTimeout(this._5stimeout)
-      clearTimeout(this._nqtimeout)
+    if (this.isRunning()) {
+      this.stopTrivia()
       if (user) {
         this.sekshi.sendChat(`[Trivia] ${user.username} stopped Trivia.`)
       }
-      this.sekshi.removeListener(this.sekshi.CHAT, this.onChat)
     }
   }
 
@@ -67,11 +93,6 @@ export default class Trivia extends TriviaCore {
         const u = this.sekshi.getUserByID(x.uid)
         return `#${i + 1} ${u.username} (${x.points})`
       }).join(', '))
-    }
-  }
-
-  skipquestion(user) {
-    if (this.isRunning() && this.currentQuestion) {
     }
   }
 
