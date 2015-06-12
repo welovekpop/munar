@@ -19,8 +19,8 @@ export default class TriviaCore extends SekshiModule {
     this._currentQuestion = null
   }
   destroy() {
-    if (this._running) {
-      this.trivquit()
+    if (this.isRunning()) {
+      this.stopTrivia()
     }
     this.questions = []
   }
@@ -44,7 +44,6 @@ export default class TriviaCore extends SekshiModule {
     this.sekshi.on(this.sekshi.CHAT, this.onChat)
 
     return this._load()
-      .catch(e => console.error(e))
   }
 
   // public api
@@ -61,39 +60,48 @@ export default class TriviaCore extends SekshiModule {
   }
 
   askQuestion(question) {
-    this.sekshi.sendChat(`[Trivia] From the "${question.category}" category: ${question.question}`)
+    return new Promise((resolve, reject) => {
+      this.sekshi.sendChat(`[Trivia] From the "${question.category}" category: ${question.question}`)
 
-    this._currentQuestion = question
-    this._history.push(question)
-    if (this._history.length > this.options.historySize) {
-      this._history.shift()
-    }
+      this._currentQuestion = question
+      this._history.push(question)
+      if (this._history.length > this.options.historySize) {
+        this._history.shift()
+      }
 
-    this._timeout = setTimeout(this.notAnswered.bind(this), this.options.roundDuration * 1000)
+      this._resolve = resolve
+      this._reject = reject
+      this._timeout = setTimeout(() => this.notAnswered(),
+                                 this.options.roundDuration * 1000)
+    })
   }
 
   showWinner(winner, answer) {
-    this.sekshi.sendChat(`[Trivia] "${answer}" is correct! ${winner.username} wins the round. ` +
-                         `Next question in 15 seconds!`)
-    this.addPoints(winner)
+    this.sekshi.sendChat(`[Trivia] "${answer}" is correct! ${winner.username} wins the round.`)
 
     clearTimeout(this._timeout)
-    this._currentQuestion = null
 
-    this._5stimeout = setTimeout(() => { this.sekshi.sendChat(`[Trivia] 5 seconds...`) }, 10 * 1000)
-    this._nqtimeout = setTimeout(this.nextQuestion.bind(this), 15 * 1000)
+    this._resolve({ winner, question: this._currentQuestion })
+
+    this._currentQuestion = null
   }
 
   notAnswered() {
-    this.sekshi.sendChat(`[Trivia] Nobody answered correctly. It was "${this._currentQuestion.answers[0]}", so I win this round~ ^o^/`)
-    this.addPoints(this.sekshi.getSelf())
+    this._resolve({ winner: null, question: this._currentQuestion })
     this._currentQuestion = null
-
-    this._nqtimeout = setTimeout(this.nextQuestion.bind(this), 5 * 1000)
   }
 
   addPoints(user, points = 1) {
     this._points[user.id] = (this._points[user.id] || 0) + points
+  }
+  getPoints(user) {
+    return this._points[user.id] || 0
+  }
+
+  stopTrivia() {
+    this._running = false
+    clearTimeout(this._timeout)
+    this.sekshi.removeListener(this.sekshi.CHAT, this.onChat)
   }
 
   onChat(msg) {
