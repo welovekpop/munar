@@ -24,7 +24,11 @@ export default class ModSkip extends SekshiModule {
         duration: 'This song is too long. Please pick a shorter one.',
         quality: 'The audio quality of this song is less than ideal. Please pick a better quality one.',
         outro: 'Skipping the rest of this song!',
-        op: 'This song has been played a lot recently. Please play a different one.'
+        op: 'This song has been played a lot recently. Please play a different one.',
+        oneshot: 'This video is long and includes multiple songs and/or extended drama portions. Please play a different one.',
+        unavailable: 'This video is unavailable or blocked. Please choose another.',
+        ua: 'This video is unavailable or blocked. Please choose another.',
+        blocked: 'This video is unavailable or blocked. Please choose another.'
       },
       lockskipPos: 1,
       cooldown: 7 // seconds
