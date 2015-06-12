@@ -32,12 +32,14 @@ export default class Trivia extends TriviaCore {
 
   defaultOptions() {
     return assign(super.defaultOptions(), {
-      points: 3
+      points: 3,
+      interval: 5
     })
   }
 
   nextQuestion() {
     const target = this.options.points
+    const interval = this.options.interval
     super.nextQuestion().then(({ winner, question }) => {
       if (winner) {
         this.addPoints(winner)
@@ -48,14 +50,14 @@ export default class Trivia extends TriviaCore {
           this.stopTrivia()
         }
         else {
-          this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly! Next question in 5 seconds!`)
-          setTimeout(() => this.nextQuestion(), 5 * 1000)
+          this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly! Next question in ${interval} seconds!`)
+          setTimeout(() => this.nextQuestion(), interval * 1000)
         }
       }
       else {
         this.sekshi.sendChat(`[Trivia] Nobody answered correctly! ` +
-                             `The right answer was "${question.answers[0]}". Next question in 5 seconds!`)
-        setTimeout(() => this.nextQuestion(), 5 * 1000)
+                             `The right answer was "${question.answers[0]}". Next question in ${interval} seconds!`)
+        setTimeout(() => this.nextQuestion(), interval * 1000)
       }
     }).catch(e => {
       this.sekshi.sendChat(`[Trivia] Something went wrong! Stopping trivia before I explode... :boom:`)
