@@ -68,7 +68,7 @@ export default class Trivia extends TriviaCore {
 
   // Chat Commands
   trivia(user, test = false) {
-    this.sekshi.sendChat(`[Trivia] @everyone ${user.username} started Trivia! ` +
+    this.sekshi.sendChat(`[Trivia] @djs ${user.username} started Trivia! ` +
                          `First to ${this.options.points} points gets waitlist spot #2 :)`)
     this.startTrivia().then(() => {
       this.sekshi.sendChat(`Loaded ${this.questions.length} questions. First question in 5 seconds!`)
