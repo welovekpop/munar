@@ -1,9 +1,12 @@
 const assign = require('object-assign')
 const find = require('array-find')
+const { EventEmitter } = require('events')
 
-export default class Module {
+export default class Module extends EventEmitter {
 
   constructor(sekshi, options = {}) {
+    super()
+
     this.sekshi = sekshi
     this.options = assign({}, this.defaultOptions(), options)
     this.permissions = {}
