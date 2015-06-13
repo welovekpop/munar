@@ -38,7 +38,7 @@ export default class StuckSkip extends SekshiModule {
   }
 
   _skip() {
-    this.sekshi.sendChat('/me Song stuck, skipping...')
+    this.sekshi.sendChat('/me Song stuck, skipping...', 5000)
     this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
   }
 
