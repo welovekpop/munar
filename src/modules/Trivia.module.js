@@ -13,9 +13,10 @@ export default class Trivia extends TriviaCore {
     this.description = ''
 
     this.permissions = {
-      trivia: sekshi.USERROLE.MANAGER,
-      trivquit: sekshi.USERROLE.MANAGER,
-      trivpoints: sekshi.USERROLE.BOUNCER
+      trivia: sekshi.USERROLE.BOUNCER,
+      trivquit: sekshi.USERROLE.BOUNCER,
+      trivpoints: sekshi.USERROLE.NONE,
+      lasttrivia: sekshi.USERROLE.RESIDENTDJ
     }
   }
 
