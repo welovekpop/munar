@@ -18,7 +18,7 @@ export default class Emotes extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.1'
+    this.version = '1.0.2'
     this.description = 'adds several emoticons as well as gifs and webms'
 
     this.permissions = {
@@ -109,7 +109,7 @@ export default class Emotes extends SekshiModule {
     }
     if (!target) target = user
 
-    Emote.findById(id).exec().then(emote => {
+    Emote.findById(cleanId(id)).exec().then(emote => {
       this.sendEmote(emote.url, target.username)
     })
   }
