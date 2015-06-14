@@ -23,7 +23,8 @@ export default class Trivia extends TriviaCore {
   defaultOptions() {
     return assign(super.defaultOptions(), {
       points: 3,
-      interval: 5
+      interval: 5,
+      winPosition: 2
     })
   }
 
@@ -36,7 +37,7 @@ export default class Trivia extends TriviaCore {
         if (this.getPoints(winner) >= target) {
           this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly and reached ${target} points!` +
                                ` Congratulations! :D`)
-          this.sekshi.moveDJ(winner.id, 1)
+          this.sekshi.moveDJ(winner.id, this.options.winPosition - 1)
           this.stopTrivia()
         }
         else {
@@ -60,7 +61,7 @@ export default class Trivia extends TriviaCore {
   trivia(user) {
     if (!this.isRunning()) {
       this.sekshi.sendChat(`[Trivia] @djs ${user.username} started Trivia! ` +
-                           `First to ${this.options.points} points gets waitlist spot #2 :)`)
+                           `First to ${this.options.points} points gets waitlist spot #${this.options.winPosition} :)`)
       this.startTrivia().then(() => {
         this.sekshi.sendChat(`Loaded ${this.questions.length} questions. First question in 5 seconds!`)
         setTimeout(() => this.nextQuestion(), 5 * 1000)
