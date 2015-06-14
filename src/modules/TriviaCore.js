@@ -96,6 +96,10 @@ export default class TriviaCore extends SekshiModule {
     return this._points[user.id] || 0
   }
 
+  getCurrentQuestion() {
+    return this._currentQuestion
+  }
+
   stopTrivia() {
     this._running = false
     clearTimeout(this._timeout)

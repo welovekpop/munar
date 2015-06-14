@@ -16,7 +16,8 @@ export default class Trivia extends TriviaCore {
       trivia: sekshi.USERROLE.BOUNCER,
       trivquit: sekshi.USERROLE.BOUNCER,
       trivpoints: sekshi.USERROLE.NONE,
-      lasttrivia: sekshi.USERROLE.RESIDENTDJ
+      lasttrivia: sekshi.USERROLE.RESIDENTDJ,
+      question: sekshi.USERROLE.NONE
     }
   }
 
@@ -42,12 +43,14 @@ export default class Trivia extends TriviaCore {
         }
         else {
           this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly! Next question in ${interval} seconds!`)
+          this._currentQuestion = null
           setTimeout(() => this.nextQuestion(), interval * 1000)
         }
       }
       else {
         this.sekshi.sendChat(`[Trivia] Nobody answered correctly! ` +
                              `The right answer was "${question.answers[0]}". Next question in ${interval} seconds!`)
+        this._currentQuestion = null
         setTimeout(() => this.nextQuestion(), interval * 1000)
       }
     }).catch(e => {
@@ -89,6 +92,15 @@ export default class Trivia extends TriviaCore {
         const u = this.sekshi.getUserByID(x.uid)
         return `#${i + 1} ${u.username} (${x.points})`
       }).join(', '))
+    }
+  }
+
+  question(user) {
+    if (this.isRunning()) {
+      let question = this.getCurrentQuestion()
+      if (question) {
+        this.sekshi.sendChat(`[Trivia] @${user.username} The current question is: ${question.question}`)
+      }
     }
   }
 
