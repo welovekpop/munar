@@ -14,10 +14,6 @@ export default class TriviaCore extends SekshiModule {
     this.onChat = this.onChat.bind(this)
   }
 
-  init() {
-    this.questions = []
-    this._currentQuestion = null
-  }
   destroy() {
     if (this.isRunning()) {
       this.stopTrivia()
@@ -41,6 +37,8 @@ export default class TriviaCore extends SekshiModule {
     this._running = true
     this._history = []
     this._points = {}
+    this.questions = []
+    this._currentQuestion = null
     this.sekshi.on(this.sekshi.CHAT, this.onChat)
 
     return this._load()
