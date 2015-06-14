@@ -3,10 +3,6 @@ const Promise = require('promise')
 const request = require('request')
 const assign = require('object-assign')
 
-function normalizeAnswer(a) {
-  return a.toLowerCase().replace(/\s+/g, ' ')
-}
-
 export default class Trivia extends TriviaCore {
 
   constructor(sekshi, options) {
@@ -21,13 +17,6 @@ export default class Trivia extends TriviaCore {
       trivquit: sekshi.USERROLE.MANAGER,
       trivpoints: sekshi.USERROLE.BOUNCER
     }
-  }
-
-  init() {
-    super.init()
-  }
-  destroy() {
-    super.destroy()
   }
 
   defaultOptions() {
@@ -67,7 +56,7 @@ export default class Trivia extends TriviaCore {
   }
 
   // Chat Commands
-  trivia(user, test = false) {
+  trivia(user) {
     if (!this.isRunning()) {
       this.sekshi.sendChat(`[Trivia] @djs ${user.username} started Trivia! ` +
                            `First to ${this.options.points} points gets waitlist spot #2 :)`)
