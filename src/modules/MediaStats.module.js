@@ -17,8 +17,12 @@ export default class MediaStats extends SekshiModule {
     this.permissions = {
       lastplayed: sekshi.USERROLE.RESIDENTDJ,
       playcount: sekshi.USERROLE.RESIDENTDJ,
-      mostplayed: sekshi.USERROLE.RESIDENTDJ
+      mostplayed: sekshi.USERROLE.RESIDENTDJ,
+      tagged: sekshi.USERROLE.RESIDENTDJ,
+      retag: sekshi.USERROLE.RESIDENTDJ
     }
+
+    this.ninjaVanish = [ 'retag' ]
   }
 
   // public API
@@ -159,6 +163,38 @@ export default class MediaStats extends SekshiModule {
         })
       },
       e => { this.sekshi.sendChat(`ERR: ${e.message}`) }
+    )
+  }
+
+  tagged(user) {
+    let media = this.sekshi.getCurrentMedia()
+    if (!media) return
+    Media.findOne({ cid: media.cid }).exec().then(
+      model => {
+        this.sekshi.sendChat(`@${user.username} "${model.author}" - "${model.title}"`)
+      }
+    )
+  }
+
+  retag(user, ...newTag) {
+    let media = this.sekshi.getCurrentMedia()
+    if (!media) return
+    newTag = newTag.join(' ')
+    let split = newTag.indexOf(' - ')
+    let author = newTag.slice(0, split)
+    let title = newTag.slice(split + 3)
+    if (!author) {
+      return this.sekshi.sendChat(`@${user.username} Please provide a valid artist name.`)
+    }
+    if (!title) {
+      return this.sekshi.sendChat(`@${user.username} Please provide a valid song title.`)
+    }
+
+    Media.update({ cid: media.cid }, { $set: { author, title } }).exec().then(
+      () => {
+        this.sekshi.sendChat(`@${user.username} Song retagged to "${author}" - "${title}"!`, 5000)
+      },
+      console.error
     )
   }
 }
