@@ -7,7 +7,7 @@ export default class Greetings extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'Sooyou'
-    this.version = '0.1.0'
+    this.version = '0.1.1'
     this.description = 'Greets users.'
 
     this.permissions = {
@@ -57,7 +57,9 @@ export default class Greetings extends SekshiModule {
   greet(user) {
     if (!this.options.autogreet ||
         this.lastGreeted == user.id ||
-        user.username === this.sekshi.getSelf().username) {
+        user.username === this.sekshi.getSelf().username ||
+        // guest users
+        user.username == '') {
       return
     }
 
