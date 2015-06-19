@@ -3,7 +3,10 @@ const Promise = require('promise')
 const request = require('request')
 
 function normalizeAnswer(a) {
-  return a.toLowerCase().replace(/\s+/g, ' ')
+  return a.toLowerCase()
+    .replace(/\s+/g, ' ')      // spaces
+    .replace(/!\.,-\?:'/g, '') // punctuation
+    .trim()
 }
 
 export default class TriviaCore extends SekshiModule {
