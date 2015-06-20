@@ -7,13 +7,14 @@ export default class ModTools extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.1.0'
+    this.version = '1.2.0'
     this.description = 'Provides moderation commands on the bot so you don\'t have to deal with plug\'s moderator UI.'
 
     this.permissions = {
       clearwaitlist: sekshi.USERROLE.MANAGER,
       lock: sekshi.USERROLE.MANAGER,
       unlock: sekshi.USERROLE.MANAGER,
+      cycle: sekshi.USERROLE.BOUNCER,
       move: sekshi.USERROLE.BOUNCER,
       ban: sekshi.USERROLE.BOUNCER,
       mute: sekshi.USERROLE.BOUNCER,
@@ -107,6 +108,21 @@ export default class ModTools extends SekshiModule {
     this.sekshi.setLock(false, false, e => {
       if (e) debug('unlock-err', e)
     })
+  }
+
+  cycle(user, set = 'toggle') {
+    let oldCycle = this.sekshi.doesWaitlistCycle()
+    let newCycle = set === 'toggle'
+      ? !oldCycle
+      : set !== 'off' // anything that isn't "off" _enables_ dj cycle.
+    if (oldCycle !== newCycle) {
+      this.sekshi.setCycle(newCycle, () => {
+        if (!newCycle) {
+          this.sekshi.sendChat(`@djs DJ Cycle has been disabled! ` +
+                               `Remember to rejoin the wait list after your play.`)
+        }
+      })
+    }
   }
 
   eatshit(user, targetName, duration = 'd') {
