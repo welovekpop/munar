@@ -1,18 +1,21 @@
 const assign = require('object-assign')
 const find = require('array-find')
 const { EventEmitter } = require('events')
+const fs = require('fs')
+const debug = require('debug')('sekshi:module')
 
 export default class Module extends EventEmitter {
 
-  constructor(sekshi, options = {}) {
+  constructor(sekshi, optionsFile) {
     super()
 
+    this._enabled = false
+    this._optionsFile = optionsFile
+
     this.sekshi = sekshi
-    this.options = assign({}, this.defaultOptions(), options)
+    this.options = assign({}, this.defaultOptions(), this.loadOptions())
     this.permissions = {}
     this.ninjaVanish = []
-
-    this._enabled = false
   }
 
   defaultOptions() {
@@ -24,9 +27,13 @@ export default class Module extends EventEmitter {
   destroy() {
   }
 
-  enable() {
+  enable(opts = {}) {
     if (!this.enabled()) {
       this._enabled = true
+      // don't save immediately on boot
+      if (!opts.silent) {
+        this.saveOptions()
+      }
       this.init()
     }
   }
@@ -34,6 +41,7 @@ export default class Module extends EventEmitter {
     if (this.enabled()) {
       this.destroy()
       this._enabled = false
+      this.saveOptions()
     }
   }
   enabled() {
@@ -54,11 +62,28 @@ export default class Module extends EventEmitter {
     const oname = this._getOptionName(name)
     if (oname in this.options) {
       this.options[oname] = value
+      this.saveOptions()
     }
   }
 
   getOptions() {
     return this.options
+  }
+
+  loadOptions() {
+    try {
+      debug('loading options', this._optionsFile)
+      return JSON.parse(fs.readFileSync(this._optionsFile, 'utf8'))
+    }
+    catch (e) {
+      return {}
+    }
+  }
+
+  saveOptions(options = this.getOptions()) {
+    debug('saving options', this._optionsFile)
+    options = assign({}, options, { $enabled: this.enabled() })
+    fs.writeFileSync(this._optionsFile, JSON.stringify(options, null, 2), 'utf8')
   }
 
 }

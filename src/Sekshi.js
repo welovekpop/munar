@@ -7,6 +7,7 @@ const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const Promise = require('promise')
 const find = require('array-find')
+const mkdirp = require('mkdirp')
 const { User } = require('./models')
 
 export default class Sekshi extends Plugged {
@@ -23,6 +24,7 @@ export default class Sekshi extends Plugged {
     this.modulePath = args.modulePath || path.join(__dirname, 'modules')
 
     this._room = args.room
+    this._configDir = path.join(__dirname, '../.config')
 
     this.onMessage = this.onMessage.bind(this)
     this.onUserUpdate = this.onUserUpdate.bind(this)
@@ -44,7 +46,11 @@ export default class Sekshi extends Plugged {
     this.on(this.CHAT, this.onMessage)
     this.on(this.USER_UPDATE, this.onUserUpdate)
 
-    if (cb) this.once(this.JOINED_ROOM, cb)
+    this.once(this.JOINED_ROOM, (room) => {
+      mkdirp(this._configDir, (e) => {
+        if (cb) cb(e || null, room || null)
+      })
+    })
   }
 
   stop(cb) {
@@ -281,7 +287,7 @@ export default class Sekshi extends Plugged {
     let mod = this.modules[lName]
     if (!mod) {
       const Module = require(this.getModulePath(name))
-      mod = new Module(this, {})
+      mod = new Module(this, path.join(this._configDir, `${lName}.json`))
       this.modules[lName] = mod
     }
 
@@ -291,7 +297,9 @@ export default class Sekshi extends Plugged {
     process.nextTick(() => { this.emit('moduleloaded', mod, lName) })
 
     // enable system modules by default
-    if (lName === 'system' || lName === 'config') mod.enable()
+    if (lName === 'system' || mod.getOption('$enabled')) {
+      mod.enable({ silent: true })
+    }
 
     return mod
   }
@@ -341,5 +349,9 @@ export default class Sekshi extends Plugged {
   reloadModules() {
     this.unloadModules()
     this.loadModules()
+  }
+
+  getConfigDir() {
+    return this._configDir
   }
 }
