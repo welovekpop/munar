@@ -286,6 +286,7 @@ export default class Sekshi extends Plugged {
     const lName = name.toLowerCase()
     let mod = this.modules[lName]
     if (!mod) {
+      this.updateAvailableModules()
       const Module = require(this.getModulePath(name))
       mod = new Module(this, path.join(this._configDir, `${lName}.json`))
       this.modules[lName] = mod
