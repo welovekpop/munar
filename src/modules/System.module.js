@@ -61,6 +61,9 @@ export default class System extends SekshiModule {
     }
   }
   enablemodule(user, name) {
+    if (!this.sekshi.getModule(name)) {
+      this.sekshi.loadModule(name)
+    }
     this.sekshi.enable(name)
     this.sekshi.sendChat(`@${user.username} Module "${name}" enabled.`)
   }
