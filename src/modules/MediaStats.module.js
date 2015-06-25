@@ -15,8 +15,8 @@ export default class MediaStats extends SekshiModule {
     this.description = 'Provides staff with some statistics on media plays.'
 
     this.permissions = {
-      lastplayed: sekshi.USERROLE.RESIDENTDJ,
-      playcount: sekshi.USERROLE.RESIDENTDJ,
+      lastplayed: sekshi.USERROLE.NONE,
+      playcount: sekshi.USERROLE.NONE,
       mostplayed: sekshi.USERROLE.RESIDENTDJ,
       tagged: sekshi.USERROLE.RESIDENTDJ,
       retag: sekshi.USERROLE.RESIDENTDJ
