@@ -18,7 +18,7 @@ export default class Emotes extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.2'
+    this.version = '1.1.0'
     this.description = 'adds several emoticons as well as gifs and webms'
 
     this.permissions = {
@@ -33,6 +33,10 @@ export default class Emotes extends SekshiModule {
     this.ninjaVanish = [ 'addemote' ]
 
     this.Emote = Emote
+  }
+
+  defaultOptions() {
+    return { url: false }
   }
 
   sendEmote(msg, username) {
@@ -80,6 +84,11 @@ export default class Emotes extends SekshiModule {
 
   emotes({ username }) {
     debug('listing emotes')
+    if (this.options.url) {
+      this.sekshi.sendChat(`@${username} Emotes can be found at ${this.options.url} !`)
+      return
+    }
+
     Emote.find({}).sort('id').exec().then(
       emotes => {
         let message = `@${username} Emotes: `
