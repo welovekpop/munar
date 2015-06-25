@@ -3,6 +3,7 @@
   "description": "Modular plug.dj room bot for WE ♥ KPOP",
   "version": "0.13.1",
   "main": "lib/Sekshi",
+  "bin": "bin/sekshibot",
   "author": "Sooyou",
   "contributors": [
     "brookiebeast",
@@ -10,7 +11,7 @@
     "PlugLynn <PlugLynn@Hushmail.com>",
     "schrobby"
   ],
-  "homepage": "http://welovekpop.club?p=420",
+  "homepage": "http://welovekpop.club/sekshibot",
   "dependencies": {
     "array-find": "^0.1.1",
     "array-findindex": "^0.1.0",
@@ -27,7 +28,7 @@
   },
   "scripts": {
     "start": "node lib/app.js",
-    "babel-start": "./node_modules/babel/bin/babel-node src/app.js",
-    "babel": "./node_modules/babel/bin/babel/index.js --out-dir lib src"
+    "babel-start": "./node_modules/.bin/babel-node src/app.js",
+    "babel": "./node_modules/.bin/babel --out-dir lib src"
   }
 }
