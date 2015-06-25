@@ -21,6 +21,7 @@
     "object-assign": "^2.0.0",
     "plugged": "2.x",
     "promise": "^6.1.0",
+    "request": "^2.58.0",
     "snoocore": "2.x",
     "unescape": "^0.1.1"
   },
