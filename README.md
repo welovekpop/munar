@@ -18,11 +18,10 @@ npm install
 1. Copy `creds.json.example` to `creds.json`
 1. Update your bot account credentials in `creds.json`
 
-Module-specific configuration is kept in the `/.config` directory, using
-the [Config](./src/modules/Config.module.js) module. Modules are
-configured at runtime, using the `!get` and `!set` commands. `!get`
-takes a module name and an option name, `!set` takes a module name, an
-option name and a value.
+Module-specific configuration is kept in the `/.config` directory.
+Modules are configured at runtime, using the `!get` and `!set` commands.
+`!get` takes a module name and an option name, `!set` takes a module
+name, an option name and a value.
 
 ```
 !get historyskip limit
@@ -76,12 +75,12 @@ const SekshiModule = require('../Module')
 
 export default class MyModule extends SekshiModule {
   constructor(sekshi, options) {
+    super(sekshi, options)
+
     // semi-optional data, will be shown in !moduleinfo:
     this.author = 'Me!'
     this.version = '0.1.1'
     this.description = 'This is a module!'
-
-    super(sekshi, options)
 
     // Command access levels. Commands can only be executed by users
     // if the command names exist in this object.
