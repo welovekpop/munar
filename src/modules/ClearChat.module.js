@@ -8,7 +8,7 @@ export default class ClearChat extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.1.0'
+    this.version = '0.1.1'
     this.description = 'Provides a !clearchat command to clean up spam.'
 
     this.permissions = {
@@ -48,6 +48,7 @@ export default class ClearChat extends SekshiModule {
         deletedLinks = true
       }
       else if (type) {
+        if (type.charAt(0) === '@') type = type.slice(1)
         let username = type.toLowerCase()
         this._delete(msg => msg.username.toLowerCase() === username)
         // get proper capitalisation for users who are in the room
