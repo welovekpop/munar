@@ -11,7 +11,7 @@ export default class MediaStats extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.4.1'
+    this.version = '0.5.0'
     this.description = 'Provides staff with some statistics on media plays.'
 
     this.permissions = {
@@ -176,25 +176,32 @@ export default class MediaStats extends SekshiModule {
     )
   }
 
-  retag(user, ...newTag) {
-    let media = this.sekshi.getCurrentMedia()
-    if (!media) return
-    newTag = newTag.join(' ')
-    let split = newTag.indexOf(' - ')
-    let author = newTag.slice(0, split)
-    let title = newTag.slice(split + 3)
-    if (!author) {
-      return this.sekshi.sendChat(`@${user.username} Please provide a valid artist name.`)
-    }
-    if (!title) {
-      return this.sekshi.sendChat(`@${user.username} Please provide a valid song title.`)
-    }
+  retag(user, cid, ...newTag) {
+    Media.findOne({ cid: cid }).lean().exec().then(media => {
+      if (!media) {
+        media = this.sekshi.getCurrentMedia()
+        newTag.unshift(cid)
+      }
+      if (!media) return
 
-    Media.update({ cid: media.cid }, { $set: { author, title } }).exec().then(
-      () => {
-        this.sekshi.sendChat(`@${user.username} Song retagged to "${author}" - "${title}"!`, 5000)
-      },
-      console.error
-    )
+      newTag = newTag.join(' ')
+      let split = newTag.indexOf(' - ')
+      let author = newTag.slice(0, split)
+      let title = newTag.slice(split + 3)
+
+      if (!author) {
+        return this.sekshi.sendChat(`@${user.username} Please provide a valid artist name.`)
+      }
+      if (!title) {
+        return this.sekshi.sendChat(`@${user.username} Please provide a valid song title.`)
+      }
+
+      Media.update({ cid: media.cid }, { $set: { author, title } }).exec().then(
+        () => {
+          this.sekshi.sendChat(`@${user.username} Song retagged to "${author}" - "${title}"!`, 5000)
+        },
+        console.error
+      )
+    })
   }
 }
