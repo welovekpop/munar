@@ -96,3 +96,10 @@ export const Grab = mongoose.model('Grab', {
 , history: { type: String, ref: 'HistoryEntry' }
 , time: { type: Date, default: Date.now }
 })
+
+export const ChatMessage = mongoose.model('ChatMessage', {
+  _id: String, // chat id
+  user: { type: Number, ref: 'User' },
+  message: String,
+  time: { type: Date, default: Date.now }
+})
