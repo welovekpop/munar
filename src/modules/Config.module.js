@@ -25,6 +25,7 @@ export default class Config extends SekshiModule {
     let mod = this.sekshi.getModule(ns)
     if (mod) {
       if (/^[0-9]+$/.test(value)) value = parseInt(value, 10)
+      if (/^true|false$/.test(value)) value = value === 'true'
       debug('value', typeof value, value)
       mod.setOption(option, value)
       this.sekshi.sendChat(`@${user.username} "${ns}.${option}" set to ${value}`)
