@@ -28,8 +28,9 @@ export default class YouTubeAvailable extends SekshiModule {
   init() {
     if (!this.options.key) {
       this.sekshi.sendChat(
-        `@staff The YouTube Availability module needs a YouTube API key. `
-        `Please set it using '!set youtubeavailable key API_KEY_HERE'.`)
+        `@staff The YouTube Availability module needs a YouTube API key. ` +
+        `Please set it using '!set youtubeavailable key API_KEY_HERE'.`
+      )
     }
 
     this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
