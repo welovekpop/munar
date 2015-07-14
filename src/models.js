@@ -72,6 +72,11 @@ export const HistoryEntry = mongoose.model('HistoryEntry', {
   , negative: Number
   , grabs: Number
   , listeners: Number }
+, skip:
+  { kind: String
+  , reason: String
+  , time: Date
+  , user: { type: Number, ref: 'User' } }
 })
 
 export const Vote = mongoose.model('Vote', {

@@ -53,10 +53,25 @@ export default class ModSkip extends SekshiModule {
       : `/me ${user.username} used skip!`
   }
 
+  _saveSkip(user, reason, isLockskip = false) {
+    const history = this.sekshi.getModule('historylogger')
+    if (history) {
+      let entry = history.getCurrentEntry()
+      if (entry) {
+        entry.set('skip', { kind: isLockskip ? 'lockskip' : 'skip'
+                          , user: user.id
+                          , reason: reason
+                          , time: Date.now() })
+        entry.save()
+      }
+    }
+  }
+
   skip(user, ...reason) {
     let isSekshi = user === this.sekshi.getSelf()
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
+      this._saveSkip(user, reason.join(' ') || false)
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
     }
@@ -66,6 +81,7 @@ export default class ModSkip extends SekshiModule {
     let isSekshi = user === this.sekshi.getSelf()
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
+      this._saveSkip(user, reason.join(' ') || false, true)
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
     }
