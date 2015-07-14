@@ -31,7 +31,7 @@ export default class StuckSkip extends SekshiModule {
 
   onAdvance(booth, { media }, previous) {
     clearTimeout(this._timer)
-    if (media) {
+    if (media && media.cid) {
       let delay = parseFloat(this.options.delay)
       this._timer = setTimeout(this._skip, (media.duration + delay) * 1000)
     }
