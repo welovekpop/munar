@@ -12,7 +12,8 @@ export default class ModSkip extends SekshiModule {
 
     this.permissions = {
       skip: sekshi.USERROLE.BOUNCER,
-      lockskip: sekshi.USERROLE.BOUNCER
+      lockskip: sekshi.USERROLE.BOUNCER,
+      ls: sekshi.USERROLE.BOUNCER
     }
   }
 
@@ -85,6 +86,10 @@ export default class ModSkip extends SekshiModule {
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
     }
+  }
+
+  ls(...args) {
+    this.lockskip(...args)
   }
 
 }
