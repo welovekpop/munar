@@ -41,18 +41,15 @@ export default class SongBan extends SekshiModule {
 
   onAdvance(booth, { media }) {
     BannedMedia.findOne({ cid: media.cid, format: media.format }).exec().then(banned => {
-      if (banned) {
-        this.sekshi.onMessage({
-          id: 'sekshi',
-          message: banned.reason
-            ? `!skip "${banned.reason}"`
-            : `!skip "This song was blacklisted."`
-        })
+      const modSkip = this.sekshi.getModule('modskip')
+      if (banned && modSkip) {
+        modSkip.skip(this.sekshi.getSelf(), banned.reason || 'This song was blacklisted.')
       }
     })
   }
 
-  songban(user, reason = '') {
+  songban(user, ...reason) {
+    reason = reason.join(' ')
     const media = this.sekshi.getCurrentMedia()
     BannedMedia.create({
       format: media.format,
@@ -70,8 +67,9 @@ export default class SongBan extends SekshiModule {
     })
   }
 
-  banskip(user, reason = '') {
-    this.sekshi.onMessage({ id: 'sekshi', message: `!skip "${reason}"` })
-    setTimeout(() => { this.songban(user, reason) }, 300)
+  banskip(user, ...reason) {
+    const modSkip = this.sekshi.getModule('modskip')
+    if (modSkip) modSkip.skip(user, ...reason)
+    setTimeout(() => { this.songban(user, ...reason) }, 300)
   }
 }
