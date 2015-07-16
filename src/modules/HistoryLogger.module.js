@@ -1,5 +1,5 @@
 const debug = require('debug')('sekshi:history-logging')
-const { User, Media, HistoryEntry, Vote } = require('../models')
+const { User, Media, HistoryEntry, Vote, Grab } = require('../models')
 const SekshiModule = require('../Module')
 const moment = require('moment')
 
@@ -34,6 +34,8 @@ export default class HistoryLogger extends SekshiModule {
 
   onAdvance({}, newPlay, previous) {
     const sekshi = this.sekshi
+
+    this._grabs = []
 
     if (this._currentEntry && previous && previous.score) {
       previous.score.listeners = sekshi.getUsers().length
