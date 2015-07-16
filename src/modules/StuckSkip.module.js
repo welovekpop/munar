@@ -7,7 +7,6 @@ export default class StuckSkip extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.0'
     this.description = 'Skips songs when plug.dj forgets to push advance messages.'
 
     this.onAdvance = this.onAdvance.bind(this)

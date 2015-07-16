@@ -7,7 +7,6 @@ export default class Rules extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.1.0'
     this.description = 'Adds a !rule command that tells people specific rules from the room description.'
 
     this.permissions = {

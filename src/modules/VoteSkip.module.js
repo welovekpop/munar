@@ -8,7 +8,6 @@ export default class VoteSkip extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.1.0'
     this.description = 'Autoskip songs after a number of mehs.'
 
     this.onVote = this.onVote.bind(this)

@@ -8,7 +8,6 @@ export default class ClearChat extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.1.1'
     this.description = 'Provides a !clearchat command to clean up spam.'
 
     this.permissions = {

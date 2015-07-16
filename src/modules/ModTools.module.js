@@ -7,7 +7,6 @@ export default class ModTools extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.2.0'
     this.description = 'Provides moderation commands on the bot so you don\'t have to deal with plug\'s moderator UI.'
 
     this.permissions = {

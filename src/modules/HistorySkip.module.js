@@ -7,7 +7,6 @@ export default class HistorySkip extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.1.0'
     this.description = 'Autoskip songs that have been played recently.'
 
     // counts subsequent skips per user. if a user is history-skipped three

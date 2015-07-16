@@ -11,7 +11,6 @@ export default class UserKarma extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'brookiebeast'
-    this.version = '0.4.1'
     this.description = 'Keeps track of users\' earned internet points.'
 
     this.permissions = {

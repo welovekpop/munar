@@ -9,7 +9,6 @@ export default class RedditFeed extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'schrobby'
-    this.version = '0.3.0'
     this.description = 'Announces new submissions from a configurable list of subreddits.'
 
     this.permissions = {

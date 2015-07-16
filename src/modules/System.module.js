@@ -6,7 +6,6 @@ export default class System extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'Sooyou'
-    this.version = '1.0.0'
     this.description = 'Simple tools for module management & system information'
 
     this.permissions = {
@@ -78,7 +77,6 @@ export default class System extends SekshiModule {
     if (mod) {
       [ `:small_blue_diamond: Module info for "${name}"`,
         `:white_small_square: Status: ${mod.enabled() ? 'enabled' : 'disabled'}`,
-        `:white_small_square: Version: ${mod.version}`,
         `:white_small_square: Author: ${mod.author}`,
         `:white_small_square: Description: ${mod.description}`,
       ].forEach(this.sekshi.sendChat, this.sekshi)

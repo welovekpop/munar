@@ -6,7 +6,6 @@ export default class AFKMessages extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.0'
     this.description = 'Auto-deletes AFK autoresponder messages.'
 
     this.onMessage = this.onMessage.bind(this)

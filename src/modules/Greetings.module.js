@@ -7,7 +7,6 @@ export default class Greetings extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'Sooyou'
-    this.version = '0.1.1'
     this.description = 'Greets users.'
 
     this.permissions = {

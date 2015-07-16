@@ -8,7 +8,6 @@ export default class SongLengthSkip extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.1.1'
     this.description = 'Autoskip songs that are too long.'
 
     this.onAdvance = this.onAdvance.bind(this)

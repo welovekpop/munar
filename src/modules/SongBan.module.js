@@ -18,7 +18,6 @@ export default class SongBan extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.0'
     this.description = 'Bans songs from being played ever again.'
 
     this.permissions = {

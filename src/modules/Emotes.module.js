@@ -18,7 +18,6 @@ export default class Emotes extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.1.0'
     this.description = 'adds several emoticons as well as gifs and webms'
 
     this.permissions = {

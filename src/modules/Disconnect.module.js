@@ -16,7 +16,6 @@ export default class Disconnect extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'Sooyou'
-    this.version = '1.0.1'
     this.description = 'Puts disconnected users back at their original wait list spot.'
 
     this.permissions = {

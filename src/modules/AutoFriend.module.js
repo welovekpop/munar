@@ -7,7 +7,6 @@ export default class AutoFriend extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.0'
     this.description = 'Just wants to be friends with everyone.'
 
     this.onRequest = this.onRequest.bind(this)

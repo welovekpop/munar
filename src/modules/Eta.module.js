@@ -8,7 +8,6 @@ export default class Misc extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'Sooyou'
-    this.version = '0.3.0'
     this.description = 'Provides an estimation of when people get to play their song.'
 
     this.permissions = {

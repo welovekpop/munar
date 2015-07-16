@@ -11,7 +11,6 @@ export default class MediaStats extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.5.0'
     this.description = 'Provides staff with some statistics on media plays.'
 
     this.permissions = {

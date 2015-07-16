@@ -7,7 +7,6 @@ export default class Links extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.1.1'
     this.description = 'Throws links at people.'
 
     this.permissions = {

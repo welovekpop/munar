@@ -7,7 +7,6 @@ export default class AutoCycle extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.0.0'
     this.description = 'Automatically enables/disables DJ cycle when the wait list is long.'
 
     this.onUpdate = this.onUpdate.bind(this)

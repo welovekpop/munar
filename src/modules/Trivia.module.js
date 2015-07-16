@@ -9,7 +9,6 @@ export default class Trivia extends TriviaCore {
     super(sekshi, options)
 
     this.author = 'WE ♥ KPOP'
-    this.version = '0.0.0'
     this.description = ''
 
     this.permissions = {

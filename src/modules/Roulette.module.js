@@ -21,7 +21,6 @@ export default class Roulette extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '2.1.0'
     this.description = 'Runs random raffles for a set wait list position (probably #1/#2).'
 
     this.permissions = {

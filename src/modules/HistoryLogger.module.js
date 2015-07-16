@@ -9,7 +9,6 @@ export default class HistoryLogger extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '0.3.1'
     this.description = 'Keeps a history of all songs that are played in the room.'
 
     this.onAdvance = this.onAdvance.bind(this)

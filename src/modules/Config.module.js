@@ -10,7 +10,6 @@ export default class Config extends SekshiModule {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.version = '1.1.0'
     this.description = 'Keeps module configuration.'
 
     this.permissions = {
