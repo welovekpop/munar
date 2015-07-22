@@ -1,5 +1,6 @@
 const SekshiModule = require('../Module')
 const Promise = require('promise')
+const random = require('random-item')
 const request = require('request')
 
 function normalizeAnswer(a) {
@@ -52,7 +53,7 @@ export default class TriviaCore extends SekshiModule {
     if (this.isRunning()) {
       let question
       do {
-        question = this.questions[Math.floor(Math.random() * this.questions.length)]
+        question = random(this.questions)
       } while (this._history.indexOf(question) !== -1)
 
       return this.askQuestion(question)

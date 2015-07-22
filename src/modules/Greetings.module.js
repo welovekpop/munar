@@ -1,3 +1,4 @@
+const random = require('random-item')
 const debug = require('debug')('sekshi:greeting')
 const SekshiModule = require('../Module')
 
@@ -58,9 +59,11 @@ export default class Greetings extends SekshiModule {
     let { greetings, emoji } = this.options
     this.lastGreeted = user.id
 
-    let greeting = greetings[Math.floor(greetings.length * Math.random())]
-    let message = greeting.replace(/@/, `@${user.username}`)
-                + (this.sekshi.isFriend(user.id) ? ' ' + emoji[Math.floor(emoji.length * Math.random())] : '')
-    setTimeout(this.sekshi.sendChat.bind(this.sekshi, message), 2 * 1000)
+    let greeting = random(greetings)
+    let message = greeting.replace(/@/g, `@${user.username}`)
+                + (this.sekshi.isFriend(user.id) ? ` ${random(emoji)}` : '')
+    setTimeout(() => {
+      this.sekshi.sendChat(message)
+    }, 2 * 1000)
   }
 }

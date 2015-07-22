@@ -1,5 +1,6 @@
 const debug = require('debug')('sekshi:roulette')
 const assign = require('object-assign')
+const random = require('random-item')
 const SekshiModule = require('../Module')
 const moment = require('moment')
 const mongoose = require('mongoose')
@@ -185,7 +186,7 @@ export default class Roulette extends SekshiModule {
       this.sekshi.sendChat(`Nobody participated in the roulette... Do I get to win now?`)
     }
     else {
-      let winner = this._players[Math.floor(Math.random() * this._players.length)]
+      let winner = random(this._players)
       debug('winner', winner.username)
       this.sekshi.sendChat(`Roulette winner: @${winner.username}. Congratulations! https://i.imgur.com/TXKz7mt.gif`)
       this.sekshi.moveDJ(winner.id, this.options.winnerPosition - 1, () => {

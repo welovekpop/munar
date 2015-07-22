@@ -1,5 +1,6 @@
 const debug = require('debug')('sekshi:karma')
 const assign = require('object-assign')
+const random = require('random-item')
 const { User, Karma } = require('../models')
 const SekshiModule = require('../Module')
 const moment = require('moment')
@@ -241,7 +242,7 @@ export default class UserKarma extends SekshiModule {
       if (reasonList.length === 0) {
         this.sekshi.sendChat(`@${user.username} no one can explain your mysterious allure.`)
       }
-      let chosen = reasonList[Math.floor(Math.random() * reasonList.length)]
+      let chosen = random(reasonList)
       this.sekshi.sendChat(`@${user.username}, you were bumped by @${chosen.giver.username} ` +
                            `"${chosen.reason}" ${moment(chosen.date).fromNow()}`)
     })
@@ -252,7 +253,7 @@ export default class UserKarma extends SekshiModule {
       if (reasonList.length === 0) {
         this.sekshi.sendChat(`@${user.username} no reason was ever given.`)
       }
-      let chosen = reasonList[Math.floor(Math.random() * reasonList.length)]
+      let chosen = random(reasonList)
       this.sekshi.sendChat(`@${user.username}, you were thumped by @${chosen.giver.username} ` +
                            `"${chosen.reason}" ${moment(chosen.date).fromNow()}`)
     })
