@@ -10,7 +10,6 @@ export default class Greetings extends SekshiModule {
     this.description = 'Greets users.'
 
     this.permissions = {
-      greetusers: sekshi.USERROLE.BOUNCER
     }
 
     this.greet = this.greet.bind(this)
@@ -18,7 +17,6 @@ export default class Greetings extends SekshiModule {
 
   defaultOptions() {
     return {
-      autogreet: true,
       greetings: [
         'Hai @',
         'Welcome, @!',
@@ -49,13 +47,8 @@ export default class Greetings extends SekshiModule {
     this.sekshi.removeListener(this.sekshi.FRIEND_JOIN, this.greet)
   }
 
-  greetusers(toggle) {
-    this.options.autogreet = (toggle.toLowerCase() === 'true' ? true : false)
-  }
-
   greet(user) {
-    if (!this.options.autogreet ||
-        this.lastGreeted == user.id ||
+    if (this.lastGreeted == user.id ||
         user.username === this.sekshi.getSelf().username ||
         // guest users
         user.username == '') {
