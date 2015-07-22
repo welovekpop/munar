@@ -13,7 +13,7 @@ const { User } = require('./models')
 export default class Sekshi extends Plugged {
   constructor(args) {
     super()
-    this.invokeLogger(this._log)
+    this.invokeLogger(this._debug)
 
     this.options = args
     this.db = mongoose.connect(args.mongo)
@@ -30,7 +30,7 @@ export default class Sekshi extends Plugged {
     this.onUserUpdate = this.onUserUpdate.bind(this)
   }
 
-  _log(msg, verbosity, color) {
+  _debug(msg, verbosity, color) {
     debug(msg)
   }
 
