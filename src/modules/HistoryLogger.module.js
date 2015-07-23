@@ -59,7 +59,7 @@ export default class HistoryLogger extends SekshiModule {
       }))
 
     const startTime = moment.utc(newPlay.startTime, 'YYYY-MM-DD HH:mm:ss')
-    let historyEntry = HistoryEntry.create({
+    let historyEntry = new HistoryEntry({
       _id: newPlay.historyID
     , dj: dj.id
     , media: null
@@ -67,7 +67,7 @@ export default class HistoryLogger extends SekshiModule {
       // heh
     , score: { positive: 0, negative: 0, grabs: 0, listeners: 0 }
     })
-    historyEntry.then(historyEntry => { this._currentEntry = historyEntry })
+    this._currentEntry = historyEntry;
 
     media.then(
       media => {
