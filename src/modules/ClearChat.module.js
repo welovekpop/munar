@@ -1,6 +1,8 @@
 const SekshiModule = require('../Module')
+const { joinList } = require('../utils')
 
 const LINK_RX = /https?:\/\/(\S{4,})/i
+const COMMAND_RX = /^!\S+/i
 
 export default class ClearChat extends SekshiModule {
 
@@ -38,13 +40,17 @@ export default class ClearChat extends SekshiModule {
       return
     }
 
-    let deletedLinks = false
+    let dels = []
     let deletedUsers = []
 
     types.forEach(type => {
       if (type === 'link' || type === 'links') {
         this._delete(msg => LINK_RX.test(msg.message))
-        deletedLinks = true
+        dels.push('links')
+      }
+      else if (type === 'commands') {
+        this._delete(msg => COMMAND_RX.test(msg.message))
+        dels.push('commands')
       }
       else if (type) {
         if (type.charAt(0) === '@') type = type.slice(1)
@@ -56,14 +62,10 @@ export default class ClearChat extends SekshiModule {
       }
     })
 
-    let dels = ''
-    if (deletedLinks) {
-      dels += `links ${deletedUsers.length ? 'and ' : ''}`
-    }
     if (deletedUsers.length > 0) {
-      dels += `messages by ${deletedUsers.join(', ')} `
+      dels.push(`messages by ${joinList(deletedUsers)}`)
     }
-    this.sekshi.sendChat(`@${user.username} Deleting ${dels} from chat!`)
+    this.sekshi.sendChat(`@${user.username} Deleting ${joinList(dels)} from chat!`)
   }
 
 }
