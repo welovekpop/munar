@@ -6,7 +6,7 @@ const SPANS = {
   m: 24 * 30
 }
 
-exports.spanToTime = function (span) {
+export function spanToTime(span) {
   if (span === 'f') {
     return moment(0)
   }
@@ -18,14 +18,14 @@ exports.spanToTime = function (span) {
   return moment().subtract(hours, 'hours')
 }
 
-exports.times = function (x) {
+export function times(x) {
   return x === 1 ? 'once'
        : x === 2 ? 'twice'
        : x >=  3 ? `${x} times`
        : ''
 }
 
-exports.days = function (h) {
+export function days(h) {
   if (h <= 24 || (h < 48 && h % 24 !== 0)) {
     return h === 1 ? 'hour' : `${h} hours`
   }
@@ -33,7 +33,7 @@ exports.days = function (h) {
   return x === 1 ? 'day' : `${x} days`
 }
 
-exports.joinList = function (args, sep = ', ', lastSep = ' and ') {
+export function joinList(args, sep = ', ', lastSep = ' and ') {
   let tail = args.pop()
   let head = args.join(sep)
   return head ? head + lastSep + tail : tail
