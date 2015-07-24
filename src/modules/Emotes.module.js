@@ -100,11 +100,15 @@ export default class Emotes extends SekshiModule {
     debug('addemote', id, url)
     let promise = null
     if (this.options.reupload && this.options.key && !IMGUR.test(url)) {
+      this.sekshi.sendChat(`@${user.username} :satellite: Reuploading to imgur`, 10 * 1000)
       promise = this.reupload(id, url)
         .then(imgurUrl => this.saveEmote(user, id, imgurUrl))
         .catch(err => {
-          this.sekshi.sendChat(`@${user.username} Could not reupload to imgur, ` +
-                               `using the original URL instead...`)
+          this.sekshi.sendChat(
+            `@${user.username} :warning: Could not reupload to imgur, ` +
+            `using the original URL instead...`
+          , 3 * 1000
+          )
           return this.saveEmote(user, id, url)
         })
     }
