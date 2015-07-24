@@ -13,7 +13,8 @@ export default class Links extends SekshiModule {
       fb: sekshi.USERROLE.NONE,
       web: sekshi.USERROLE.NONE,
       gh: sekshi.USERROLE.NONE,
-      help: sekshi.USERROLE.NONE
+      help: sekshi.USERROLE.NONE,
+      steam: sekshi.USERROLE.NONE
     }
   }
 
@@ -31,6 +32,10 @@ export default class Links extends SekshiModule {
 
   help(user) {
     this.sekshi.sendChat(`@${user.username} SekshiBot commands can be found on our website. http://welovekpop.club/sekshibot`)
+  }
+
+  steam() {
+    this.sekshi.sendChat('Join us on steam! http://steamcommunity.com/groups/wlk_gaming')
   }
 
 }
