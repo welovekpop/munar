@@ -32,3 +32,9 @@ exports.days = function (h) {
   const x = Math.floor(h / 24)
   return x === 1 ? 'day' : `${x} days`
 }
+
+exports.joinList = function (args, sep = ', ', lastSep = ' and ') {
+  let tail = args.pop()
+  let head = args.join(sep)
+  return head ? head + lastSep + tail : tail
+}
