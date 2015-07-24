@@ -1,6 +1,8 @@
 const SekshiModule = require('../Module')
 const mongoose = require('mongoose')
 const debug = require('debug')('sekshi:emotes')
+const request = require('request')
+const Promise = require('promise')
 
 const Emote = mongoose.modelNames().indexOf('Emote') === -1
   ? mongoose.model('Emote', {
@@ -12,6 +14,8 @@ const Emote = mongoose.modelNames().indexOf('Emote') === -1
   : mongoose.model('Emote')
 
 const cleanId = id => id.toLowerCase()
+
+const IMGUR = /^https?:\/\/i\.imgur\.com\//
 
 export default class Emotes extends SekshiModule {
   constructor(sekshi, options) {
@@ -35,7 +39,11 @@ export default class Emotes extends SekshiModule {
   }
 
   defaultOptions() {
-    return { url: false }
+    return {
+      url: false,
+      reupload: false,
+      key: ''
+    }
   }
 
   sendEmote(msg, username) {
@@ -49,14 +57,65 @@ export default class Emotes extends SekshiModule {
     this.sekshi.sendChat(msg)
   }
 
-  addemote(user, id, url) {
-    id = cleanId(id)
-    debug('addemote', id, url)
-    Emote.findByIdAndUpdate(
+  saveEmote(user, id, url) {
+    return Emote.findByIdAndUpdate(
       id,
       { url, addedBy: user.id },
       { upsert: true }
-    ).exec().then(
+    ).exec()
+  }
+
+  upload(form) {
+    return new Promise((resolve, reject) => {
+      let upload = request.post('https://api.imgur.com/3/image', {
+        headers: {
+          Authorization: `Client-ID ${this.options.key}`
+        },
+        form: form
+      }, (e, res, body) => {
+        if (body) {
+          body = JSON.parse(body)
+          if (body.success) {
+            return resolve(body.data.link.replace('http:', 'https:'))
+          }
+          else {
+            console.log(body)
+          }
+        }
+        reject(e)
+      })
+    })
+  }
+
+  reupload(title, url, cb) {
+    return this.upload({
+      type: 'url',
+      title: title,
+      image: url
+    })
+  }
+
+  addemote(user, id, url) {
+    id = cleanId(id)
+    debug('addemote', id, url)
+    let promise = null
+    if (this.options.reupload && this.options.key && !IMGUR.test(url)) {
+      this.sekshi.sendChat(`@${user.username} :satellite: Reuploading to imgur`, 10 * 1000)
+      promise = this.reupload(id, url)
+        .then(imgurUrl => this.saveEmote(user, id, imgurUrl))
+        .catch(err => {
+          this.sekshi.sendChat(
+            `@${user.username} :warning: Could not reupload to imgur, ` +
+            `using the original URL instead...`
+          , 3 * 1000
+          )
+          return this.saveEmote(user, id, url)
+        })
+    }
+    else {
+      promise = this.saveEmote(user, id, url)
+    }
+    promise.then(
       emote => {
         debug('added', id, url)
         this.sekshi.sendChat(`@${user.username} Emote "${id}" updated!`, 10 * 1000)
@@ -64,7 +123,8 @@ export default class Emotes extends SekshiModule {
       err => {
         debug('add-err', err)
         this.sekshi.sendChat(`@${user.username} Emote "${id}" could not be updated`, 10 * 1000)
-      })
+      }
+    )
   }
 
   delemote(user, id) {
