@@ -13,19 +13,9 @@ export default class UserKarma extends SekshiModule {
 
     this.author = 'brookiebeast'
     this.description = 'Keeps track of users\' earned internet points.'
-
-    this.permissions = {
-      karma: sekshi.USERROLE.NONE,
-      bump: sekshi.USERROLE.NONE,
-      thump: sekshi.USERROLE.NONE,
-      karmawhores: sekshi.USERROLE.NONE,
-      bitch: sekshi.USERROLE.NONE,
-      pimp: sekshi.USERROLE.NONE,
-      fistbump: sekshi.USERROLE.NONE,
-      fistthump: sekshi.USERROLE.NONE
-    }
   }
 
+  @command('karma')
   karma(user, username, time = 'w') {
     let self = false
     if (username && /(^[dwmf]$)|(^\d+$)/.test(username)) {
@@ -76,6 +66,7 @@ export default class UserKarma extends SekshiModule {
     }
   }
 
+  @command('karmawhores')
   karmawhores(user, time = 'w') {
     // stole all this shit from !mostplayed in MediaStats
     const since = utils.spanToTime(time)
@@ -111,6 +102,7 @@ export default class UserKarma extends SekshiModule {
       .catch(e => console.error(e))
   }
 
+  @command('bump')
   bump(user, username, ...reason) {
     if (!username) {
       this.sekshi.sendChat(`@${user.username} You must provide a user to bump`)
@@ -146,6 +138,7 @@ export default class UserKarma extends SekshiModule {
     })
   }
 
+  @command('thump')
   thump(user, username, ...reason) {
     if (!username) {
       debug('karma thump no username')
@@ -180,6 +173,7 @@ export default class UserKarma extends SekshiModule {
     })
   }
 
+  @command('bitch')
   bitch(user, time = 'w') {
     const since = utils.spanToTime(time)
     const hours = moment().diff(since, 'hours')
@@ -207,6 +201,7 @@ export default class UserKarma extends SekshiModule {
       .catch(err => console.error(err))
   }
 
+  @command('pimp')
   pimp(user, time = 'w') {
     const since = utils.spanToTime(time)
     const hours = moment().diff(since, 'hours')
@@ -234,6 +229,7 @@ export default class UserKarma extends SekshiModule {
       .catch(err => console.error(err))
   }
 
+  @command('fistbump')
   fistbump(user) {
     Karma.find({ target: user.id, reason: { $ne: null } }).where('amount').gt(0).populate('giver').exec().then( reasonList => {
       debug(reasonList)
@@ -246,6 +242,7 @@ export default class UserKarma extends SekshiModule {
     })
   }
 
+  @command('fistthump')
   fistthump(user) {
     Karma.find({ target: user.id, reason: { $ne: null } }).where('amount').lt(0).populate('giver').exec().then( reasonList => {
       if (reasonList.length === 0) {

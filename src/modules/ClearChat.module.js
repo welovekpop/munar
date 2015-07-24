@@ -11,10 +11,6 @@ export default class ClearChat extends SekshiModule {
 
     this.author = 'ReAnna'
     this.description = 'Provides a !clearchat command to clean up spam.'
-
-    this.permissions = {
-      clearchat: sekshi.USERROLE.BOUNCER
-    }
   }
 
   init() {
@@ -30,6 +26,7 @@ export default class ClearChat extends SekshiModule {
       .forEach(msg => this.sekshi.removeChatMessage(msg.cid))
   }
 
+  @command('clearchat', { role: command.ROLE.BOUNCER })
   clearchat(user, ...types) {
     if (types.length === 0) {
       types = [ 'all' ]

@@ -12,16 +12,6 @@ export default class MediaStats extends SekshiModule {
 
     this.author = 'ReAnna'
     this.description = 'Provides staff with some statistics on media plays.'
-
-    this.permissions = {
-      lastplayed: sekshi.USERROLE.NONE,
-      playcount: sekshi.USERROLE.NONE,
-      mostplayed: sekshi.USERROLE.RESIDENTDJ,
-      tagged: sekshi.USERROLE.RESIDENTDJ,
-      retag: sekshi.USERROLE.RESIDENTDJ
-    }
-
-    this.ninjaVanish = [ 'retag' ]
   }
 
   // public API
@@ -81,6 +71,7 @@ export default class MediaStats extends SekshiModule {
   }
 
   // chat commands
+  @command('lastplayed')
   lastplayed(user) {
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
@@ -98,6 +89,7 @@ export default class MediaStats extends SekshiModule {
       .catch(e => { console.error(e) })
   }
 
+  @command('playcount')
   playcount(user, span = 'w') {
     const hours = moment().diff(utils.spanToTime(span), 'hours')
     const allTime = span === 'f'
@@ -125,6 +117,7 @@ export default class MediaStats extends SekshiModule {
       .catch(e => { console.error(e) })
   }
 
+  @command('mostplayed', { role: command.ROLE.RESIDENTDJ })
   mostplayed(user, amount = 3, time = 'f') {
     // !mostplayed can take 1, 2, or no parameters.
     // without parameters, it shows the top 3 most played songs
@@ -160,6 +153,7 @@ export default class MediaStats extends SekshiModule {
       .catch(e => { this.sekshi.sendChat(`ERR: ${e.message}`) })
   }
 
+  @command('tagged', { role: command.ROLE.RESIDENTDJ })
   tagged(user, cid) {
     if (!cid) {
       let media = this.sekshi.getCurrentMedia()
@@ -172,6 +166,7 @@ export default class MediaStats extends SekshiModule {
       })
   }
 
+  @command('retag', { role: command.ROLE.RESIDENTDJ, ninjaVanish: true })
   retag(user, cid, ...newTag) {
     let author
     let title

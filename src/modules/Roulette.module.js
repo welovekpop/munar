@@ -24,18 +24,6 @@ export default class Roulette extends SekshiModule {
     this.author = 'ReAnna'
     this.description = 'Runs random raffles for a set wait list position (probably #1/#2).'
 
-    this.permissions = {
-      play: sekshi.USERROLE.NONE,
-      withdraw: sekshi.USERROLE.NONE,
-      players: sekshi.USERROLE.NONE,
-      lastroulette: sekshi.USERROLE.BOUNCER,
-      roulette: sekshi.USERROLE.BOUNCER,
-      stoproulette: sekshi.USERROLE.BOUNCER,
-      luckybastards: sekshi.USERROLE.BOUNCER
-    }
-
-    this.ninjaVanish = [ 'play', 'withdraw' ]
-
     this.Roulette = RouletteHistory
   }
 
@@ -60,6 +48,7 @@ export default class Roulette extends SekshiModule {
     }
   }
 
+  @command('roulette', { role: command.ROLE.BOUNCER })
   roulette(user) {
     if (this._running) {
       return
@@ -82,6 +71,7 @@ export default class Roulette extends SekshiModule {
                          `Type "!play" (without quotes) to join. You have ${duration.humanize()}!`)
   }
 
+  @command('play', { ninjaVanish: true })
   play(user) {
     if (this._running && this._players.indexOf(user) === -1) {
       var waitlist = this.sekshi.getWaitlist()
@@ -111,6 +101,7 @@ export default class Roulette extends SekshiModule {
     }
   }
 
+  @command('withdraw', { ninjaVanish: true })
   withdraw(user) {
     let i = this._players.indexOf(user)
     if (this._running && i !== -1) {
@@ -118,6 +109,7 @@ export default class Roulette extends SekshiModule {
     }
   }
 
+  @command('players')
   players() {
     if (this._running) {
       debug('players', this._players.length)
@@ -126,6 +118,7 @@ export default class Roulette extends SekshiModule {
     }
   }
 
+  @command('lastroulette', { role: command.ROLE.RESIDENTDJ })
   lastroulette(user) {
     const notPlayed = () => {
       this.sekshi.sendChat(`@${user.username} I don't remember playing roulette!`)
@@ -144,6 +137,7 @@ export default class Roulette extends SekshiModule {
       .catch(notPlayed)
   }
 
+  @command('stoproulette', { role: command.ROLE.BOUNCER })
   stoproulette(user) {
     if (this._running) {
       clearTimeout(this._timer)
@@ -155,6 +149,7 @@ export default class Roulette extends SekshiModule {
     }
   }
 
+  @command('luckybastards', { role: command.ROLE.RESIDENTDJ })
   luckybastards(user, amount = 5) {
     RouletteHistory.aggregate()
       .group({ _id: '$winner', wins: { $sum: 1 } })

@@ -8,19 +8,6 @@ export default class ModTools extends SekshiModule {
 
     this.author = 'ReAnna'
     this.description = 'Provides moderation commands on the bot so you don\'t have to deal with plug\'s moderator UI.'
-
-    this.permissions = {
-      clearwaitlist: sekshi.USERROLE.MANAGER,
-      lock: sekshi.USERROLE.MANAGER,
-      unlock: sekshi.USERROLE.MANAGER,
-      cycle: sekshi.USERROLE.BOUNCER,
-      move: sekshi.USERROLE.BOUNCER,
-      ban: sekshi.USERROLE.BOUNCER,
-      mute: sekshi.USERROLE.BOUNCER,
-      unmute: sekshi.USERROLE.BOUNCER,
-      eatshit: sekshi.USERROLE.BOUNCER,
-      lastgame: sekshi.USERROLE.BOUNCER
-    }
   }
 
   defaultOptions() {
@@ -29,6 +16,7 @@ export default class ModTools extends SekshiModule {
     }
   }
 
+  @command('clearwaitlist', { role: command.ROLE.MANAGER })
   clearwaitlist(user) {
     this.sekshi.setLock(true, true, e => {
       if (e) debug('lock-err', e)
@@ -38,6 +26,7 @@ export default class ModTools extends SekshiModule {
     })
   }
 
+  @command('move', { role: command.ROLE.BOUNCER })
   move(user, target, pos) {
     debug('move', target, pos)
     if (!/^\d+$/.test(pos)) {
@@ -65,6 +54,7 @@ export default class ModTools extends SekshiModule {
     }
   }
 
+  @command('ban', { role: command.ROLE.BOUNCER })
   ban(user, targetName, duration = 'h') {
     if (duration !== 'h' && duration !== 'd' && duration !== 'f') {
       duration = 'h'
@@ -78,6 +68,7 @@ export default class ModTools extends SekshiModule {
     }
   }
 
+  @command('mute', { role: command.ROLE.BOUNCER })
   mute(user, targetName, duration = 15) {
     duration = duration === 45 || duration === 'l' ? 'l'
              : duration === 30 || duration === 'm' ? 'm'
@@ -91,6 +82,7 @@ export default class ModTools extends SekshiModule {
     }
   }
 
+  @command('unmute', { role: command.ROLE.BOUNCER })
   unmute(user, targetName) {
     const target = this.sekshi.getUserByName(targetName)
     if (target) {
@@ -100,6 +92,7 @@ export default class ModTools extends SekshiModule {
     }
   }
 
+  @command('lock', { role: command.ROLE.MANAGER })
   lock(user, clear = false) {
     debug('locking waitlist', clear === 'clear' ? 'clearing' : 'not clearing')
     this.sekshi.setLock(true, clear === 'clear', e => {
@@ -107,6 +100,7 @@ export default class ModTools extends SekshiModule {
     })
   }
 
+  @command('unlock', { role: command.ROLE.MANAGER })
   unlock(user) {
     debug('unlocking waitlist')
     this.sekshi.setLock(false, false, e => {
@@ -114,6 +108,7 @@ export default class ModTools extends SekshiModule {
     })
   }
 
+  @command('cycle', { role: command.ROLE.MANAGER })
   cycle(user, set = 'toggle') {
     let oldCycle = this.sekshi.doesWaitlistCycle()
     let newCycle = set === 'toggle'
@@ -129,6 +124,7 @@ export default class ModTools extends SekshiModule {
     }
   }
 
+  @command('eatshit', 'es', { role: command.ROLE.BOUNCER })
   eatshit(user, targetName, duration = 'd') {
     const target = this.sekshi.getUserByName(targetName)
     if (target) {
@@ -142,6 +138,7 @@ export default class ModTools extends SekshiModule {
   }
 
   // alias to !lastroulette, !lasttrivia
+  @command('lastgame', { role: command.ROLE.BOUNCER })
   lastgame(user) {
     const roulette = this.sekshi.getModule('roulette')
     const trivia = this.sekshi.getModule('trivia')

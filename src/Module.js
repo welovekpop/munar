@@ -14,8 +14,6 @@ export default class Module extends EventEmitter {
 
     this.sekshi = sekshi
     this.options = assign({}, this.defaultOptions(), this.loadOptions())
-    this.permissions = {}
-    this.ninjaVanish = []
   }
 
   defaultOptions() {

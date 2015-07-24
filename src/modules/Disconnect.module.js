@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const debug = require('debug')('sekshi:disconnect')
 const moment = require('moment')
 const mongoose = require('mongoose')
@@ -17,10 +18,6 @@ export default class Disconnect extends SekshiModule {
 
     this.author = 'Sooyou'
     this.description = 'Puts disconnected users back at their original wait list spot.'
-
-    this.permissions = {
-      dc: sekshi.USERROLE.NONE
-    }
 
     this.Disconnection = Disconnections
 
@@ -76,6 +73,7 @@ export default class Disconnect extends SekshiModule {
     }
   }
 
+  @command('dc')
   dc(user) {
     debug('!dc', user.username)
 

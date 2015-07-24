@@ -8,10 +8,6 @@ export default class Rules extends SekshiModule {
 
     this.author = 'ReAnna'
     this.description = 'Adds a !rule command that tells people specific rules from the room description.'
-
-    this.permissions = {
-      rule: sekshi.USERROLE.NONE
-    }
   }
 
   defaultOptions() {
@@ -20,6 +16,7 @@ export default class Rules extends SekshiModule {
     }
   }
 
+  @command('rule')
   rule(user, n, targetName = null) {
     const descr = this.sekshi.getDescription()
     const rx = new RegExp(`^${n}. `)

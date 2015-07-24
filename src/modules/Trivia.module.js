@@ -21,14 +21,6 @@ export default class Trivia extends TriviaCore {
 
     this.author = 'WE ♥ KPOP'
     this.description = ''
-
-    this.permissions = {
-      trivia: sekshi.USERROLE.BOUNCER,
-      trivquit: sekshi.USERROLE.BOUNCER,
-      trivpoints: sekshi.USERROLE.NONE,
-      lasttrivia: sekshi.USERROLE.BOUNCER,
-      question: sekshi.USERROLE.NONE
-    }
   }
 
   defaultOptions() {
@@ -75,6 +67,7 @@ export default class Trivia extends TriviaCore {
   }
 
   // Chat Commands
+  @command('lasttrivia', { role: command.ROLE.BOUNCER })
   lasttrivia(user) {
     const notPlayed = () => {
       this.sekshi.sendChat(`@${user.username} I don't remember playing trivia!`)
@@ -96,6 +89,7 @@ export default class Trivia extends TriviaCore {
       .catch(notPlayed)
   }
 
+  @command('trivia', { role: command.ROLE.BOUNCER })
   trivia(user) {
     if (!this.isRunning()) {
       this.sekshi.sendChat(`[Trivia] @djs ${user.username} started Trivia! ` +
@@ -112,6 +106,7 @@ export default class Trivia extends TriviaCore {
     }
   }
 
+  @command('trivquit', 'stoptrivia', { role: command.ROLE.BOUNCER })
   trivquit(user) {
     if (this.isRunning()) {
       this.stopTrivia()
@@ -121,6 +116,7 @@ export default class Trivia extends TriviaCore {
     }
   }
 
+  @command('trivpoints')
   trivpoints(user) {
     if (this.isRunning()) {
       let points = Object.keys(this._points).map(uid => {
@@ -135,6 +131,7 @@ export default class Trivia extends TriviaCore {
     }
   }
 
+  @command('question')
   question(user) {
     if (this.isRunning()) {
       let question = this.getCurrentQuestion()

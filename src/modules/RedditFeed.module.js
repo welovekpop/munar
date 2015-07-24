@@ -11,14 +11,6 @@ export default class RedditFeed extends SekshiModule {
     this.author = 'schrobby'
     this.description = 'Announces new submissions from a configurable list of subreddits.'
 
-    this.permissions = {
-      addsubreddit: sekshi.USERROLE.MANAGER,
-      removesubreddit: sekshi.USERROLE.MANAGER,
-      listsubreddits: sekshi.USERROLE.NONE,
-      setfeedinterval: sekshi.USERROLE.COHOST,
-      updatereddit: sekshi.USERROLE.MANAGER
-    }
-
     this.reddit = new Snoocore({ userAgent: `RedditFeed v${this.version} by /u/schrobby` })
   }
 
@@ -42,6 +34,7 @@ export default class RedditFeed extends SekshiModule {
     }
   }
 
+  @command('updatereddit', { role: command.ROLE.MANAGER })
   updatereddit() {
     clearTimeout(this.timer)
     this.runTimer()
