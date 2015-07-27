@@ -31,6 +31,10 @@ userSchema.static('fromPlugUser', function (plugUser) {
   , badge: plugUser.badge
   }
 
+  // slugs don't exist on some user objects, but plugged still adds the
+  // property. delete it to prevent overwriting existing slugs with nothing.
+  if (!descr.slug) delete descr.slug
+
   return User.findById(plugUser.id).exec().then(doc => {
     if (!doc) return User.create(assign(descr, { _id: plugUser.id }))
     else      return doc.set(descr).save()
