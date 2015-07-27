@@ -2,6 +2,17 @@ const TriviaCore = require('./TriviaCore')
 const Promise = require('promise')
 const request = require('request')
 const assign = require('object-assign')
+const debug = require('debug')('sekshi:trivia')
+const moment = require('moment')
+const mongoose = require('mongoose')
+
+const TriviaHistory = mongoose.modelNames().indexOf('Trivia') === -1
+  ? mongoose.model('Trivia', {
+      time: { type: Date, default: Date.now },
+      user: { type: Number, ref: 'User' },
+      winner: { type: Number, ref: 'User' }
+    })
+  : mongoose.model('Trivia')
 
 export default class Trivia extends TriviaCore {
 
@@ -15,7 +26,7 @@ export default class Trivia extends TriviaCore {
       trivia: sekshi.USERROLE.BOUNCER,
       trivquit: sekshi.USERROLE.BOUNCER,
       trivpoints: sekshi.USERROLE.NONE,
-      lasttrivia: sekshi.USERROLE.RESIDENTDJ,
+      lasttrivia: sekshi.USERROLE.BOUNCER,
       question: sekshi.USERROLE.NONE
     }
   }
@@ -39,6 +50,10 @@ export default class Trivia extends TriviaCore {
                                ` Congratulations! :D`)
           this.sekshi.moveDJ(winner.id, this.options.winPosition - 1)
           this.stopTrivia()
+          if (this.model) {
+            this.model.set('winner', winner.id).save()
+            this.model = null
+          }
         }
         else {
           this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly! Next question in ${interval} seconds!`)
@@ -60,6 +75,27 @@ export default class Trivia extends TriviaCore {
   }
 
   // Chat Commands
+  lasttrivia(user) {
+    const notPlayed = () => {
+      this.sekshi.sendChat(`@${user.username} I don't remember playing trivia!`)
+    }
+
+    TriviaHistory.findOne({})
+                 .select('time')
+                 .sort({ time: -1 })
+                 .exec()
+      .then(last => {
+        if (last && last.time) {
+          const lastPlayed = moment(last.time).utc()
+          this.sekshi.sendChat(`@${user.username} The last trivia was started ${lastPlayed.calendar()} (${lastPlayed.fromNow()}).`)
+        }
+        else {
+          notPlayed()
+        }
+      })
+      .then(null, notPlayed)
+  }
+
   trivia(user) {
     if (!this.isRunning()) {
       this.sekshi.sendChat(`[Trivia] @djs ${user.username} started Trivia! ` +
@@ -67,6 +103,12 @@ export default class Trivia extends TriviaCore {
       this.startTrivia().then(() => {
         this.sekshi.sendChat(`Loaded ${this.questions.length} questions. First question in 5 seconds!`)
         setTimeout(() => this.nextQuestion(), 5 * 1000)
+
+        this.model = new TriviaHistory({ user: user.id })
+        this.model.save().then(
+          () => { debug('created history item') },
+          e => console.error(e)
+        )
       })
     }
   }
