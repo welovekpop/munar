@@ -15,7 +15,6 @@
   "dependencies": {
     "array-find": "^0.1.1",
     "array-findindex": "^0.1.0",
-    "babel": "5.x",
     "debug": "*",
     "mkdirp": "^0.5.1",
     "moment": "^2.9.0",
@@ -27,9 +26,12 @@
     "request": "^2.58.0",
     "snoocore": "2.x"
   },
+  "devDependencies": {
+    "babel": "5.x"
+  },
   "scripts": {
     "start": "node lib/app.js",
-    "babel-start": "./node_modules/.bin/babel-node src/app.js",
-    "babel": "./node_modules/.bin/babel --out-dir lib src"
+    "babel-start": "babel-node src/app.js",
+    "babel": "babel --out-dir lib src"
   }
 }
