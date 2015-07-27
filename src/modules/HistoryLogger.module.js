@@ -1,6 +1,7 @@
 const debug = require('debug')('sekshi:history-logging')
 const { User, Media, HistoryEntry, Vote, Grab } = require('../models')
 const SekshiModule = require('../Module')
+const { fixTags } = require('../utils')
 const moment = require('moment')
 
 export default class HistoryLogger extends SekshiModule {
@@ -49,14 +50,19 @@ export default class HistoryLogger extends SekshiModule {
     if (!dj) dj = { id: null }
 
     let media = Media.findOne({ format: currentMedia.format, cid: currentMedia.cid }).exec()
-      .then(media => media || Media.create({
-        format: currentMedia.format
-      , cid: currentMedia.cid
-      , author: currentMedia.author
-      , title: currentMedia.title
-      , image: currentMedia.image
-      , duration: currentMedia.duration
-      }))
+      .then(media => {
+        if (media) return media
+        // first time this is played!
+        let fixed = fixTags(currentMedia)
+        return Media.create({
+          format: currentMedia.format
+        , cid: currentMedia.cid
+        , author: fixed.author
+        , title: fixed.title
+        , image: currentMedia.image
+        , duration: currentMedia.duration
+        })
+      })
 
     const startTime = moment.utc(newPlay.startTime, 'YYYY-MM-DD HH:mm:ss')
     let historyEntry = new HistoryEntry({

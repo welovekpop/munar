@@ -176,6 +176,8 @@ export default class MediaStats extends SekshiModule {
   }
 
   retag(user, cid, ...newTag) {
+    let author
+    let title
     Media.findOne({ cid: cid }).lean().exec().then(media => {
       if (!media) {
         media = this.sekshi.getCurrentMedia()
@@ -184,9 +186,18 @@ export default class MediaStats extends SekshiModule {
       if (!media) return
 
       newTag = newTag.join(' ')
-      let split = newTag.indexOf(' - ')
-      let author = newTag.slice(0, split)
-      let title = newTag.slice(split + 3)
+
+      if (newTag.length === 0) {
+         let fixed = utils.fixTags(media)
+         console.log(fixed)
+         author = fixed.author
+         title = fixed.title
+      }
+      else {
+        let split = newTag.indexOf(' - ')
+        author = newTag.slice(0, split)
+        title = newTag.slice(split + 3)
+      }
 
       if (!author) {
         return this.sekshi.sendChat(`@${user.username} Please provide a valid artist name.`)
@@ -195,12 +206,12 @@ export default class MediaStats extends SekshiModule {
         return this.sekshi.sendChat(`@${user.username} Please provide a valid song title.`)
       }
 
-      Media.update({ cid: media.cid }, { $set: { author, title } }).exec().then(
-        () => {
-          this.sekshi.sendChat(`@${user.username} Song retagged to "${author}" - "${title}"!`, 5000)
-        },
-        console.error
-      )
-    })
+      return Media.update({ cid: media.cid }, { $set: { author, title } }).exec()
+    }).then(
+      () => {
+        this.sekshi.sendChat(`@${user.username} Song retagged to "${author}" - "${title}"!`, 5000)
+      },
+      console.error
+    )
   }
 }
