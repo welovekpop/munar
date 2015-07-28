@@ -165,10 +165,13 @@ export default class MediaStats extends SekshiModule {
     )
   }
 
-  tagged(user) {
-    let media = this.sekshi.getCurrentMedia()
-    if (!media) return
-    Media.findOne({ cid: media.cid }).exec().then(
+  tagged(user, cid) {
+    if (!cid) {
+      let media = this.sekshi.getCurrentMedia()
+      if (!media) return
+      cid = media.cid
+    }
+    Media.findOne({ cid: cid }).exec().then(
       model => {
         this.sekshi.sendChat(`@${user.username} "${model.author}" - "${model.title}"`)
       }
