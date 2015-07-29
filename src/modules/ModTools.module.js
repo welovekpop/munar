@@ -18,7 +18,8 @@ export default class ModTools extends SekshiModule {
       ban: sekshi.USERROLE.BOUNCER,
       mute: sekshi.USERROLE.BOUNCER,
       unmute: sekshi.USERROLE.BOUNCER,
-      eatshit: sekshi.USERROLE.BOUNCER
+      eatshit: sekshi.USERROLE.BOUNCER,
+      lastgame: sekshi.USERROLE.BOUNCER
     }
   }
 
@@ -137,6 +138,19 @@ export default class ModTools extends SekshiModule {
       setTimeout(() => {
         this.ban(user, targetName, duration)
       }, this.options.eatshitDelay * 1000)
+    }
+  }
+
+  // alias to !lastroulette, !lasttrivia
+  lastgame(user) {
+    const roulette = this.sekshi.getModule('roulette')
+    const trivia = this.sekshi.getModule('trivia')
+
+    if (roulette && roulette.enabled()) {
+      roulette.lastroulette(user)
+    }
+    if (trivia && trivia.enabled()) {
+      trivia.lasttrivia(user)
     }
   }
 
