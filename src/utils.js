@@ -45,9 +45,12 @@ const SMENT = /^sment|smtown$/i
 // random stuff
 const MV = /Music ?Video/i
 const MVPREFIX = /^\[M\/?V\] ?/i
-const MVSUFFIX = /\(?(?:(?:Off?icial)? ?Music ?Video|M\/?V)\)?$/i
+const MVSUFFIX = /\(?\[?(?:Off?icial)? ?(?:Music ?Video|M\/?V)?\]?\)?$/i
 const FEATURING = /Feat(?:uring)?|With/i
-const TEASER = /^\s*\[Teaser\]\s*/i
+const TEASER = /^\s*\[?Teaser\]?\s*/i
+const ALBUM = /\[(?:(?:.*?Mini |\D*\d\D+)Album - .+?|.+? - (?:Mini |\D*\d\D+)Album|Mini-Album)\]/i
+const AUDIO = /\[?\(?(?:Full )?(?:H[QD] )?Audio\)?\]?/i
+const HQSUFFIX = /(\s*H[QD])+$/i
 
 export function fixTags(at) {
   let author = at.author.trim()
@@ -71,7 +74,11 @@ export function fixTags(at) {
     }
   }
 
-  title = title.replace(MVSUFFIX, '')
+  title = title
+    .replace(MVSUFFIX, '')
+    .replace(ALBUM, '')
+    .replace(AUDIO, '')
+    .replaec(HQSUFFIX, '')
 
   author = author.replace(MVPREFIX, '')
   if (TEASER.test(author)) {
