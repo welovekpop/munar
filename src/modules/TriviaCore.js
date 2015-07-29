@@ -2,6 +2,7 @@ const SekshiModule = require('../Module')
 const Promise = require('promise')
 const random = require('random-item')
 const request = require('request')
+const parseCsv = require('csv-parse')
 
 function normalizeAnswer(a) {
   return a.toLowerCase()
@@ -27,7 +28,8 @@ export default class TriviaCore extends SekshiModule {
 
   defaultOptions() {
     return {
-      data: 'https://spreadsheets.google.com/feeds/list/1agQloBvRb1zS3Kf9NPZVD9iI5hE-sdNw62adcna4HPE/od6/public/full?alt=json',
+      data: 'https://docs.google.com/spreadsheets/d/1agQloBvRb1zS3Kf9NPZVD9iI5hE-sdNw62adcna4HPE/pub?gid=0&single=true&output=csv',
+      type: 'csv',
       roundDuration: 120,
       historySize: 100
     }
@@ -126,28 +128,30 @@ export default class TriviaCore extends SekshiModule {
 
   _load() {
     return new Promise((resolve, reject) => {
-      request({ uri: this.options.data, json: true }, (e, _, body) => {
+      request({ uri: this.options.data }, (e, _, body) => {
         if (e) reject(e)
-        else {
-          this._loadFromGoogleSheets(body)
-          resolve(this.questions)
-        }
+        else resolve(body)
       })
     })
+    .then(body => this.parse(body, this.options.type))
+    .then(questions => this.questions = questions)
   }
-  _loadFromGoogleSheets(json) {
-    const $t = obj => obj && obj.$t && obj.$t.trim()
-
-    json.feed.entry.forEach(entry => {
-      this.addQuestion(new Question(
-        $t(entry.gsx$category),
-        $t(entry.gsx$question),
-        $t(entry.gsx$answer),
-        $t(entry.gsx$altanswer1),
-        $t(entry.gsx$altanswer2),
-        $t(entry.gsx$altanswer3)
-      ))
-    })
+  parse(data, type) {
+    if (type === 'csv') {
+      return new Promise((resolve, reject) => {
+        parseCsv(data.slice(data.indexOf('\n')), (e, questions) => {
+          if (e) reject(e)
+          else {
+            resolve(
+              questions.map(arr => new Question(arr[0], arr[1], arr.slice(3), arr[2]))
+            )
+          }
+        })
+      })
+    }
+    else {
+      return Promise.reject(new Error('Unknown data type'))
+    }
   }
 
   _historySize() {
@@ -159,7 +163,7 @@ export default class TriviaCore extends SekshiModule {
 }
 
 class Question {
-  constructor(category, question, ...answers) {
+  constructor(category, question, answers, points = 1) {
     this.category = category
     this.question = question
     this.answers = answers.filter(a => a).map(normalizeAnswer)
