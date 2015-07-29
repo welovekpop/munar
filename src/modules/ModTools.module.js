@@ -39,6 +39,10 @@ export default class ModTools extends SekshiModule {
 
   move(user, target, pos) {
     debug('move', target, pos)
+    if (!/^\d+$/.test(pos)) {
+      return this.sekshi.sendChat(`@${user.username} Invalid position!`)
+    }
+    pos = parseInt(pos, 10) - 1
     let targetUser = this.sekshi.getUserByName(target)
     if (targetUser) {
       if (this.sekshi.getWaitlist().indexOf(targetUser.id) === -1) {
