@@ -78,7 +78,7 @@ export function fixTags(at) {
     .replace(MVSUFFIX, '')
     .replace(ALBUM, '')
     .replace(AUDIO, '')
-    .replaec(HQSUFFIX, '')
+    .replace(HQSUFFIX, '')
 
   author = author.replace(MVPREFIX, '')
   if (TEASER.test(author)) {
