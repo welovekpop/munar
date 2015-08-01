@@ -1,8 +1,5 @@
 const SekshiModule = require('../Module')
 const debug = require('debug')('sekshi:config')
-const fs = require('fs')
-const path = require('path')
-const assign = require('object-assign')
 
 const configCommands = [ 'set', 'get', 'add', 'remove' ]
 
