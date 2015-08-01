@@ -45,12 +45,8 @@ const SMENT = /^sment|smtown$/i
 // random stuff
 const MV = /Music ?Video/i
 const MVPREFIX = /^\[M\/?V\] ?/i
-const MVSUFFIX = /\(?\[?(?:Off?icial)? ?(?:Music ?Video|M\/?V)?\]?\)?$/i
 const FEATURING = /Feat(?:uring)?|With/i
-const TEASER = /^\s*\[?Teaser\]?\s*/i
-const ALBUM = /\[(?:(?:.*?Mini |\D*\d\D+)Album - .+?|.+? - (?:Mini |\D*\d\D+)Album|Mini-Album)\]/i
-const AUDIO = /\[?\(?(?:Full )?(?:H[QD] )?Audio\)?\]?/i
-const HQSUFFIX = /(\s*H[QD])+$/i
+const TEASER = /^\s*\[?(?:M\/?V\s*)?Teaser\]?\s*/i
 
 export function fixTags(at) {
   let author = at.author.trim()
@@ -74,11 +70,39 @@ export function fixTags(at) {
     }
   }
 
+  // taken from
+  // https://github.com/brooke/Chrome-Last.fm-Scrobbler/blob/5c45a3b/connectors/youtube.js#L186-L216
   title = title
-    .replace(MVSUFFIX, '')
-    .replace(ALBUM, '')
-    .replace(AUDIO, '')
-    .replace(HQSUFFIX, '')
+    .replace(/\s*\*+\s?\S+\s?\*+$/, '') // **NEW**
+    .replace(/\s*\[[^\]]+\]$/, '') // [whatever]
+    .replace(/\s*\[\s*(M\/?V)\s*\]/, '') // [MV] or [M/V]
+    .replace(/\s*\(\s*(M\/?V)\s*\)/, '') // (MV) or (M/V)
+    .replace(/[\s\-–_]+(M\/?V)\s*/, '') // MV or M/V
+    .replace(/\s*\([^\)]*ver(\.|sion)?\s*\)$/i, '') // (whatever version)
+    .replace(/\s*[a-z]*\s*ver(\.|sion)?$/i, '') // ver. and 1 word before (no parens)
+    .replace(/\s*\.(avi|wmv|mpg|mpeg|flv)$/i, '') // video extensions
+    .replace(/\s*(of+icial\s*)?(music\s*)?video/i, '') // (official)? (music)? video
+    .replace(/\s*(ALBUM TRACK\s*)?(album track\s*)/i, '') // (ALBUM TRACK)
+    .replace(/\s*\(\s*of+icial\s*\)/i, '') // (official)
+    .replace(/\s*\(\s*[0-9]{4}\s*\)/i, '') // (1999)
+    .replace(/\s+\(\s*(HD|HQ)\s*\)$/, '') // HD (HQ)
+    .replace(/[\s\-–_]+(HD|HQ)\s*$/, '') // HD (HQ)
+    .replace(/\s*video\s*clip/i, '') // video clip
+    .replace(/\s+\(?live\)?$/i, '') // live
+    .replace(/\(\s*\)/, '') // Leftovers after e.g. (official video)
+    .replace(/^(|.*\s)"(.*)"(\s.*|)$/, '$2') // Artist - The new "Track title" featuring someone
+    .replace(/^(|.*\s)'(.*)'(\s.*|)$/, '$2') // 'Track title'
+    .replace(/^[\/\s,:;~\-–_\s"]+/, '') // trim starting white chars and dash
+    .replace(/[\/\s,:;~\-–_\s"\s!]+$/, '') // trim trailing white chars and dash
+
+  author = author
+    .replace(/\s*[0-1][0-9][0-1][0-9][0-3][0-9]\s*/, '') // date formats ex. 130624
+    .replace(/\[\s*(1080|720)p\s*\]/i, '') // [1080p]
+    .replace(/\[\s*(M\/?V)\s*\]/, '') // [MV] or [M/V]
+    .replace(/\(\s*(M\/?V)\s*\)/, '') // (MV) or (M/V)
+    .replace(/\s*(M\/?V)\s*/, '') // MV or M/V
+    .replace(/^[\/\s,:;~\-–_\s"]+/, '') // trim starting white chars and dash
+    .replace(/[\/\s,:;~\-–_\s"\s!]+$/, '') // trim trailing white chars and dash
 
   author = author.replace(MVPREFIX, '')
   if (TEASER.test(author)) {
