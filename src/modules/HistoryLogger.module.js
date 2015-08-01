@@ -54,7 +54,7 @@ export default class HistoryLogger extends SekshiModule {
         if (media) return media
         // first time this is played!
         let fixed = fixTags(currentMedia)
-        return Media.create({
+        let model = new Media({
           format: currentMedia.format
         , cid: currentMedia.cid
         , author: fixed.author
@@ -62,6 +62,7 @@ export default class HistoryLogger extends SekshiModule {
         , image: currentMedia.image
         , duration: currentMedia.duration
         })
+        return model.save()
       })
 
     const startTime = moment.utc(newPlay.startTime, 'YYYY-MM-DD HH:mm:ss')
@@ -102,10 +103,10 @@ export default class HistoryLogger extends SekshiModule {
     debug('grab', uid)
     if (this._currentEntry && this._grabs.indexOf(uid) === -1) {
       this._grabs.push(uid);
-      Grab.create({
+      new Grab({
         history: this._currentEntry.id,
         user: uid
-      })
+      }).save()
         .then(grab => { debug('saved grab', uid) })
         .catch(err => { debug('grab-err', err) })
     }

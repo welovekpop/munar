@@ -36,7 +36,7 @@ userSchema.static('fromPlugUser', function (plugUser) {
   if (!descr.slug) delete descr.slug
 
   return User.findById(plugUser.id).exec().then(doc => {
-    if (!doc) return User.create(assign(descr, { _id: plugUser.id }))
+    if (!doc) return new User(assign(descr, { _id: plugUser.id })).save()
     else      return doc.set(descr).save()
   })
 })
