@@ -44,7 +44,7 @@ export default class HistoryLogger extends SekshiModule {
 
     let currentMedia = sekshi.getCurrentMedia()
     let dj = sekshi.getCurrentDJ()
-    if (!currentMedia) return
+    if (!currentMedia || !currentMedia.cid) return
 
     // just to be sure?
     if (!dj) dj = { id: null }
