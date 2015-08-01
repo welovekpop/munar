@@ -155,14 +155,13 @@ export default class MediaStats extends SekshiModule {
     let title = `@${user.username} Most played songs`
     if (!allTime) title += ` over the last ${utils.days(hours)}`
     this.sekshi.sendChat(`${title}:`)
-    this.getMostPlayed(amount, time).then(
-      medias => {
+    this.getMostPlayed(amount, time)
+      .then(medias => {
         medias.forEach((m, i) => {
           this.sekshi.sendChat(`#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`)
         })
-      },
-      e => { this.sekshi.sendChat(`ERR: ${e.message}`) }
-    )
+      })
+      .catch(e => { this.sekshi.sendChat(`ERR: ${e.message}`) })
   }
 
   tagged(user, cid) {
@@ -171,50 +170,48 @@ export default class MediaStats extends SekshiModule {
       if (!media) return
       cid = media.cid
     }
-    Media.findOne({ cid: cid }).exec().then(
-      model => {
+    Media.findOne({ cid: cid }).exec()
+      .then(model => {
         this.sekshi.sendChat(`@${user.username} "${model.author}" - "${model.title}"`)
-      }
-    )
+      })
   }
 
   retag(user, cid, ...newTag) {
     let author
     let title
-    Media.findOne({ cid: cid }).lean().exec().then(media => {
-      if (!media) {
-        media = this.sekshi.getCurrentMedia()
-        newTag.unshift(cid)
-      }
-      if (!media) return
+    Media.findOne({ cid: cid }).lean().exec()
+      .then(media => {
+        if (!media) {
+          media = this.sekshi.getCurrentMedia()
+          newTag.unshift(cid)
+        }
+        if (!media) return
 
-      newTag = newTag.join(' ')
+        newTag = newTag.join(' ')
 
-      if (newTag.length === 0) {
-         let fixed = utils.fixTags(media)
-         console.log(fixed)
-         author = fixed.author
-         title = fixed.title
-      }
-      else {
-        let split = newTag.indexOf(' - ')
-        author = newTag.slice(0, split)
-        title = newTag.slice(split + 3)
-      }
+        if (newTag.length === 0) {
+           let fixed = utils.fixTags(media)
+           author = fixed.author
+           title = fixed.title
+        }
+        else {
+          let split = newTag.indexOf(' - ')
+          author = newTag.slice(0, split)
+          title = newTag.slice(split + 3)
+        }
 
-      if (!author) {
-        return this.sekshi.sendChat(`@${user.username} Please provide a valid artist name.`)
-      }
-      if (!title) {
-        return this.sekshi.sendChat(`@${user.username} Please provide a valid song title.`)
-      }
+        if (!author) {
+          return this.sekshi.sendChat(`@${user.username} Please provide a valid artist name.`)
+        }
+        if (!title) {
+          return this.sekshi.sendChat(`@${user.username} Please provide a valid song title.`)
+        }
 
-      return Media.update({ cid: media.cid }, { $set: { author, title } }).exec()
-    }).then(
-      () => {
+        return Media.update({ cid: media.cid }, { $set: { author, title } }).exec()
+      })
+      .then(() => {
         this.sekshi.sendChat(`@${user.username} Song retagged to "${author}" - "${title}"!`, 5000)
-      },
-      console.error
-    )
+      })
+      .catch(e => console.error(e))
   }
 }

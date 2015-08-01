@@ -141,7 +141,7 @@ export default class Roulette extends SekshiModule {
           notPlayed()
         }
       })
-      .then(null, notPlayed)
+      .catch(notPlayed)
   }
 
   stoproulette(user) {
@@ -174,7 +174,7 @@ export default class Roulette extends SekshiModule {
               .forEach((u, i) => { this.sekshi.sendChat(`#${i + 1} - ${u.username} (${u.wins} wins)`) })
           })
       })
-      .then(null, e => console.error(e))
+      .catch(e => console.error(e))
   }
 
   onEnd() {
@@ -204,13 +204,11 @@ export default class Roulette extends SekshiModule {
       .where('dj').equals(id)
       .where('time').gt(Date.now() - this.options.timeout * 1000)
       .count().exec()
-      .then(
-        // user DJed recently if there is at least one play in
-        // the last X minutes
-        count => count > 0,
-        // assume user didn't DJ recently on error
-        e => false
-      )
+      // user DJed recently if there is at least one play in
+      // the last X minutes
+      .then(count => count > 0)
+      // assume user didn't DJ recently on error
+      .catch(e => false)
   }
 
 }

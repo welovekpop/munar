@@ -38,38 +38,41 @@ export default class UserKarma extends SekshiModule {
 
     if (username && username.charAt(0) === '@') username = username.slice(1)
     if (!self && username) {
-      User.findOne({ username }).exec()
-      .then(usar => {
-        if (!usar) {
-          this.sekshi.sendChat(`@${user.username} I don't know ${username} yet`)
-          return undefined
-        }
-        Karma.find({date: {"$gte": since.toDate()}, target:usar._id }).select('amount').exec().then(karmaList => {
-          let karma = karmaList.reduce( (a, b) => { return a + b.amount }, 0)
-          let msg = `@${user.username} ${username} has ${karma} karma`
-          if (!allTime) msg += ` from the past ${utils.days(hours)}`
-          this.sekshi.sendChat(`${msg}.`)
-        }
-        , err => {debug(err)})
-
-        return usar
-      })
+      User.findOne({ username })
+        .then(usar => {
+          if (!usar) {
+            this.sekshi.sendChat(`@${user.username} I don't know ${username} yet`)
+            return undefined
+          }
+          return Karma.find({ date: { $gte: since.toDate() }, target: usar._id })
+                      .select('amount')
+                      .exec()
+            .then(karmaList => {
+              let karma = karmaList.reduce( (a, b) => { return a + b.amount }, 0)
+              let msg = `@${user.username} ${username} has ${karma} karma`
+              if (!allTime) msg += ` from the past ${utils.days(hours)}`
+              this.sekshi.sendChat(`${msg}.`)
+            })
+        })
+        .catch(e => console.error(e))
     } else {
-      User.findById(user.id).exec()
-      .then(usar => {
-        if (!usar) {
-          this.sekshi.sendChat(`@${user.username} who are you?`)
-          return undefined
-        }
-        Karma.find({date: {"$gte": since.toDate()}, target:usar._id }).select('amount').exec().then(karmaList => {
-          let karma = karmaList.reduce( (a, b) => { return a + b.amount }, 0)
-          let msg = `@${user.username} you have ${karma} karma`
-          if (!allTime) msg += ` from the past ${utils.days(hours)}`
-          this.sekshi.sendChat(`${msg}.`)
-        }
-        , err => {debug(err)})
-        return usar
-      })
+      User.findById(user.id)
+        .then(usar => {
+          if (!usar) {
+            this.sekshi.sendChat(`@${user.username} who are you?`)
+            return undefined
+          }
+          return Karma.find({ date: { $gte: since.toDate() }, target: usar._id })
+                      .select('amount')
+                      .exec()
+            .then(karmaList => {
+              let karma = karmaList.reduce( (a, b) => { return a + b.amount }, 0)
+              let msg = `@${user.username} you have ${karma} karma`
+              if (!allTime) msg += ` from the past ${utils.days(hours)}`
+              this.sekshi.sendChat(`${msg}.`)
+            })
+        })
+        .catch(e => console.error(e))
     }
   }
 
@@ -92,25 +95,20 @@ export default class UserKarma extends SekshiModule {
         else {
           let karmas = {}
           karmaList.forEach(k => { karmas[k._id] = k.karma })
-          User.where('_id').in(karmaList.map(k => k._id)).lean().exec()
+          return User.where('_id').in(karmaList.map(k => k._id)).lean().exec()
             .then(users => users.map(u => assign(u, { karma: karmas[u._id] })))
             .then(users => users.sort((a, b) => a.karma > b.karma ? -1 : 1))
-            .then(
-              users => {
-                let title = `@${user.username} Karma leaders`
-                if (!allTime) title += ` over the last ${utils.days(hours)}`
-                this.sekshi.sendChat(`${title}:`)
-                users.forEach((u, rank) => {
-                  this.sekshi.sendChat(`${rank + 1} - ${u.username}: ${u.karma}`)
-                })
-              },
-              err => {}
-            )
+            .then(users => {
+              let title = `@${user.username} Karma leaders`
+              if (!allTime) title += ` over the last ${utils.days(hours)}`
+              this.sekshi.sendChat(`${title}:`)
+              users.forEach((u, rank) => {
+                this.sekshi.sendChat(`${rank + 1} - ${u.username}: ${u.karma}`)
+              })
+            })
         }
-      },
-      err => {
-        debug(`${err}`)
       })
+      .catch(e => console.error(e))
   }
 
   bump(user, username, ...reason) {
@@ -188,25 +186,25 @@ export default class UserKarma extends SekshiModule {
     const allTime = time === 'f'
 
     Karma.aggregate()
-    .match({ target: user.id, giver: { $ne: 0 }, date: { $gte: since.toDate() } })
-    .group({ _id: "$giver", karma: { $sum: "$amount" } })
-    .sort({ karma: -1 }).exec().then(karmaList => {
-      if (karmaList.length === 0) {
-        let msg = `@${user.username} you have no bitches`
-        if (!allTime) msg += ` from the past ${utils.days(hours)}`
-        this.sekshi.sendChat(`${msg}. :cry:`)
-      } else {
-        let karma = karmaList[0]['karma']
-        User.findById(karmaList[0]['_id']).exec().then(usar => {
-          let msg = `@${user.username}, ${usar.username} is your bitch. They gave you ${karma} karma`
-          if (!allTime) msg += ` in the past ${utils.days(hours)}`
-          this.sekshi.sendChat(`${msg}.`)
-        })
-      }
-    },
-    err => {
-      debug(`${err}`)
-    })
+      .match({ target: user.id, giver: { $ne: 0 }, date: { $gte: since.toDate() } })
+      .group({ _id: "$giver", karma: { $sum: "$amount" } })
+      .sort({ karma: -1 })
+      .exec()
+      .then(karmaList => {
+        if (karmaList.length === 0) {
+          let msg = `@${user.username} you have no bitches`
+          if (!allTime) msg += ` from the past ${utils.days(hours)}`
+          this.sekshi.sendChat(`${msg}. :cry:`)
+        } else {
+          let karma = karmaList[0]['karma']
+          return User.findById(karmaList[0]['_id']).then(usar => {
+            let msg = `@${user.username}, ${usar.username} is your bitch. They gave you ${karma} karma`
+            if (!allTime) msg += ` in the past ${utils.days(hours)}`
+            this.sekshi.sendChat(`${msg}.`)
+          })
+        }
+      })
+      .catch(err => console.error(err))
   }
 
   pimp(user, time = 'w') {
@@ -215,25 +213,25 @@ export default class UserKarma extends SekshiModule {
     const allTime = time === 'f'
 
     Karma.aggregate()
-    .match({ giver: user.id, target: { $ne: 0 }, date: { $gte: since.toDate() } })
-    .group({ _id: "$target", karma: { $sum: "$amount" } })
-    .sort({ karma: -1 }).exec().then(karmaList => {
-      if (karmaList.length === 0) {
-        let msg = `@${user.username} you have been noone's bitch`
-        if (!allTime) msg += ` in the past ${utils.days(hours)}`
-        this.sekshi.sendChat(`${msg}. :smirk:`)
-      } else {
-        let karma = karmaList[0]['karma']
-        User.findById(karmaList[0]['_id']).exec().then(usar => {
-          let msg = `@${user.username}, ${usar.username} is your pimp. You gave them ${karma} karma`
+      .match({ giver: user.id, target: { $ne: 0 }, date: { $gte: since.toDate() } })
+      .group({ _id: "$target", karma: { $sum: "$amount" } })
+      .sort({ karma: -1 })
+      .exec()
+      .then(karmaList => {
+        if (karmaList.length === 0) {
+          let msg = `@${user.username} you have been noone's bitch`
           if (!allTime) msg += ` in the past ${utils.days(hours)}`
-          this.sekshi.sendChat(`${msg}.`)
-        })
-      }
-    },
-    err => {
-      debug(`${err}`)
-    })
+          this.sekshi.sendChat(`${msg}. :smirk:`)
+        } else {
+          let karma = karmaList[0]['karma']
+          return User.findById(karmaList[0]['_id']).then(usar => {
+            let msg = `@${user.username}, ${usar.username} is your pimp. You gave them ${karma} karma`
+            if (!allTime) msg += ` in the past ${utils.days(hours)}`
+            this.sekshi.sendChat(`${msg}.`)
+          })
+        }
+      })
+      .catch(err => console.error(err))
   }
 
   fistbump(user) {

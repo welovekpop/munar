@@ -75,15 +75,14 @@ export default class HistoryLogger extends SekshiModule {
     })
     this._currentEntry = historyEntry;
 
-    media.then(
-      media => {
+    media
+      .then(media => {
         debug('dj', dj.id)
         debug('media', `${media.fullTitle} (${media.id})`)
         debug('time', startTime.format())
         return historyEntry.set('media', media.id).save()
-      },
-      e => { debug('err', e) }
-    )
+      })
+      .catch(e => { console.error(e.stack) })
   }
 
   onVote({ id, direction }) {
@@ -93,10 +92,9 @@ export default class HistoryLogger extends SekshiModule {
         { user: id, history: this._currentEntry.id },
         { direction: direction, time: Date.now() },
         { upsert: true }
-      ).exec().then(
-        vote => { debug('saved vote', id, direction) },
-        err  => { debug('vote-err', err) }
       )
+        .then(vote => { debug('saved vote', id, direction) })
+        .catch(err => { debug('vote-err', err) })
     }
   }
 
@@ -107,10 +105,9 @@ export default class HistoryLogger extends SekshiModule {
       Grab.create({
         history: this._currentEntry.id,
         user: uid
-      }).then(
-        grab => { debug('saved grab', uid) },
-        err  => { debug('grab-err', err) }
-      )
+      })
+        .then(grab => { debug('saved grab', uid) })
+        .catch(err => { debug('grab-err', err) })
     }
   }
 }

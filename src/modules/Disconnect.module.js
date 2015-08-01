@@ -79,8 +79,8 @@ export default class Disconnect extends SekshiModule {
   dc(user) {
     debug('!dc', user.username)
 
-    Disconnections.findById(user.id).exec().then(
-      drop => {
+    Disconnections.findById(user.id).exec()
+      .then(drop => {
         if (drop) {
           debug('found drop')
           const time = moment(drop.time)
@@ -94,10 +94,9 @@ export default class Disconnect extends SekshiModule {
                                `from position ${drop.position + 1}.`)
 
           const removeDrop = () => {
-            Disconnections.remove({ _id: drop.id }).exec().then(
-              () => { debug('removed drop', drop.id) },
-              e => { debug('drop remove error', e) }
-            )
+            Disconnections.remove({ _id: drop.id })
+              .then(() => { debug('removed drop', drop.id) })
+              .catch(e => { debug('drop remove error', e) })
           }
           if (this.sekshi.getWaitlist().indexOf(drop.id) < 0) {
             this.sekshi.addToWaitlist(drop.id, () => {
@@ -111,11 +110,10 @@ export default class Disconnect extends SekshiModule {
         else {
           this.sekshi.sendChat(`@${user.username} I couldn't find you in the database!`)
         }
-      },
-      e => {
+      })
+      .catch(e => {
         debug('!dc error', e)
         this.sekshi.sendChat(`@${user.username} I couldn't find you in the database!`)
-      }
-    )
+      })
   }
 }

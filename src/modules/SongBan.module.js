@@ -39,12 +39,13 @@ export default class SongBan extends SekshiModule {
   }
 
   onAdvance(booth, { media }) {
-    BannedMedia.findOne({ cid: media.cid, format: media.format }).exec().then(banned => {
-      const modSkip = this.sekshi.getModule('modskip')
-      if (banned && modSkip) {
-        modSkip.skip(this.sekshi.getSelf(), banned.reason || 'This song was blacklisted.')
-      }
-    })
+    BannedMedia.findOne({ cid: media.cid, format: media.format }).exec()
+      .then(banned => {
+        const modSkip = this.sekshi.getModule('modskip')
+        if (banned && modSkip) {
+          modSkip.skip(this.sekshi.getSelf(), banned.reason || 'This song was blacklisted.')
+        }
+      })
   }
 
   songban(user, ...reason) {
@@ -55,15 +56,17 @@ export default class SongBan extends SekshiModule {
       cid: media.cid,
       reason: reason,
       moderator: user.id
-    }).then(banned => {
-      this.sekshi.sendChat(`@${user.username} This song has now been blacklisted.`)
     })
+      .then(banned => {
+        this.sekshi.sendChat(`@${user.username} This song has now been blacklisted.`)
+      })
   }
 
   songunban(user, cid) {
-    BannedMedia.findOne({ cid: cid }).exec().then(banned => {
-      if (banned) BannedMedia.remove({ _id: banned._id })
-    })
+    BannedMedia.findOne({ cid: cid }).exec()
+      .then(banned => {
+        if (banned) BannedMedia.remove({ _id: banned._id })
+      })
   }
 
   banskip(user, ...reason) {

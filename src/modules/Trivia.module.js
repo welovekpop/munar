@@ -93,7 +93,7 @@ export default class Trivia extends TriviaCore {
           notPlayed()
         }
       })
-      .then(null, notPlayed)
+      .catch(notPlayed)
   }
 
   trivia(user) {
@@ -105,10 +105,9 @@ export default class Trivia extends TriviaCore {
         setTimeout(() => this.nextQuestion(), 5 * 1000)
 
         this.model = new TriviaHistory({ user: user.id })
-        this.model.save().then(
-          () => { debug('created history item') },
-          e => console.error(e)
-        )
+        this.model.save()
+          .then(() => { debug('created history item') })
+          .catch(e => console.error(e))
       })
     }
   }

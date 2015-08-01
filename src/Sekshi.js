@@ -10,6 +10,8 @@ const find = require('array-find')
 const mkdirp = require('mkdirp')
 const { User } = require('./models')
 
+mongoose.Promise = Promise
+
 export default class Sekshi extends Plugged {
   constructor(args) {
     super()

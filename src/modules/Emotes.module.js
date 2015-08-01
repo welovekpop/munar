@@ -115,30 +115,28 @@ export default class Emotes extends SekshiModule {
     else {
       promise = this.saveEmote(user, id, url)
     }
-    promise.then(
-      emote => {
+    promise
+      .then(emote => {
         debug('added', id, url)
         this.sekshi.sendChat(`@${user.username} Emote "${id}" updated!`, 10 * 1000)
-      },
-      err => {
+      })
+      .catch(err => {
         debug('add-err', err)
         this.sekshi.sendChat(`@${user.username} Emote "${id}" could not be updated`, 10 * 1000)
-      }
-    )
+      })
   }
 
   delemote(user, id) {
     debug('delemote', id)
-    Emote.remove({ _id: id }).exec().then(
-      () => {
+    Emote.remove({ _id: id }).exec()
+      .then(() => {
         debug('deleted', id)
         this.sekshi.sendChat(`@${user.username} Emote "${id}" removed!`, 10 * 1000)
-      },
-      err => {
+      })
+      .catch(err => {
         debug('del-err', err)
         this.sekshi.sendChat(`@${user.username} Emote "${id}" could not be updated`, 10 * 1000)
-      }
-    )
+      })
   }
 
   emotes({ username }) {
@@ -148,8 +146,8 @@ export default class Emotes extends SekshiModule {
       return
     }
 
-    Emote.find({}).sort('id').exec().then(
-      emotes => {
+    Emote.find({}).sort('id').exec()
+      .then(emotes => {
         let message = `@${username} Emotes: `
         let messages = []
         debug('got emotes', emotes.length)
@@ -164,9 +162,8 @@ export default class Emotes extends SekshiModule {
         messages.forEach((msg, i) => {
           this.sekshi.sendChat(msg, 20 * 1000)
         })
-      },
-      err => { debug('error', err) }
-    )
+      })
+      .catch(err => { console.error(err) })
   }
 
   emote(user, id, username) {
