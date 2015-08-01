@@ -1,5 +1,6 @@
 const assign = require('object-assign')
 const SekshiModule = require('../Module')
+const command = require('../command')
 
 export default class ModSkip extends SekshiModule {
 

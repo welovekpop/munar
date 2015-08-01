@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const { joinList } = require('../utils')
 
 const LINK_RX = /https?:\/\/(\S{4,})/i

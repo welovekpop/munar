@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 
 export default class System extends SekshiModule {
 

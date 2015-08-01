@@ -3,6 +3,7 @@ const assign = require('object-assign')
 const random = require('random-item')
 const { User, Karma } = require('../models')
 const SekshiModule = require('../Module')
+const command = require('../command')
 const moment = require('moment')
 const utils = require('../utils')
 

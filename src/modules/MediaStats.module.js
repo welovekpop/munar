@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const debug = require('debug')('sekshi:check-plays')
 const assign = require('object-assign')
 const { Media, HistoryEntry } = require('../models')

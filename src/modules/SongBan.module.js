@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const debug = require('debug')('sekshi:song-ban')
 const moment = require('moment')
 const mongoose = require('mongoose')

@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const find = require('array-find')
 
 export default class Rules extends SekshiModule {

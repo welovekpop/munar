@@ -2,6 +2,7 @@ const Snoocore = require('snoocore')
 const debug = require('debug')('sekshi:reddit-feed')
 const Promise = require('bluebird')
 const SekshiModule = require('../Module')
+const command = require('../command')
 
 export default class RedditFeed extends SekshiModule {
 

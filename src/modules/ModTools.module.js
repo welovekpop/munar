@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const debug = require('debug')('sekshi:mod-tools')
 
 export default class ModTools extends SekshiModule {

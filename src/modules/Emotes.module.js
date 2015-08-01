@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const mongoose = require('mongoose')
 const debug = require('debug')('sekshi:emotes')
 const request = require('request')

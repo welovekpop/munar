@@ -1,4 +1,5 @@
 const TriviaCore = require('./TriviaCore')
+const command = require('../command')
 const Promise = require('bluebird')
 const request = require('request')
 const assign = require('object-assign')
