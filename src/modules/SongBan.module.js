@@ -58,7 +58,7 @@ export default class SongBan extends SekshiModule {
       })
   }
 
-  @command('songunban', 'unbansog', { role: command.ROLE.BOUNCER })
+  @command('songunban', 'unbansong', { role: command.ROLE.BOUNCER })
   songunban(user, cid) {
     BannedMedia.findOne({ cid: cid }).exec()
       .then(banned => {
