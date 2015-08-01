@@ -166,13 +166,12 @@ export default class Roulette extends SekshiModule {
         const wins = {}
         mostWins.forEach(w => wins[w._id] = w.wins)
         return User.where('_id').in(mostWins.map(w => w._id)).select('_id username').exec()
+          .map(u => assign(u, { wins: wins[u._id] }))
           .then(users => {
             this.sekshi.sendChat(`Lucky Bastards leaderboard:`)
-            users
-              .map(u => assign(u, { wins: wins[u._id] }))
-              .sort((a, b) => a.wins > b.wins ? -1 : 1)
-              .forEach((u, i) => { this.sekshi.sendChat(`#${i + 1} - ${u.username} (${u.wins} wins)`) })
+            return users.sort((a, b) => a.wins > b.wins ? -1 : 1)
           })
+          .each((u, i) => { this.sekshi.sendChat(`#${i + 1} - ${u.username} (${u.wins} wins)`) })
       })
       .catch(e => console.error(e))
   }

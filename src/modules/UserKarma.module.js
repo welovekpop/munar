@@ -96,7 +96,7 @@ export default class UserKarma extends SekshiModule {
           let karmas = {}
           karmaList.forEach(k => { karmas[k._id] = k.karma })
           return User.where('_id').in(karmaList.map(k => k._id)).lean().exec()
-            .then(users => users.map(u => assign(u, { karma: karmas[u._id] })))
+            .map(u => assign(u, { karma: karmas[u._id] }))
             .then(users => users.sort((a, b) => a.karma > b.karma ? -1 : 1))
             .then(users => {
               let title = `@${user.username} Karma leaders`

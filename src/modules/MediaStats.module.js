@@ -60,7 +60,7 @@ export default class MediaStats extends SekshiModule {
         const playcounts = {}
         mostPlayed.forEach(h => { playcounts[h._id] = h.count })
         return Media.where('_id').in(mediaIds).lean().exec()
-          .then(medias => medias.map(m => assign(m, { plays: playcounts[m._id] })))
+          .map(m => assign(m, { plays: playcounts[m._id] }))
           .then(medias => medias.sort((a, b) => a.plays > b.plays ? -1 : 1)) // good enough!
       })
   }
@@ -84,8 +84,8 @@ export default class MediaStats extends SekshiModule {
   lastplayed(user) {
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
-    this.getLastPlay(currentMedia).then(
-      mostRecent => {
+    this.getLastPlay(currentMedia)
+      .then(mostRecent => {
         if (mostRecent) {
           let text = `@${user.username} This song was played ${moment(mostRecent.time).fromNow()}`
           if (mostRecent.dj) text += ` by ${mostRecent.dj.username}`
@@ -94,9 +94,8 @@ export default class MediaStats extends SekshiModule {
         else {
           this.sekshi.sendChat(`@${user.username} This song hasn't been played before.`)
         }
-      }
-    )
-    .then(null, e => { debug('media-err', e) })
+      })
+      .catch(e => { console.error(e) })
   }
 
   playcount(user, span = 'w') {
@@ -104,8 +103,8 @@ export default class MediaStats extends SekshiModule {
     const allTime = span === 'f'
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
-    this.getRecentPlays(currentMedia, span).then(
-      results => {
+    this.getRecentPlays(currentMedia, span)
+      .then(results => {
         const playcount = results.length
 
         if (playcount > 0) {
@@ -122,9 +121,8 @@ export default class MediaStats extends SekshiModule {
           this.sekshi.sendChat(`@${user.username} This song hasn't been played ` +
                                (allTime ? `before.` : `in the last ${utils.days(hours)}.`))
         }
-      }
-    )
-    .then(null, e => { debug('media-err', e) })
+      })
+      .catch(e => { console.error(e) })
   }
 
   mostplayed(user, amount = 3, time = 'f') {
@@ -156,10 +154,8 @@ export default class MediaStats extends SekshiModule {
     if (!allTime) title += ` over the last ${utils.days(hours)}`
     this.sekshi.sendChat(`${title}:`)
     this.getMostPlayed(amount, time)
-      .then(medias => {
-        medias.forEach((m, i) => {
-          this.sekshi.sendChat(`#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`)
-        })
+      .each((m, i) => {
+        this.sekshi.sendChat(`#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`)
       })
       .catch(e => { this.sekshi.sendChat(`ERR: ${e.message}`) })
   }
