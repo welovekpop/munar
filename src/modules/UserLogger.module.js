@@ -2,7 +2,7 @@ const debug = require('debug')('sekshi:user-logging')
 const assign = require('object-assign')
 const { User } = require('../models')
 const SekshiModule = require('../Module')
-const Promise = require('promise')
+const Promise = require('bluebird')
 
 export default class UserLogger extends SekshiModule {
 

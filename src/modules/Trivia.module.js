@@ -1,5 +1,5 @@
 const TriviaCore = require('./TriviaCore')
-const Promise = require('promise')
+const Promise = require('bluebird')
 const request = require('request')
 const assign = require('object-assign')
 const debug = require('debug')('sekshi:trivia')

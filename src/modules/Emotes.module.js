@@ -2,7 +2,7 @@ const SekshiModule = require('../Module')
 const mongoose = require('mongoose')
 const debug = require('debug')('sekshi:emotes')
 const request = require('request')
-const Promise = require('promise')
+const Promise = require('bluebird')
 
 const Emote = mongoose.modelNames().indexOf('Emote') === -1
   ? mongoose.model('Emote', {

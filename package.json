@@ -15,6 +15,7 @@
   "dependencies": {
     "array-find": "^0.1.1",
     "array-findindex": "^0.1.0",
+    "bluebird": "^2.9.34",
     "csv-parse": "^0.1.4",
     "debug": "*",
     "lastfm": "^0.9.2",

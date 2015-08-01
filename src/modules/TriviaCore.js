@@ -1,5 +1,5 @@
 const SekshiModule = require('../Module')
-const Promise = require('promise')
+const Promise = require('bluebird')
 const random = require('random-item')
 const request = require('request')
 const parseCsv = require('csv-parse')
