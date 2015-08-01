@@ -212,10 +212,10 @@ export default class Sekshi extends Plugged {
   }
 
   lockskipDJ(id, position, cb) {
-    const skipDJ = Promise.denodeify(this.skipDJ.bind(this))
-    const addToWaitlist = Promise.denodeify(this.addToWaitlist.bind(this))
-    const moveDJ = Promise.denodeify(this.moveDJ.bind(this))
-    const setLock = Promise.denodeify(this.setLock.bind(this))
+    const skipDJ = Promise.promisify(this.skipDJ, this)
+    const addToWaitlist = Promise.promisify(this.addToWaitlist, this)
+    const moveDJ = Promise.promisify(this.moveDJ, this)
+    const setLock = Promise.promisify(this.setLock, this)
 
     if (this.doesWaitlistCycle()) {
       skipDJ(id)
