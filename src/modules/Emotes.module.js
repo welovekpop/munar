@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const mongoose = require('mongoose')
 const debug = require('debug')('sekshi:emotes')
 const request = require('request')
@@ -23,17 +24,6 @@ export default class Emotes extends SekshiModule {
 
     this.author = 'ReAnna'
     this.description = 'adds several emoticons as well as gifs and webms'
-
-    this.permissions = {
-      thatsnono: sekshi.USERROLE.NONE,
-      emotes: sekshi.USERROLE.NONE,
-      addemote: sekshi.USERROLE.BOUNCER,
-      delemote: sekshi.USERROLE.BOUNCER,
-      emote: sekshi.USERROLE.NONE,
-      e: sekshi.USERROLE.NONE
-    }
-
-    this.ninjaVanish = [ 'addemote' ]
 
     this.Emote = Emote
   }
@@ -95,6 +85,7 @@ export default class Emotes extends SekshiModule {
     })
   }
 
+  @command('addemote', { role: command.ROLE.BOUNCER, ninjaVanish: true })
   addemote(user, id, url) {
     id = cleanId(id)
     debug('addemote', id, url)
@@ -126,6 +117,7 @@ export default class Emotes extends SekshiModule {
       })
   }
 
+  @command('delemote', { role: command.ROLE.BOUNCER })
   delemote(user, id) {
     debug('delemote', id)
     Emote.remove({ _id: id }).exec()
@@ -139,6 +131,7 @@ export default class Emotes extends SekshiModule {
       })
   }
 
+  @command('emotes')
   emotes({ username }) {
     debug('listing emotes')
     if (this.options.url) {
@@ -166,6 +159,7 @@ export default class Emotes extends SekshiModule {
       .catch(err => { console.error(err) })
   }
 
+  @command('emote', 'e')
   emote(user, id, username) {
     let target
     if (username) {
@@ -175,14 +169,13 @@ export default class Emotes extends SekshiModule {
     if (!target) target = user
 
     Emote.findById(cleanId(id)).exec().then(emote => {
-      this.sendEmote(emote.url, target.username)
+      if (emote) {
+        this.sendEmote(emote.url, target.username)
+      }
     })
   }
 
-  e(...args) {
-    this.emote(...args)
-  }
-
+  @command('thatsnono')
   thatsnono(user, username) {
     if (username && username.charAt(0) === '@') username = username.slice(1)
     this.sendEmote('That\'s no no http://a.pomf.se/lcmeuw.webm', username)

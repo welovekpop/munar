@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const debug = require('debug')('sekshi:song-ban')
 const moment = require('moment')
 const mongoose = require('mongoose')
@@ -19,12 +20,6 @@ export default class SongBan extends SekshiModule {
 
     this.author = 'ReAnna'
     this.description = 'Bans songs from being played ever again.'
-
-    this.permissions = {
-      songban: sekshi.USERROLE.BOUNCER,
-      banskip: sekshi.USERROLE.BOUNCER,
-      songunban: sekshi.USERROLE.BOUNCER
-    }
 
     this.BannedMedia = BannedMedia
 
@@ -48,6 +43,7 @@ export default class SongBan extends SekshiModule {
       })
   }
 
+  @command('songban', 'bansong', { role: command.ROLE.BOUNCER })
   songban(user, ...reason) {
     reason = reason.join(' ')
     const media = this.sekshi.getCurrentMedia()
@@ -62,6 +58,7 @@ export default class SongBan extends SekshiModule {
       })
   }
 
+  @command('songunban', 'unbansong', { role: command.ROLE.BOUNCER })
   songunban(user, cid) {
     BannedMedia.findOne({ cid: cid }).exec()
       .then(banned => {
@@ -69,6 +66,7 @@ export default class SongBan extends SekshiModule {
       })
   }
 
+  @command('banskip', 'bs', { role: command.ROLE.BOUNCER })
   banskip(user, ...reason) {
     const modSkip = this.sekshi.getModule('modskip')
     if (modSkip) modSkip.skip(user, ...reason)

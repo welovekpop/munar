@@ -1,8 +1,10 @@
 const assign = require('object-assign')
 const find = require('array-find')
+const includes = require('array-includes')
 const { EventEmitter } = require('events')
 const fs = require('fs')
 const debug = require('debug')('sekshi:module')
+const command = require('./command')
 
 export default class Module extends EventEmitter {
 
@@ -11,11 +13,10 @@ export default class Module extends EventEmitter {
 
     this._enabled = false
     this._optionsFile = optionsFile
+    this.commands = []
 
     this.sekshi = sekshi
     this.options = assign({}, this.defaultOptions(), this.loadOptions())
-    this.permissions = {}
-    this.ninjaVanish = []
   }
 
   defaultOptions() {
@@ -34,6 +35,11 @@ export default class Module extends EventEmitter {
       if (!opts.silent) {
         this.saveOptions()
       }
+
+      if (this[command.symbol]) {
+        this.commands = this[command.symbol].slice()
+      }
+
       this.init()
     }
   }
@@ -41,11 +47,34 @@ export default class Module extends EventEmitter {
     if (this.enabled()) {
       this.destroy()
       this._enabled = false
+      this.commands = []
       this.saveOptions()
     }
   }
   enabled() {
     return this._enabled
+  }
+
+  addCommand(name, opts, cb = null) {
+    if (cb === null) {
+      [ opts, cb ] = [ {}, opts ]
+    }
+    this.commands.push(assign({}, command.defaults, opts, {
+      names: [ name ],
+      callback: cb
+    }))
+    return this
+  }
+
+  removeCommand(name) {
+    this.commands = this.commands.filter(com => {
+      let i = com.names.indexOf(name)
+      if (i !== -1) {
+        com.names.splice(i, 1)
+      }
+      // keep if there are still names that trigger this command
+      return com.names.length > 0
+    })
   }
 
   _getOptionName(name) {

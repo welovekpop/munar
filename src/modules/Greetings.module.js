@@ -10,9 +10,6 @@ export default class Greetings extends SekshiModule {
     this.author = 'Sooyou'
     this.description = 'Greets users.'
 
-    this.permissions = {
-    }
-
     this.greet = this.greet.bind(this)
   }
 

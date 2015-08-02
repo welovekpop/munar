@@ -1,5 +1,6 @@
 const assign = require('object-assign')
 const SekshiModule = require('../Module')
+const command = require('../command')
 
 export default class ModSkip extends SekshiModule {
 
@@ -8,12 +9,6 @@ export default class ModSkip extends SekshiModule {
 
     this.author = 'ReAnna'
     this.description = 'Simple DJ skipping tools'
-
-    this.permissions = {
-      skip: sekshi.USERROLE.BOUNCER,
-      lockskip: sekshi.USERROLE.BOUNCER,
-      ls: sekshi.USERROLE.BOUNCER
-    }
   }
 
   defaultOptions() {
@@ -67,6 +62,7 @@ export default class ModSkip extends SekshiModule {
     }
   }
 
+  @command('skip', { role: command.ROLE.BOUNCER })
   skip(user, ...reason) {
     let isSekshi = user === this.sekshi.getSelf()
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
@@ -77,6 +73,7 @@ export default class ModSkip extends SekshiModule {
     }
   }
 
+  @command('lockskip', 'ls', { role: command.ROLE.BOUNCER })
   lockskip(user, ...reason) {
     let isSekshi = user === this.sekshi.getSelf()
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
@@ -85,10 +82,6 @@ export default class ModSkip extends SekshiModule {
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
       this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
     }
-  }
-
-  ls(...args) {
-    this.lockskip(...args)
   }
 
 }

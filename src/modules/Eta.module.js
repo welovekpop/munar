@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const debug = require('debug')('sekshi:eta')
 const findIndex = require('array-findindex')
 
@@ -9,12 +10,9 @@ export default class Misc extends SekshiModule {
 
     this.author = 'Sooyou'
     this.description = 'Provides an estimation of when people get to play their song.'
-
-    this.permissions = {
-      eta: sekshi.USERROLE.NONE
-    }
   }
 
+  @command('eta')
   eta(user) {
     if (user.id === this.sekshi.getCurrentDJ().id) {
       return this.sekshi.sendChat(`@${user.username} Your turn is right now!`)

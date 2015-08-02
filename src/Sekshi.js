@@ -7,8 +7,10 @@ const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const Promise = require('bluebird')
 const find = require('array-find')
+const includes = require('array-includes')
 const mkdirp = require('mkdirp')
 const { User } = require('./models')
+const commandsSymbol = require('./command').symbol
 
 mongoose.Promise = Promise
 
@@ -63,12 +65,16 @@ export default class Sekshi extends Plugged {
 
     this.once(this.LOGOUT_SUCCESS, () => {
       this.removeAllListeners()
-      cb()
+      if (cb) {
+        cb()
+      }
     })
     this.once(this.LOGOUT_ERROR, e => {
       // TODO figure out something useful to do here
       this.removeAllListeners()
-      cb(e)
+      if (cb) {
+        cb(e)
+      }
     })
   }
 
@@ -104,9 +110,10 @@ export default class Sekshi extends Plugged {
       return
     }
 
+    msg.message = msg.message.replace(/\\"/g, '"')
+
     logChat(msg.username, msg.message)
     if (msg.message.charAt(0) === this.delimiter) {
-      let func = null
       let user = msg.id === 'sekshi' ? { role: this.USERROLE.HOST }
                                      : this.getUserByID(msg.id, true)
 
@@ -123,21 +130,28 @@ export default class Sekshi extends Plugged {
 
       let args = this.parseArguments(msg.message)
 
-      func = args.shift().replace(this.delimiter, '').toLowerCase()
-      args.unshift(user)
+      let commandName = args.shift().replace(this.delimiter, '').toLowerCase()
 
       for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
         let mod = this.modules[name]
-        if (mod.enabled() && typeof mod[func] === 'function' && mod.permissions.hasOwnProperty(func)) {
-          if (mod.ninjaVanish.indexOf(func) !== -1) {
-            this.deleteMessage(msg.cid)
-          }
-          if (user.role >= mod.permissions[func]) {
-            mod[func](...args)
+        if (!mod.enabled() || !Array.isArray(mod.commands)) continue
+
+        let command = find(mod.commands, com => includes(com.names, commandName))
+        if (!command) continue
+
+        if (command.ninjaVanish) {
+          this.deleteMessage(msg.cid)
+        }
+        if (user.role >= command.role) {
+          if (command.method) {
+            mod[command.method](user, ...args)
           }
           else {
-            this.sendChat(`@${msg.username}: You don't have sufficient permissions to use this command.`, 5 * 1000)
+            command.callback.call(mod, user, ...args)
           }
+        }
+        else {
+          this.sendChat(`@${msg.username}: You don't have sufficient permissions to use this command.`, 5 * 1000)
         }
       }
     }

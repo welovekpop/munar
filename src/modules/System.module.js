@@ -1,4 +1,8 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
+const sekshibot = require('../../package.json')
+const plugged = require('plugged/package.json')
+const mongoose = require('mongoose/package.json')
 
 export default class System extends SekshiModule {
 
@@ -7,20 +11,17 @@ export default class System extends SekshiModule {
 
     this.author = 'Sooyou'
     this.description = 'Simple tools for module management & system information'
-
-    this.permissions = {
-      listmodules: sekshi.USERROLE.MANAGER,
-      reloadmodules: sekshi.USERROLE.COHOST,
-      moduleinfo: sekshi.USERROLE.MANAGER,
-      unloadmodule: sekshi.USERROLE.MANAGER,
-      loadmodule: sekshi.USERROLE.MANAGER,
-      reloadmodule: sekshi.USERROLE.MANAGER,
-      enablemodule: sekshi.USERROLE.MANAGER,
-      disablemodule: sekshi.USERROLE.MANAGER,
-      exit: sekshi.USERROLE.MANAGER
-    }
   }
 
+  @command('version')
+  version(user) {
+    const str = pkg => `${pkg.name} v${pkg.version}`
+    this.sekshi.sendChat(
+      `@${user.username} Running ${str(sekshibot)} on ${str(plugged)}, ${str(mongoose)}`
+    )
+  }
+
+  @command('reloadmodule', { role: command.ROLE.MANAGER })
   reloadmodule(user, name) {
     try {
       this.sekshi.reloadModule(name)
@@ -31,6 +32,7 @@ export default class System extends SekshiModule {
     }
   }
 
+  @command('unloadmodule', 'unload', { role: command.ROLE.MANAGER })
   unloadmodule(user, name) {
     try {
       this.sekshi.unloadModule(name)
@@ -40,6 +42,7 @@ export default class System extends SekshiModule {
       this.sekshi.sendChat(`@${user.username} Could not unload "${name}": ${e.message}`)
     }
   }
+  @command('loadmodule', 'load', { role: command.ROLE.MANAGER })
   loadmodule(user, name) {
     try {
       this.sekshi.loadModule(name)
@@ -50,6 +53,7 @@ export default class System extends SekshiModule {
     }
   }
 
+  @command('disablemodule', 'disable', { role: command.ROLE.MANAGER })
   disablemodule(user, name) {
     if (name.toLowerCase() === 'system') {
       this.sekshi.sendChat(`@${user.username} Cannot disable the System module.`)
@@ -59,6 +63,7 @@ export default class System extends SekshiModule {
       this.sekshi.sendChat(`@${user.username} Module "${name}" disabled.`)
     }
   }
+  @command('enablemodule', 'enable', { role: command.ROLE.MANAGER })
   enablemodule(user, name) {
     if (!this.sekshi.getModule(name)) {
       this.sekshi.loadModule(name)
@@ -67,6 +72,7 @@ export default class System extends SekshiModule {
     this.sekshi.sendChat(`@${user.username} Module "${name}" enabled.`)
   }
 
+  @command('moduleinfo', { role: command.ROLE.MANAGER })
   moduleinfo(user, name) {
     if(!name || name.length === 0) {
         this.sekshi.sendChat(`usage: !moduleinfo "modulename"`)
@@ -86,11 +92,7 @@ export default class System extends SekshiModule {
     }
   }
 
-  reloadmodules(user) {
-    this.sekshi.reloadModules()
-    this.sekshi.sendChat(`@${user.username} Reloaded all modules.`)
-  }
-
+  @command('listmodules', { role: command.ROLE.MANAGER })
   listmodules(user) {
     const text = this.sekshi.getAvailableModules().map(name => {
       const mod = this.sekshi.getModule(name)
@@ -99,6 +101,7 @@ export default class System extends SekshiModule {
     this.sekshi.sendChat(text.sort().join(', '), 20 * 1000)
   }
 
+  @command('exit', { role: command.ROLE.MANAGER })
   exit(user) {
     this.sekshi.sendChat(`@${user.username} okay... </3 T_T`)
     this.sekshi.stop()
