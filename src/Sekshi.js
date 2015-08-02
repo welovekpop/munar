@@ -64,12 +64,16 @@ export default class Sekshi extends Plugged {
 
     this.once(this.LOGOUT_SUCCESS, () => {
       this.removeAllListeners()
-      cb()
+      if (cb) {
+        cb()
+      }
     })
     this.once(this.LOGOUT_ERROR, e => {
       // TODO figure out something useful to do here
       this.removeAllListeners()
-      cb(e)
+      if (cb) {
+        cb(e)
+      }
     })
   }
 
