@@ -110,6 +110,8 @@ export default class Sekshi extends Plugged {
       return
     }
 
+    msg.message = msg.message.replace(/\\"/g, '"')
+
     logChat(msg.username, msg.message)
     if (msg.message.charAt(0) === this.delimiter) {
       let user = msg.id === 'sekshi' ? { role: this.USERROLE.HOST }
