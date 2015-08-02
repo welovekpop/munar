@@ -132,16 +132,21 @@ export default class Sekshi extends Plugged {
 
       for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
         let mod = this.modules[name]
-        if (!mod.enabled() || !Array.isArray(mod[commandsSymbol])) continue
+        if (!mod.enabled() || !Array.isArray(mod.commands)) continue
 
-        let command = find(mod[commandsSymbol], com => includes(com.names, commandName))
+        let command = find(mod.commands, com => includes(com.names, commandName))
         if (!command) continue
 
         if (command.ninjaVanish) {
           this.deleteMessage(msg.cid)
         }
         if (user.role >= command.role) {
-          mod[command.method](user, ...args)
+          if (command.method) {
+            mod[command.method](user, ...args)
+          }
+          else {
+            command.callback.call(mod, user, ...args)
+          }
         }
         else {
           this.sendChat(`@${msg.username}: You don't have sufficient permissions to use this command.`, 5 * 1000)

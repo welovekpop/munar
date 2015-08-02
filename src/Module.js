@@ -3,6 +3,7 @@ const find = require('array-find')
 const { EventEmitter } = require('events')
 const fs = require('fs')
 const debug = require('debug')('sekshi:module')
+const command = require('./command')
 
 export default class Module extends EventEmitter {
 
@@ -11,6 +12,7 @@ export default class Module extends EventEmitter {
 
     this._enabled = false
     this._optionsFile = optionsFile
+    this.commands = []
 
     this.sekshi = sekshi
     this.options = assign({}, this.defaultOptions(), this.loadOptions())
@@ -32,6 +34,11 @@ export default class Module extends EventEmitter {
       if (!opts.silent) {
         this.saveOptions()
       }
+
+      if (this[command.symbol]) {
+        this.commands = this[command.symbol].slice()
+      }
+
       this.init()
     }
   }
@@ -39,11 +46,23 @@ export default class Module extends EventEmitter {
     if (this.enabled()) {
       this.destroy()
       this._enabled = false
+      this.commands = []
       this.saveOptions()
     }
   }
   enabled() {
     return this._enabled
+  }
+
+  addCommand(name, opts, cb = null) {
+    if (cb === null) {
+      [ opts, cb ] = [ {}, opts ]
+    }
+    this.commands.push(assign({}, command.defaults, opts, {
+      names: [ name ],
+      callback: cb
+    }))
+    return this
   }
 
   _getOptionName(name) {

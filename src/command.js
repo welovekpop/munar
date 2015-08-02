@@ -24,5 +24,6 @@ export default function command(...names) {
 
 assign(command, {
   ROLE: ROLE
+, defaults: defaults
 , symbol: commandsSym
 })
