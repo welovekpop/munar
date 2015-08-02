@@ -1,5 +1,8 @@
 const SekshiModule = require('../Module')
 const command = require('../command')
+const sekshibot = require('../../package.json')
+const plugged = require('plugged/package.json')
+const mongoose = require('mongoose/package.json')
 
 export default class System extends SekshiModule {
 
@@ -8,6 +11,14 @@ export default class System extends SekshiModule {
 
     this.author = 'Sooyou'
     this.description = 'Simple tools for module management & system information'
+  }
+
+  @command('version')
+  version(user) {
+    const str = pkg => `${pkg.name} v${pkg.version}`
+    this.sekshi.sendChat(
+      `@${user.username} Running ${str(sekshibot)} on ${str(plugged)}, ${str(mongoose)}`
+    )
   }
 
   @command('reloadmodule', { role: command.ROLE.MANAGER })
