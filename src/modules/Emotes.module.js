@@ -169,7 +169,9 @@ export default class Emotes extends SekshiModule {
     if (!target) target = user
 
     Emote.findById(cleanId(id)).exec().then(emote => {
-      this.sendEmote(emote.url, target.username)
+      if (emote) {
+        this.sendEmote(emote.url, target.username)
+      }
     })
   }
 
