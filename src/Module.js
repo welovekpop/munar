@@ -1,5 +1,6 @@
 const assign = require('object-assign')
 const find = require('array-find')
+const includes = require('array-includes')
 const { EventEmitter } = require('events')
 const fs = require('fs')
 const debug = require('debug')('sekshi:module')
@@ -63,6 +64,17 @@ export default class Module extends EventEmitter {
       callback: cb
     }))
     return this
+  }
+
+  removeCommand(name) {
+    this.commands = this.commands.filter(com => {
+      let i = com.names.indexOf(name)
+      if (i !== -1) {
+        com.names.splice(i, 1)
+      }
+      // keep if there are still names that trigger this command
+      return com.names.length > 0
+    })
   }
 
   _getOptionName(name) {
