@@ -7,6 +7,7 @@ const logChat = require('debug')('sekshi:chat')
 const mongoose = require('mongoose')
 const Promise = require('bluebird')
 const find = require('array-find')
+const includes = require('array-includes')
 const mkdirp = require('mkdirp')
 const { User } = require('./models')
 const commandsSymbol = require('./command').symbol
