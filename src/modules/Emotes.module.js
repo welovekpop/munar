@@ -161,6 +161,8 @@ export default class Emotes extends SekshiModule {
 
   @command('emote', 'e')
   emote(user, id, username) {
+    if (!id) return
+
     let target
     if (username) {
       if (username.charAt(0) === '@') username = username.slice(1)
