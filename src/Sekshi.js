@@ -11,6 +11,7 @@ const includes = require('array-includes')
 const mkdirp = require('mkdirp')
 const { User } = require('./models')
 const commandsSymbol = require('./command').symbol
+const ModuleManager = require('./ModuleManager')
 
 mongoose.Promise = Promise
 
@@ -22,10 +23,8 @@ export default class Sekshi extends Plugged {
     this.options = args
     this.db = mongoose.connect(args.mongo)
 
-    this.modules = {}
-    this._availableModules = []
+    this.modules = new ModuleManager(this, path.join(__dirname, 'modules'))
     this.delimiter = args.delimiter || '!'
-    this.modulePath = args.modulePath || path.join(__dirname, 'modules')
 
     this._room = args.room
     this._configDir = path.join(__dirname, '../.config')
@@ -54,6 +53,16 @@ export default class Sekshi extends Plugged {
       mkdirp(this._configDir, (e) => {
         if (cb) cb(e || null, room || null)
       })
+    })
+
+    // the event is fired on nextTick so modules can simply listen for "moduleloaded"
+    // and get events for *all* the modules when loadModules() is called, even for those
+    // that register earlier
+    this.modules.on('load', (mod, name) => {
+      setImmediate(() => { this.emit('moduleloaded', mod, name) })
+    })
+    this.modules.on('unload', (mod, name) => {
+      setImmediate(() => { this.emit('moduleunloaded', mod, name) })
     })
   }
 
@@ -132,12 +141,13 @@ export default class Sekshi extends Plugged {
 
       let commandName = args.shift().replace(this.delimiter, '').toLowerCase()
 
-      for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
-        let mod = this.modules[name]
-        if (!mod.enabled() || !Array.isArray(mod.commands)) continue
+      this.modules.loaded().forEach(name => {
+        let mod = this.modules.get(name)
+        if (!mod) return
+        if (!mod.enabled() || !Array.isArray(mod.commands)) return
 
         let command = find(mod.commands, com => includes(com.names, commandName))
-        if (!command) continue
+        if (!command) return
 
         if (command.ninjaVanish) {
           this.deleteMessage(msg.cid)
@@ -153,7 +163,7 @@ export default class Sekshi extends Plugged {
         else {
           this.sendChat(`@${msg.username}: You don't have sufficient permissions to use this command.`, 5 * 1000)
         }
-      }
+      })
     }
   }
 
@@ -253,119 +263,19 @@ export default class Sekshi extends Plugged {
   }
 
   getModule(name) {
-    return this.modules[name.toLowerCase()]
-  }
-
-  _getModuleFiles(modulePath) {
-    const stat = fs.statSync(modulePath)
-    if (stat.isDirectory()) {
-      let files = fs.readdirSync(modulePath)
-      return files.reduce((modules, filename) => {
-        return modules.concat(this._getModuleFiles(path.join(modulePath, filename)))
-      }, [])
-    }
-    else if (stat.isFile() && /\.module\.js$/.test(modulePath)) {
-      return [ modulePath ]
-    }
-    return []
-  }
-
-  updateAvailableModules() {
-    return this._availableModules = this._getModuleFiles(this.modulePath)
-      .map(file => file.match(/\/([^\/]+?)\.module\.js$/)[1])
-  }
-
-  getAvailableModules() {
-    return this._availableModules
-  }
-
-  // finds the file path for the given module name, case-insensitive
-  getModulePath(name) {
-    const lower = name.toLowerCase()
-    const match = find(this.getAvailableModules(), avail => avail.toLowerCase() === lower)
-    return match ? path.join(this.modulePath, `${match}.module.js`) : null
-  }
-
-  enable(name) {
-    debug('enable', name)
-    const mod = this.getModule(name)
-    if (mod) mod.enable()
-  }
-  disable(name) {
-    debug('disable', name)
-    const mod = this.getModule(name)
-    if (mod) mod.disable()
-  }
-
-  loadModule(name) {
-    debug('load', name)
-    const lName = name.toLowerCase()
-    let mod = this.modules[lName]
-    if (!mod) {
-      this.updateAvailableModules()
-      const Module = require(this.getModulePath(name))
-      mod = new Module(this, path.join(this._configDir, `${lName}.json`))
-      this.modules[lName] = mod
-    }
-
-    // the event is fired on nextTick so modules can simply listen for "moduleloaded"
-    // and get events for *all* the modules when loadModules() is called, even for those
-    // that register earlier
-    process.nextTick(() => { this.emit('moduleloaded', mod, lName) })
-
-    // enable system modules by default
-    if (lName === 'system' || mod.getOption('$enabled')) {
-      mod.enable({ silent: true })
-    }
-
-    return mod
-  }
-
-  unloadModule(name) {
-    debug('unload', name)
-    const mod = this.getModule(name)
-    if (mod) {
-      mod.destroy()
-    }
-    const file = this.getModulePath(name)
-    delete require.cache[path.resolve(file)]
-    delete this.modules[name.toLowerCase()]
-
-    process.nextTick(() => { this.emit('moduleunloaded', mod, name.toLowerCase()) })
-  }
-
-  reloadModule(name) {
-    let mod = this.getModule(name)
-    let enabled = false
-    if (mod) {
-      enabled = mod.enabled()
-      mod = null
-    }
-
-    this.unloadModule(name)
-    this.loadModule(name)
-
-    if (enabled) {
-      this.getModule(name).enable()
-    }
+    return this.modules.get(name)
   }
 
   loadModules() {
     debug('load all')
-    this.updateAvailableModules()
-    this.getAvailableModules().forEach(this.loadModule, this)
+    this.modules.update()
+      .each(name => this.modules.load(name))
   }
 
   unloadModules() {
     debug('unload all')
-    for (let name in this.modules) if (this.modules.hasOwnProperty(name)) {
-      this.unloadModule(name)
-    }
-  }
-
-  reloadModules() {
-    this.unloadModules()
-    this.loadModules()
+    this.modules.loaded()
+      .forEach(name => this.modules.unload(name))
   }
 
   getConfigDir() {

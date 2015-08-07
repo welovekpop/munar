@@ -17,6 +17,8 @@ export default class Module extends EventEmitter {
 
     this.sekshi = sekshi
     this.options = assign({}, this.defaultOptions(), this.loadOptions())
+
+    debug('init', this.constructor.name, optionsFile)
   }
 
   defaultOptions() {
@@ -43,12 +45,14 @@ export default class Module extends EventEmitter {
       this.init()
     }
   }
-  disable() {
+  disable(opts = {}) {
     if (this.enabled()) {
       this.destroy()
       this._enabled = false
       this.commands = []
-      this.saveOptions()
+      if (!opts.silent) {
+        this.saveOptions()
+      }
     }
   }
   enabled() {
