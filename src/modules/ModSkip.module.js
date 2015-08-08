@@ -73,18 +73,22 @@ export default class ModSkip extends SekshiModule {
       this._lastSkip = Date.now()
       this._saveSkip(user, reason.join(' ') || false)
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
-      this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
+      this.sekshi.skipDJ(dj.id)
     }
   }
 
   @command('lockskip', 'ls', { role: command.ROLE.BOUNCER })
   lockskip(user, ...reason) {
+    const dj = this.sekshi.getCurrentDJ()
+    if (!dj || !dj.id) {
+      return this.sekshi.sendChat(`@${user.username} Nobody is DJing currently...`)
+    }
     let isSekshi = user === this.sekshi.getSelf()
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
       this._saveSkip(user, reason.join(' ') || false, true)
       this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
-      this.sekshi.lockskipDJ(this.sekshi.getCurrentDJ().id, this.options.lockskipPos)
+      this.sekshi.lockskipDJ(dj.id, this.options.lockskipPos)
     }
   }
 
