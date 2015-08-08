@@ -64,6 +64,10 @@ export default class ModSkip extends SekshiModule {
 
   @command('skip', { role: command.ROLE.BOUNCER })
   skip(user, ...reason) {
+    const dj = this.sekshi.getCurrentDJ()
+    if (!dj || !dj.id) {
+      return this.sekshi.sendChat(`@${user.username} Nobody is DJing currently...`)
+    }
     let isSekshi = user === this.sekshi.getSelf()
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
