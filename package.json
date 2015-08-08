@@ -26,6 +26,7 @@
     "plugged": "2.x",
     "promise": "^6.1.0",
     "random-item": "^1.0.0",
+    "replaceall": "^0.1.6",
     "request": "^2.58.0",
     "snoocore": "2.x"
   },
