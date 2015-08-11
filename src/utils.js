@@ -115,3 +115,44 @@ export function fixTags(at) {
 
   return { author, title }
 }
+
+// Taken from the plug.dj app source code
+export const emojiAliases = {
+  '>:(': 'angry',
+  '>XD': 'astonished',
+  ':DX': 'bowtie',
+  '</3': 'broken_heart',
+  ':$': 'confused',
+  'X$': 'confounded',
+  ':~(': 'cry',
+  ':[': 'disappointed',
+  ':~[': 'disappointed_relieved',
+  'XO': 'dizzy_face',
+  ':|': 'expressionless',
+  '8|': 'flushed',
+  ':(': 'frowning',
+  ':#': 'grimacing',
+  ':D': 'grinning',
+  '<3': 'heart',
+  '<3)': 'heart_eyes',
+  'O:)': 'innocent',
+  ':~)': 'joy',
+  ':*': 'kissing',
+  ':<3': 'kissing_heart',
+  'X<3': 'kissing_closed_eyes',
+  'XD': 'laughing',
+  ':O': 'open_mouth',
+  'Z:|': 'sleeping',
+  ':)': 'smiley',
+  ':/': 'smirk',
+  'T_T': 'sob',
+  ':P': 'stuck_out_tongue',
+  'X-P': 'stuck_out_tongue_closed_eyes',
+  ';P': 'stuck_out_tongue_winking_eye',
+  'B-)': 'sunglasses',
+  '~:(': 'sweat',
+  '~:)': 'sweat_smile',
+  'XC': 'tired_face',
+  '>:/': 'unamused',
+  ';)': 'wink'
+}
