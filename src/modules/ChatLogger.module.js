@@ -1,7 +1,7 @@
 const SekshiModule = require('../Module')
 const { ChatMessage } = require('../models')
 const { emojiAliases } = require('../utils')
-const replace = require('replaceall')
+const quote = require('regexp-quote')
 
 export default class ChatLogger extends SekshiModule {
 
@@ -32,7 +32,7 @@ export default class ChatLogger extends SekshiModule {
 
   getEmoji(message) {
     Object.keys(emojiAliases).forEach(emote => {
-      message = replace(emote, `:${emojiAliases[emote]}:`, message)
+      message = message.replace(new RegExp(`(\\s|^)(${quote(emote)})(?=\\s|$)`, 'g'), `$1:${emojiAliases[emote]}:`)
     })
     return message.match(/:([^ :]+):/g) || []
   }
