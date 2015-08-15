@@ -1,14 +1,21 @@
 const SekshiModule = require('../Module')
 
-export default class AFKMessages extends SekshiModule {
+export default class AntiSpam extends SekshiModule {
 
   constructor(sekshi, options) {
     super(sekshi, options)
 
     this.author = 'ReAnna'
-    this.description = 'Auto-deletes AFK autoresponder messages.'
+    this.description = 'Auto-deletes messages.'
 
     this.onMessage = this.onMessage.bind(this)
+  }
+
+  defaultOptions() {
+    return {
+      afk: true,
+      spam: true
+    }
   }
 
   init() {
@@ -20,7 +27,8 @@ export default class AFKMessages extends SekshiModule {
   }
 
   onMessage(message) {
-    if (message.message.indexOf('[AFK] ') === 0) {
+    if (this.options.afk && message.message.indexOf('[AFK] ') === 0 ||
+        this.options.spam && message.message.indexOf('//adf.ly') > -1) {
       this.sekshi.deleteMessage(message.cid)
     }
   }
