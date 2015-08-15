@@ -1,6 +1,7 @@
 const debug = require('debug')('sekshi:roulette')
 const assign = require('object-assign')
 const random = require('random-item')
+const includes = require('array-includes')
 const SekshiModule = require('../Module')
 const command = require('../command')
 const moment = require('moment')
@@ -47,6 +48,11 @@ export default class Roulette extends SekshiModule {
     if (this._timer) {
       clearTimeout(this._timer)
     }
+  }
+
+  players() {
+    let waitlist = this.sekshi.getWaitlist()
+    return this._players.filter(user => includes(waitlist, user.id))
   }
 
   @command('roulette', { role: command.ROLE.BOUNCER })
@@ -111,7 +117,7 @@ export default class Roulette extends SekshiModule {
   }
 
   @command('players')
-  players() {
+  showPlayers() {
     if (this._running) {
       debug('players', this._players.length)
       this.sekshi.sendChat(`Roulette players [${this._players.length}]: ` +
@@ -176,12 +182,16 @@ export default class Roulette extends SekshiModule {
     this._running = false
     this._timer = null
     let roulette = this._roulette
+    let players = this.players()
     roulette.entrants = this._players.map(p => p.id)
     if (this._players.length === 0) {
       this.sekshi.sendChat(`Nobody participated in the roulette... Do I get to win now?`)
     }
+    else if (players.length === 0) {
+      this.sekshi.sendChat(`Nobody is eligible to win the roulette... Too bad!`)
+    }
     else {
-      let winner = random(this._players)
+      let winner = random(players)
       debug('winner', winner.username)
       this.sekshi.sendChat(`Roulette winner: @${winner.username}. Congratulations! https://i.imgur.com/TXKz7mt.gif`)
       this.sekshi.moveDJ(winner.id, this.options.winnerPosition - 1, () => {
