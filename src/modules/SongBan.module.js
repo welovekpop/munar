@@ -1,5 +1,6 @@
 const SekshiModule = require('../Module')
 const command = require('../command')
+const { Media } = require('../models')
 const debug = require('debug')('sekshi:song-ban')
 const moment = require('moment')
 const mongoose = require('mongoose')
@@ -45,17 +46,29 @@ export default class SongBan extends SekshiModule {
   }
 
   @command('songban', 'bansong', { role: command.ROLE.BOUNCER })
-  songban(user, ...reason) {
-    reason = reason.join(' ')
-    const media = this.sekshi.getCurrentMedia()
-    BannedMedia.create({
-      format: media.format,
-      cid: media.cid,
-      reason: reason,
-      moderator: user.id
-    })
-      .then(banned => {
-        this.sekshi.sendChat(`@${user.username} This song has now been blacklisted.`)
+  songban(user, cid, ...reason) {
+    Media.findOne({ cid: cid })
+      .then(media => {
+        if (!media) {
+          reason.unshift(cid)
+          return this.sekshi.getCurrentMedia()
+        }
+        return media
+      })
+      .then(media => {
+        return BannedMedia.create({
+          format: media.format,
+          cid: media.cid,
+          reason: reason.join(' '),
+          moderator: user.id
+        }).then(banned => {
+          if (media && media.author) {
+            this.sekshi.sendChat(`@${user.username} ${media.author} - ${media.title} is now blacklisted.`)
+          }
+          else {
+            this.sekshi.sendChat(`@${user.username} That song is now blacklisted.`)
+          }
+        })
       })
   }
 
