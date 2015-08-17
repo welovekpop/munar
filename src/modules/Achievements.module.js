@@ -1,6 +1,7 @@
 const SekshiModule = require('../Module')
 const command = require('../command')
 const mongoose = require('mongoose')
+const Promise = require('bluebird')
 
 const Achievement = mongoose.modelNames().indexOf('Achievement') === -1
   ? mongoose.model('Achievement', {
@@ -60,15 +61,22 @@ export default class Achievements extends SekshiModule {
   unlockAchievement(user, achievement) {
     // normalise achievement name
     achievement = achievement.toLowerCase()
-    return this.hasAchievement(user, achievement).then(has => {
-      if (has) {
-        return null
-      }
-      return AchievementUnlock.create({
-        user,
-        achievement,
+    return Achievement.findById(achievement)
+      .then(exists => {
+        if (!exists) {
+          return Promise.reject(new Error(`Achievement ${achievement} does not exist`))
+        }
+        return this.hasAchievement(user, achievement)
       })
-    })
+      .then(has => {
+        if (has) {
+          return null
+        }
+        return AchievementUnlock.create({
+          user,
+          achievement
+        })
+      })
   }
 
   notifyUnlocked(unlock) {
