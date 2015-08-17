@@ -38,7 +38,8 @@ export default class SongBan extends SekshiModule {
       .then(banned => {
         const modSkip = this.sekshi.getModule('modskip')
         if (banned && modSkip) {
-          modSkip.skip(this.sekshi.getSelf(), banned.reason || 'This song was blacklisted.')
+          modSkip.lockskip(this.sekshi.getSelf(),
+                           banned.reason || 'This song was blacklisted.')
         }
       })
   }
