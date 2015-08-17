@@ -1,8 +1,10 @@
 const assign = require('object-assign')
 const find = require('array-find')
 const includes = require('array-includes')
+const mkdirp = require('mkdirp')
 const { EventEmitter } = require('events')
 const fs = require('fs')
+const { dirname } = require('path')
 const debug = require('debug')('sekshi:module')
 const command = require('./command')
 
@@ -116,6 +118,7 @@ export default class Module extends EventEmitter {
   saveOptions(options = this.getOptions()) {
     debug('saving options', this._optionsFile)
     options = assign({}, options, { $enabled: this.enabled() })
+    mkdirp.sync(dirname(this._optionsFile))
     fs.writeFileSync(this._optionsFile, JSON.stringify(options, null, 2), 'utf8')
   }
 
