@@ -109,19 +109,29 @@ export default class Achievements extends SekshiModule {
 
   @command('giveachievement', 'ga', { role: command.ROLE.BOUNCER })
   giveachievement(user, targetName, achievement) {
-    const target = this.sekshi.getUserByName(targetName)
+    let target = this.sekshi.getUserByName(targetName)
+    // take arguments in both orders (nice for autocomplete)
+    if (!target) {
+      [ targetName, achievement ] = [ achievement, targetName ]
+      target = this.sekshi.getUserByName(targetName)
+    }
     if (target) {
-      this.unlockAchievement(target.id, achievement).then(unlock => {
-        if (unlock == null) {
-          this.sekshi.sendChat(`@${user.username} ${target.username} ` +
-                               `already has that achievement!`)
-          return
-        }
-        unlock.set('giver', user.id).save()
-        return this.notifyUnlocked(unlock)
-      }).then(null, e => {
-        console.error(e.stack || e.message)
-      })
+      this.unlockAchievement(target.id, achievement)
+        .then(unlock => {
+          if (unlock == null) {
+            this.sekshi.sendChat(`@${user.username} ${target.username} ` +
+                                 `already has that achievement!`)
+            return
+          }
+          unlock.set('giver', user.id).save()
+          return this.notifyUnlocked(unlock)
+        })
+        .catch(e => {
+          console.error(e.stack || e.message)
+        })
+    }
+    else {
+      this.sekshi.sendChat(`@${user.username} I couldn't find that user!`)
     }
   }
 
