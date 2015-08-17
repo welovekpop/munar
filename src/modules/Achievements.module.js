@@ -1,4 +1,5 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const mongoose = require('mongoose')
 
 const Achievement = mongoose.modelNames().indexOf('Achievement') === -1
@@ -25,14 +26,6 @@ export default class Achievements extends SekshiModule {
 
     this.version = '0.1.0'
     this.description = 'Achievements.'
-
-    this.permissions = {
-      addachievement: sekshi.USERROLE.COHOST,
-      giveachievement: sekshi.USERROLE.BOUNCER,
-      ga: sekshi.USERROLE.BOUNCER
-    }
-
-    this.ninjaVanish = [ 'addachievement' ]
 
     this.Achievement = Achievement
     this.AchievementUnlock = AchievementUnlock
@@ -78,6 +71,17 @@ export default class Achievements extends SekshiModule {
     })
   }
 
+  notifyUnlocked(unlock) {
+    let target = this.sekshi.getUserByID(unlock.user)
+    return Achievement.findById(unlock.achievement).then(ach => {
+      if (ach.description && this.options.showDescription) {
+        this.sekshi.sendChat(ach.description)
+      }
+      this.sekshi.sendChat(`@${target.username} unlocked achievement ${ach.image}`)
+    })
+  }
+
+  @command('addachievement', { role: command.ROLE.COHOST, ninjaVanish: true })
   addachievement({ username }, name, image, ...description) {
     description = description.join(' ')
     let e
@@ -95,6 +99,7 @@ export default class Achievements extends SekshiModule {
     )
   }
 
+  @command('giveachievement', 'ga', { role: command.ROLE.BOUNCER })
   giveachievement(user, targetName, achievement) {
     const target = this.sekshi.getUserByName(targetName)
     if (target) {
@@ -105,19 +110,11 @@ export default class Achievements extends SekshiModule {
           return
         }
         unlock.set('giver', user.id).save()
-        return Achievement.findById(unlock.achievement).exec().then(ach => {
-          if (ach.description && this.options.showDescription) {
-            this.sekshi.sendChat(ach.description)
-          }
-          this.sekshi.sendChat(`@${target.username} unlocked achievement ${ach.image}`)
-        })
+        return this.notifyUnlocked(unlock)
       }).then(null, e => {
         console.error(e.stack || e.message)
       })
     }
-  }
-  ga(...args) {
-    this.giveachievement(...args)
   }
 
 }
