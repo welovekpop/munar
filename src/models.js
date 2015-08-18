@@ -106,3 +106,10 @@ export const ChatMessage = mongoose.model('ChatMessage', {
   emoji: [ String ],
   mentions: [ { type: Number, ref: 'User' } ]
 })
+
+export const Trigger = mongoose.model('Trigger', {
+  _id: String,
+  response: String,
+  user: { type: Number, ref: 'User' },
+  added: { type: Date, default: Date.now }
+})
