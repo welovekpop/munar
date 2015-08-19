@@ -38,9 +38,9 @@ export function days(h) {
 // inverse of plugged's decode utility
 export function encode(str) {
   return str
+    .replace(/&/g, '&amp;')
     .replace(/"/g, '&#34;')
     .replace(/'/g, '&#39;')
-    .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
 }
