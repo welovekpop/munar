@@ -12,13 +12,6 @@ export default class Config extends SekshiModule {
     this.author = 'ReAnna'
     this.description = 'Keeps module configuration.'
 
-    this.permissions = {
-      set: sekshi.USERROLE.MANAGER,
-      get: sekshi.USERROLE.BOUNCER,
-      config: sekshi.USERROLE.BOUNCER,
-      cf: sekshi.USERROLE.BOUNCER
-    }
-
     this.subPerms = {
       set: sekshi.USERROLE.MANAGER,
       get: sekshi.USERROLE.BOUNCER,
