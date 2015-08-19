@@ -127,6 +127,10 @@ export default class Roulette extends SekshiModule {
 
   @command('lastroulette', { role: command.ROLE.RESIDENTDJ })
   lastroulette(user) {
+    if (this._running) {
+      return this.sekshi.sendChat(`@${user.username} Roulette is going on right now!`)
+    }
+
     const notPlayed = () => {
       this.sekshi.sendChat(`@${user.username} I don't remember playing roulette!`)
     }
