@@ -70,6 +70,10 @@ export default class Trivia extends TriviaCore {
   // Chat Commands
   @command('lasttrivia', { role: command.ROLE.BOUNCER })
   lasttrivia(user) {
+    if (this.isRunning()) {
+      return this.sekshi.sendChat(`@${user.username} Trivia is going on right now!`)
+    }
+
     const notPlayed = () => {
       this.sekshi.sendChat(`@${user.username} I don't remember playing trivia!`)
     }
