@@ -76,7 +76,7 @@ export function splitMessageSemiProperlyMaybe(string, chunkSize = 250) {
     i += end
   }
   // stringify and decode stuff again
-  return parts.map(buf => decode(buf.toString('utf8')))
+  return parts.map(buf => decode(buf.toString('utf8')).replace(/\\"/g, '"'))
 }
 
 export function joinList(args, sep = ', ', lastSep = ' and ') {
