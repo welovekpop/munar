@@ -12,12 +12,13 @@ const mkdirp = require('mkdirp')
 const { User } = require('./models')
 const commandsSymbol = require('./command').symbol
 const ModuleManager = require('./ModuleManager')
+const { splitMessageSemiProperlyMaybe } = require('./utils')
 
 mongoose.Promise = Promise
 
 export default class Sekshi extends Plugged {
   constructor(args) {
-    super()
+    super({ messageProc: splitMessageSemiProperlyMaybe })
     this.invokeLogger(this._debug)
 
     this.options = args
