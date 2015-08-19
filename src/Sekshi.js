@@ -119,6 +119,9 @@ export default class Sekshi extends Plugged {
     if (!this.getCurrentRoomStats()) {
       return
     }
+    if (this.getSelf().id === msg.uid) {
+      return
+    }
 
     msg.message = msg.message.replace(/\\"/g, '"')
 
