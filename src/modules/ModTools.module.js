@@ -60,13 +60,11 @@ export default class ModTools extends SekshiModule {
     if (duration !== 'h' && duration !== 'd' && duration !== 'f') {
       duration = 'h'
     }
-    const target = this.sekshi.getUserByName(targetName)
-
-    if (target) {
+    this.sekshi.findUser(targetName).then(target => {
       this.sekshi.banUser(target.id, duration, e => {
         if (e) debug('ban-err', e)
       })
-    }
+    })
   }
 
   @command('mute', { role: command.ROLE.BOUNCER })
@@ -75,22 +73,20 @@ export default class ModTools extends SekshiModule {
              : duration === 30 || duration === 'm' ? 'm'
              : 's'
 
-    const target = this.sekshi.getUserByName(targetName, true)
-    if (target) {
+    this.sekshi.findUser(targetName).then(target => {
       this.sekshi.muteUser(target.id, duration, 1, e => {
         if (e) debug('mute-err', e)
       })
-    }
+    })
   }
 
   @command('unmute', { role: command.ROLE.BOUNCER })
   unmute(user, targetName) {
-    const target = this.sekshi.getUserByName(targetName)
-    if (target) {
+    this.sekshi.findUser(targetName).then(target => {
       this.sekshi.unmuteUser(target.id, e => {
         if (e) debug('unmute-err', e)
       })
-    }
+    })
   }
 
   @command('lock', { role: command.ROLE.MANAGER })
@@ -127,15 +123,14 @@ export default class ModTools extends SekshiModule {
 
   @command('eatshit', 'es', { role: command.ROLE.BOUNCER })
   eatshit(user, targetName, duration = 'd') {
-    const target = this.sekshi.getUserByName(targetName)
-    if (target) {
+    this.sekshi.findUser(targetName).then(target => {
       const emotes = this.sekshi.getModule('emotes')
       emotes && emotes.emote(user, 'eatshit', target.username)
       this.mute(user, targetName)
       setTimeout(() => {
         this.ban(user, targetName, duration)
       }, this.options.eatshitDelay * 1000)
-    }
+    })
   }
 
   // alias to !lastroulette, !lasttrivia
