@@ -1,6 +1,8 @@
 const SekshiModule = require('../Module')
+const command = require('../command')
 const { ChatMessage } = require('../models')
 const { emojiAliases } = require('../utils')
+const moment = require('moment')
 const quote = require('regexp-quote')
 
 export default class ChatLogger extends SekshiModule {
@@ -19,6 +21,25 @@ export default class ChatLogger extends SekshiModule {
   }
   destroy() {
     this.sekshi.removeListener(this.sekshi.CHAT, this.onChat)
+  }
+
+  @command('lastspoke')
+  showLastSpoke(user, ...nameParts) {
+    const targetName = nameParts.join(' ')
+    this.sekshi.findUser(targetName)
+      .then(target => {
+        return ChatMessage.find({ user: target.id }).sort({ time: -1 }).limit(1)
+          .then(([ msg ]) => {
+            let time = moment(msg.time)
+            this.sekshi.sendChat(
+              `@${user.username} ${target.username} last uttered a word on ` +
+              `${time.format('LL [at] LT')} (${time.fromNow()}).`
+            )
+          })
+      })
+      .catch(e => {
+        this.sekshi.sendChat(`@${user.username} I haven't seen ${targetName} speak.`)
+      })
   }
 
   isEmote(message) {
