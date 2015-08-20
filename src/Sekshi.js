@@ -1,6 +1,5 @@
 const Plugged = require('plugged')
 const path = require('path')
-const { inherits } = require('util')
 const fs = require('fs')
 const debug = require('debug')('sekshi:sekshi')
 const logChat = require('debug')('sekshi:chat')
@@ -13,6 +12,7 @@ const { User } = require('./models')
 const commandsSymbol = require('./command').symbol
 const ModuleManager = require('./ModuleManager')
 const { splitMessageSemiProperlyMaybe } = require('./utils')
+const quote = require('regexp-quote')
 
 mongoose.Promise = Promise
 
@@ -91,6 +91,29 @@ export default class Sekshi extends Plugged {
   setRoom(room) {
     this.options.room = room
     this.connect(room)
+  }
+
+  // Find a user model or default to something.
+  // Useful for commands that can optionally take a target user.
+  findUser(name, _default = null) {
+    if (!name) {
+      return _default
+        ? Promise.resolve(_default)
+        : Promise.reject(new Error('No user given'))
+    }
+
+    let promise
+    let user = this.getUserByName(name)
+    if (user) {
+      promise = User.findById(user.id)
+    }
+    else {
+      let rx = new RegExp(`^${quote(name)}$`, 'i')
+      promise = User.findOne({ username: rx })
+    }
+    return promise.then(user => {
+      return user || Promise.reject(new Error('User not found'))
+    })
   }
 
   // updates user name, avatar and level
