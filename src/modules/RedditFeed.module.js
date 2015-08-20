@@ -68,7 +68,7 @@ export default class RedditFeed extends SekshiModule {
         debug('got new posts', posts.length)
         if (this.lastPost && this.enabled()) {
           posts.forEach(post => {
-            this.sekshi.sendChat(`[r/kpop] ${post.data.author} posted: ` +
+            this.sekshi.sendChat(`[r/${post.data.subreddit}] ${post.data.author} posted: ` +
                               `${post.data.title} https://reddit.com/${post.data.id}`)
           })
         }
