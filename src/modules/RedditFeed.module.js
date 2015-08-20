@@ -19,7 +19,7 @@ export default class RedditFeed extends SekshiModule {
     return {
       subreddits: [ 'kpop' ],
       interval: 300000,
-      format: '%feed | %title by %submitter | %link'
+      format: '[r/$subreddit] $poster posted: $title $posturl'
     }
   }
 
@@ -68,8 +68,13 @@ export default class RedditFeed extends SekshiModule {
         debug('got new posts', posts.length)
         if (this.lastPost && this.enabled()) {
           posts.forEach(post => {
-            this.sekshi.sendChat(`[r/${post.data.subreddit}] ${post.data.author} posted: ` +
-                              `${post.data.title} https://reddit.com/${post.data.id}`)
+            let message = this.options.format
+              .replace(/\$subreddit\b/g, post.data.subreddit)
+              .replace(/\$poster\b/g, post.data.author)
+              .replace(/\$title\b/g, post.data.title)
+              .replace(/\$url\b/g, post.data.url)
+              .replace(/\$posturl\b/g, `https://reddit.com/${post.data.id}`)
+            this.sekshi.sendChat(message)
           })
         }
 
