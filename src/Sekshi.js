@@ -31,7 +31,6 @@ export default class Sekshi extends Plugged {
     this._configDir = path.join(__dirname, '../.config')
 
     this.onMessage = this.onMessage.bind(this)
-    this.onUserUpdate = this.onUserUpdate.bind(this)
   }
 
   _debug(msg, verbosity, color) {
@@ -48,7 +47,6 @@ export default class Sekshi extends Plugged {
     })
 
     this.on(this.CHAT, this.onMessage)
-    this.on(this.USER_UPDATE, this.onUserUpdate)
 
     this.once(this.JOINED_ROOM, (room) => {
       mkdirp(this._configDir, (e) => {
@@ -113,28 +111,6 @@ export default class Sekshi extends Plugged {
     }
     return promise.then(user => {
       return user || Promise.reject(new Error('User not found'))
-    })
-  }
-
-  // updates user name, avatar and level
-  onUserUpdate(update) {
-    const user = this.getUserByID(update.id)
-    if (!user) return
-    User.findById(user.id).exec().then(model => {
-      if (!model) return
-      if (update.level) {
-        user.level = update.level
-        model.set('level', update.level)
-      }
-      if (update.avatarID) {
-        user.avatarID = update.avatarID
-        model.set('avatar', update.avatarID)
-      }
-      if (update.username) {
-        user.username = update.username
-        model.set('username', update.username)
-      }
-      model.save()
     })
   }
 
