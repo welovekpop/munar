@@ -67,6 +67,18 @@ export default class ModTools extends SekshiModule {
     })
   }
 
+  @command('unban', { role: command.ROLE.BOUNCER })
+  unban(user, targetName) {
+    this.sekshi.findUser(targetName).then(target => {
+      this.sekshi.unbanUser(target.id, e => {
+        if (e) debug('ban-err', e)
+        else {
+          this.sekshi.sendChat(`@${user.username} Unbanned ${target.username}`)
+        }
+      })
+    })
+  }
+
   @command('mute', { role: command.ROLE.BOUNCER })
   mute(user, targetName, duration = 15) {
     duration = duration === 45 || duration === 'l' ? 'l'
