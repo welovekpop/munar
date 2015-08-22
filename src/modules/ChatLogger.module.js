@@ -1,6 +1,6 @@
 const SekshiModule = require('../Module')
 const command = require('../command')
-const { ChatMessage } = require('../models')
+const ChatMessage = require('../models/ChatMessage')
 const { emojiAliases } = require('../utils')
 const moment = require('moment')
 const quote = require('regexp-quote')

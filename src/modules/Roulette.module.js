@@ -6,7 +6,8 @@ const SekshiModule = require('../Module')
 const command = require('../command')
 const moment = require('moment')
 const mongoose = require('mongoose')
-const { User, HistoryEntry } = require('../models')
+const User = require('../models/User')
+const HistoryEntry = require('../models/HistoryEntry')
 
 const RouletteHistory = mongoose.modelNames().indexOf('Roulette') === -1
   ? mongoose.model('Roulette', {
