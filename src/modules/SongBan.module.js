@@ -1,6 +1,6 @@
 const SekshiModule = require('../Module')
 const command = require('../command')
-const { Media } = require('../models')
+const Media = require('../models/Media')
 const debug = require('debug')('sekshi:song-ban')
 const moment = require('moment')
 const mongoose = require('mongoose')

@@ -1,7 +1,7 @@
 const debug = require('debug')('sekshi:triggers')
 const SekshiModule = require('../Module')
 const command = require('../command')
-const { Trigger } = require('../models')
+const Trigger = require('../models/Trigger')
 const random = require('random-item')
 
 export default class Triggers extends SekshiModule {

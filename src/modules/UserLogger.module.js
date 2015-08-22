@@ -1,6 +1,6 @@
 const debug = require('debug')('sekshi:user-logging')
 const assign = require('object-assign')
-const { User } = require('../models')
+const User = require('../models/User')
 const SekshiModule = require('../Module')
 const Promise = require('bluebird')
 
