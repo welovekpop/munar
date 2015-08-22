@@ -85,6 +85,10 @@ export function joinList(args, sep = ', ', lastSep = ' and ') {
   return head ? head + lastSep + tail : tail
 }
 
+export function roleName(role) {
+  return 'user, resident DJ, bouncer, manager, cohost, host'.split(', ')[role]
+}
+
 // channel names that we can auto-fix
 const LOENENT = /^loenent|1theK \(.*?\)|LOEN MUSIC Official Channel \(.*?\)$/i
 const SMENT = /^sment|smtown$/i

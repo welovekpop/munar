@@ -11,7 +11,7 @@ const mkdirp = require('mkdirp')
 const { User } = require('./models')
 const commandsSymbol = require('./command').symbol
 const ModuleManager = require('./ModuleManager')
-const { splitMessageSemiProperlyMaybe } = require('./utils')
+const { splitMessageSemiProperlyMaybe, roleName } = require('./utils')
 const quote = require('regexp-quote')
 
 mongoose.Promise = Promise
@@ -140,34 +140,43 @@ export default class Sekshi extends Plugged {
 
       user.role = user.role || this.USERROLE.NONE
 
-      let args = this.parseArguments(msg.message)
+      this.execute(user, msg.message)
+        .catch(e => {
+          this.sendChat(`@${msg.username} ${e.message}`, 5 * 1000)
+        })
+    }
+  }
 
-      let commandName = args.shift().replace(this.delimiter, '').toLowerCase()
+  execute(user, message) {
+    let args = this.parseArguments(message)
+    let commandName = args.shift().replace(this.delimiter, '').toLowerCase()
 
-      this.modules.loaded().forEach(name => {
-        let mod = this.modules.get(name)
-        if (!mod) return
-        if (!mod.enabled() || !Array.isArray(mod.commands)) return
+    let promise = Promise.resolve()
+    this.modules.loaded().forEach(name => {
+      let mod = this.modules.get(name)
+      if (!mod || !mod.enabled() || !Array.isArray(mod.commands)) return
 
-        let command = find(mod.commands, com => includes(com.names, commandName))
-        if (!command) return
+      let command = find(mod.commands, com => includes(com.names, commandName))
+      if (!command) return
 
-        if (command.ninjaVanish) {
-          this.deleteMessage(msg.cid)
-        }
-        if (user.role >= command.role) {
-          if (command.method) {
-            mod[command.method](user, ...args)
-          }
-          else {
-            command.callback.call(mod, user, ...args)
-          }
+      if (command.ninjaVanish) {
+        this.deleteMessage(msg.cid)
+      }
+      if (user.role >= command.role) {
+        if (command.method) {
+          mod[command.method](user, ...args)
         }
         else {
-          this.sendChat(`@${msg.username}: You don't have sufficient permissions to use this command.`, 5 * 1000)
+          command.callback.call(mod, user, ...args)
         }
-      })
-    }
+      }
+      else {
+        promise = Promise.reject(new Error(
+          `You need to be a ${roleName(user.role)} to use this command.`
+        ))
+      }
+    })
+    return promise
   }
 
   // Parses space-separated chat command arguments.
