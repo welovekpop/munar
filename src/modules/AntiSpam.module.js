@@ -26,8 +26,13 @@ export default class AntiSpam extends SekshiModule {
     this.sekshi.removeListener(this.sekshi.CHAT, this.onMessage)
   }
 
+  isAFK(message) {
+    return message.indexOf('[AFK] ') === 0 ||
+      /^@(.*?) \[AFK\] /.test(message)
+  }
+
   onMessage(message) {
-    if (this.options.afk && message.message.indexOf('[AFK] ') === 0 ||
+    if (this.options.afk && this.isAFK(message.message) ||
         this.options.spam && message.message.indexOf('//adf.ly') > -1) {
       this.sekshi.deleteMessage(message.cid)
     }
