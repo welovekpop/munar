@@ -140,14 +140,14 @@ export default class Sekshi extends Plugged {
 
       user.role = user.role || this.USERROLE.NONE
 
-      this.execute(user, msg.message)
+      this.execute(user, msg.message, msg)
         .catch(e => {
           this.sendChat(`@${msg.username} ${e.message}`, 5 * 1000)
         })
     }
   }
 
-  execute(user, message) {
+  execute(user, message, msg = null) {
     let args = this.parseArguments(message)
     let commandName = args.shift().replace(this.delimiter, '').toLowerCase()
 
@@ -159,7 +159,7 @@ export default class Sekshi extends Plugged {
       let command = find(mod.commands, com => includes(com.names, commandName))
       if (!command) return
 
-      if (command.ninjaVanish) {
+      if (command.ninjaVanish && msg) {
         this.deleteMessage(msg.cid)
       }
       if (user.role >= command.role) {
