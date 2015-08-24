@@ -1,6 +1,7 @@
 const Snoocore = require('snoocore')
 const debug = require('debug')('sekshi:reddit-feed')
 const Promise = require('bluebird')
+const decode = require('ent/decode')
 const SekshiModule = require('../Module')
 const command = require('../command')
 
@@ -71,7 +72,7 @@ export default class RedditFeed extends SekshiModule {
             let message = this.options.format
               .replace(/\$subreddit\b/g, post.data.subreddit)
               .replace(/\$poster\b/g, post.data.author)
-              .replace(/\$title\b/g, post.data.title)
+              .replace(/\$title\b/g, () => decode(post.data.title))
               .replace(/\$url\b/g, post.data.url)
               .replace(/\$posturl\b/g, `https://reddit.com/${post.data.id}`)
             this.sekshi.sendChat(message)

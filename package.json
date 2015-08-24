@@ -19,6 +19,7 @@
     "bluebird": "^2.9.34",
     "csv-parse": "^0.1.4",
     "debug": "*",
+    "ent": "^2.2.0",
     "lodash.last": "^3.0.0",
     "mkdirp": "^0.5.1",
     "moment": "^2.9.0",
