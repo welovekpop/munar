@@ -1,7 +1,7 @@
 {
   "name": "sekshibot",
   "description": "Modular plug.dj room bot for WE ♥ KPOP",
-  "version": "0.16.3",
+  "version": "0.16.4",
   "main": "lib/Sekshi",
   "bin": "bin/sekshibot",
   "author": "Sooyou",
