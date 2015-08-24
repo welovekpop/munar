@@ -160,6 +160,7 @@ export default class Triggers extends SekshiModule {
       name = name.slice(1)
     }
     Trigger.remove({ _id: name }).then(removed => {
+      this.removeCommand(name)
       this.sekshi.sendChat(`@${user.username} Removed trigger "!${name}"`)
     })
   }
