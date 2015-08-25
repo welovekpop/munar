@@ -3,10 +3,9 @@ const command = require('../../command')
 const debug = require('debug')('sekshi:wlk:tag-watcher')
 const Promise = require('bluebird')
 const request = Promise.promisify(require('request'))
-const { authorTitle } = require('../../utils')
+const { authorTitle, fixTags } = require('../../utils')
 const takeWhile = require('lodash.takewhile')
 const last = require('lodash.last')
-const { fixTags } = require('../../../utils')
 const assign = require('object-assign')
 
 const toMedia = video => {
