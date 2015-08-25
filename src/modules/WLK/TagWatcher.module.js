@@ -137,7 +137,6 @@ export default class TagWatcher extends SekshiModule {
   update() {
     let seq = Promise.resolve()
     this.options.watchPlaylists.forEach(watch => {
-      let processor = this.processors[watch.processor] || this.processors.generic
       seq = seq
         .then(() => this.api('playlistItems', { part: 'snippet', playlistId: watch.playlist }))
         .get('items')
