@@ -124,15 +124,21 @@ export default class Trivia extends TriviaCore {
   @command('trivpoints')
   trivpoints(user) {
     if (this.isRunning()) {
-      let points = Object.keys(this._points).map(uid => {
-        return { uid: uid, points: this._points[uid] }
-      })
-      points.sort((a, b) => a.points > b.points ? -1 : a.points < b.points ? 1 : 0)
+      let points = Object.keys(this._points)
+        .map(uid => ({ uid: uid
+                     , user: this.sekshi.getUserByID(uid, true)
+                     , points: this._points[uid] }))
+        // exclude users who left the room
+        // not ideal, but Good Enough™ in 99.99% of cases
+        .filter(entry => entry.user)
+        .sort((a, b) => a.points > b.points ? -1 : a.points < b.points ? 1 : 0)
 
-      this.sekshi.sendChat('Current top points: ' + points.slice(0, 5).map((x, i) => {
-        const u = this.sekshi.getUserByID(x.uid)
-        return `#${i + 1} ${u.username} (${x.points})`
-      }).join(', '))
+      this.sekshi.sendChat(
+        'Current top points: ' +
+        points.slice(0, 5)
+          .map((entry, i) => `#${i + 1} ${entry.user.username} (${entry.points})`)
+          .join(', ')
+      )
     }
   }
 
