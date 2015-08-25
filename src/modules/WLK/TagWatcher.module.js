@@ -172,6 +172,7 @@ export default class TagWatcher extends SekshiModule {
         // clean slate for the next playlist
         .return(null)
     })
+    return seq
   }
 
   addToPlaylist(watch, medias) {
