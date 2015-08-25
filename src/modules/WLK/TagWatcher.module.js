@@ -5,7 +5,6 @@ const Promise = require('bluebird')
 const request = Promise.promisify(require('request'))
 const { authorTitle, fixTags } = require('../../utils')
 const takeWhile = require('lodash.takewhile')
-const last = require('lodash.last')
 const assign = require('object-assign')
 
 const toMedia = video => {
@@ -66,6 +65,7 @@ export default class TagWatcher extends SekshiModule {
       )
     }
     setTimeout(() => {
+      this.update()
       this.watch()
     }, 10000)
   }
@@ -158,7 +158,7 @@ export default class TagWatcher extends SekshiModule {
             .get('items')
             .map(toMedia)
             // set last processed video
-            .tap(medias => { watch.last = last(medias).cid })
+            .tap(medias => { watch.last = medias[0].cid })
 
             // start autofixing magic!
             .filter(media => media.duration >= this.options.minDuration
