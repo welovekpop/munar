@@ -89,6 +89,32 @@ export function roleName(role) {
   return 'user, resident DJ, bouncer, manager, cohost, host'.split(', ')[role]
 }
 
+// basically the same algorithm as plug's
+export function authorTitle(str) {
+  if (!str) return { author: null, title: null }
+  let author = ''
+  let title = str
+  let i = str.indexOf('-')
+  if (i > -1) {
+    return {
+      author: str.substr(0, i).trim(),
+      title: str.substr(i + 1).trim()
+    }
+  }
+  i = str.indexOf(' "')
+  if (i > -1) {
+    let end = str.indexOf('"', i + 2)
+    if (end > -1) {
+      return {
+        // heh, javascript…
+        author: str.substr(0, i).trim(),
+        title: str.substring(i + 2, end).trim()
+      }
+    }
+  }
+  return { author, title: title.trim() }
+}
+
 // channel names that we can auto-fix
 const LOENENT = /^loenent|1theK \(.*?\)|LOEN MUSIC Official Channel \(.*?\)$/i
 const SMENT = /^sment|smtown$/i
