@@ -135,6 +135,7 @@ export default class TagWatcher extends SekshiModule {
   }
 
   update() {
+    debug('updating')
     let seq = Promise.resolve()
     this.options.watchPlaylists.forEach(watch => {
       seq = seq
@@ -168,6 +169,9 @@ export default class TagWatcher extends SekshiModule {
 
             // store last processed video ID in config
             .tap(() => this.saveOptions())
+
+            //
+            .catch(e => console.error(e.stack || e.message))
         })
         // clean slate for the next playlist
         .return(null)
