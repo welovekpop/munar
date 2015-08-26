@@ -83,11 +83,13 @@ export default class Disconnect extends SekshiModule {
     if (!this.options.autodc || !user || user.guest) {
       return
     }
-    Disconnections.findById(user.id).exec().then(drop => {
-      if (drop && drop.time > Date.now() - this.options.timeLimit * MINUTE) {
-        setTimeout(() => { this.undrop(user, drop) }, 2200)
-      }
-    })
+    setTimeout(() => {
+      Disconnections.findById(user.id).exec().then(drop => {
+        if (drop && drop.time > Date.now() - this.options.timeLimit * MINUTE) {
+          this.undrop(user, drop)
+        }
+      })
+    }, 2200)
   }
 
   undrop(user, drop) {
