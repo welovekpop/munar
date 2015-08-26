@@ -2,6 +2,7 @@ const SekshiModule = require('../Module')
 const Promise = require('bluebird')
 const random = require('random-item')
 const request = require('request')
+const includes = require('array-includes')
 const parseCsv = require('csv-parse')
 
 function normalizeAnswer(a) {
@@ -115,7 +116,7 @@ export default class TriviaCore extends SekshiModule {
   onChat(msg) {
     if (this._running && this._currentQuestion) {
       const answer = normalizeAnswer(msg.message)
-      if (this._currentQuestion.answers.indexOf(answer) !== -1) {
+      if (this._currentQuestion.check(answer)) {
         const user = this.sekshi.getUserByID(msg.id)
         this.showWinner(user, msg.message)
       }
@@ -166,6 +167,10 @@ class Question {
   constructor(category, question, answers, points = 1) {
     this.category = category
     this.question = question
-    this.answers = answers.filter(a => a).map(normalizeAnswer)
+    this.answers = answers.map(normalizeAnswer).filter(a => a.length > 0)
+  }
+
+  check(answer) {
+    return includes(this.answers, answer)
   }
 }
