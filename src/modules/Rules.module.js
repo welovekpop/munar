@@ -17,7 +17,7 @@ export default class Rules extends SekshiModule {
     }
   }
 
-  @command('rule')
+  @command('rule', { role: command.ROLE.RESIDENTDJ })
   rule(user, n, targetName = null) {
     const descr = this.sekshi.getDescription()
     const rx = new RegExp(`^${n}. `)
