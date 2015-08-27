@@ -84,8 +84,13 @@ export default class ModTools extends SekshiModule {
     this.sekshi.findUser(targetName).then(target => {
       this.sekshi.banUser(target.id, 'h', e => {
         if (e) return debug('kick-err', e)
-        this.sekshi.unbanUser(target.id, e=> {
+        this.sekshi.unbanUser(target.id, e => {
           if (e) debug('kick-err', e)
+          if (target.role > 0) {
+            this.sekshi.addStaff(target.id, target.role, e => {
+              if (e) debug('kick-err', e)
+            })
+          }
         })
       })
     })
