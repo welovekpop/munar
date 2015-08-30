@@ -2,22 +2,63 @@ const { Buffer } = require('buffer')
 const moment = require('moment')
 const { decode } = require('plugged/utils')
 
+// converts user input into moments.js input
 const SPANS = {
-  d: 24,
-  w: 24 * 7,
-  m: 24 * 30
+  y: 'years',
+  M: 'months',
+  w: 'weeks',
+  d: 'days',
+  h: 'hours',
+  m: 'minutes',
+  s: 'seconds'
 }
-
+//=====================================================
+//============== time input multi-parser ==============
 export function spanToTime(span) {
+  span = span.trim()
+  // Don't fix what ain't broken
   if (span === 'f') {
     return moment(0)
   }
 
-  let hours = span in SPANS ? SPANS[span] : span
-  if (typeof hours === 'string' && /^\d+$/.test(hours)) {
-    hours = parseInt(hours, 10)
+  let toRemove = {
+    years: 0,
+    months: 0,
+    weeks:0,
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
   }
-  return moment().subtract(hours, 'hours')
+
+  if(typeof span === 'string' && /^[\s|\d|y|M|w|d|h|m|s]*$/.test(span)){
+    // ================== Complex Parse Start ==========================
+    let choppedSpan = span.split('').filter(function(n){ return n !== ' ' })
+
+    // This is helpful if things go bad.
+    //console.log(choppedSpan);
+
+    while(choppedSpan.length !== 0) {
+      // This recipe has two ingredients:
+      // First, we get a number.
+      let timeAmount = ''
+      while(/^\d+$/.test(choppedSpan[0]) && choppedSpan.length !== 0) {
+        timeAmount = timeAmount + choppedSpan.shift()
+      }
+      timeAmount = (timeAmount !== '') ? parseInt(timeAmount, 10) : 1
+
+      // Then, we get a letter.
+      let timeSize = (choppedSpan.length !== 0) ? choppedSpan.shift() : 'd'
+
+      // Finally, we mash them together.
+      toRemove[SPANS[timeSize]] = toRemove[SPANS[timeSize]] + timeAmount
+    }
+  } else {
+    // Nothing happens here and if it does I'd rather not talk about it.
+  }
+
+  // Fin
+  return toRemove
 }
 
 export function times(x) {
