@@ -2,6 +2,7 @@ const SekshiModule = require('../Module')
 const command = require('../command')
 const ChatMessage = require('../models/ChatMessage')
 const { emojiAliases } = require('../utils')
+const emoji = require('js-emoji')
 const moment = require('moment')
 const quote = require('regexp-quote')
 
@@ -18,6 +19,8 @@ export default class ChatLogger extends SekshiModule {
 
   init() {
     this.sekshi.on(this.sekshi.CHAT, this.onChat)
+
+    emoji.emoticons_data = emojiAliases
   }
   destroy() {
     this.sekshi.removeListener(this.sekshi.CHAT, this.onChat)
@@ -52,9 +55,10 @@ export default class ChatLogger extends SekshiModule {
   }
 
   getEmoji(message) {
-    Object.keys(emojiAliases).forEach(emote => {
-      message = message.replace(new RegExp(`(\\s|^)(${quote(emote)})(?=\\s|$)`, 'g'), `$1:${emojiAliases[emote]}:`)
-    })
+    emoji.colons_mode = true
+    message = emoji.replace_emoticons_with_colons(message)
+    message = emoji.replace_colons(message)
+    message = emoji.replace_unified(message)
     return message.match(/:([^ :]+):/g) || []
   }
 

@@ -1,7 +1,7 @@
 {
   "name": "sekshibot",
   "description": "Modular plug.dj room bot for WE ♥ KPOP",
-  "version": "0.16.6",
+  "version": "0.16.7",
   "main": "lib/Sekshi",
   "bin": "bin/sekshibot",
   "author": "Sooyou",
@@ -20,6 +20,7 @@
     "csv-parse": "^0.1.4",
     "debug": "*",
     "ent": "^2.2.0",
+    "js-emoji": "iamcal/js-emoji#16dcafc2",
     "lodash.last": "^3.0.0",
     "mkdirp": "^0.5.1",
     "moment": "^2.9.0",

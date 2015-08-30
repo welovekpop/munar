@@ -172,7 +172,7 @@ export default class Sekshi extends Plugged {
       }
       else {
         promise = Promise.reject(new Error(
-          `You need to be a ${roleName(user.role)} to use this command.`
+          `You need to be a ${roleName(command.role)} to use this command.`
         ))
       }
     })
