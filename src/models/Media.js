@@ -7,7 +7,7 @@ const mediaSchema = new Schema({
 , image: String
 , duration: Number
 , format: Number
-, cid: String
+, cid: { type: String, index: true }
 })
 
 mediaSchema.virtual('fullTitle').get(function () { return `${this.author} – ${this.title}` })

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 
 const userSchema = new Schema({
   _id: Number
-, username: String
+, username: { type: String, index: true }
 , slug: String
 , level: Number
 , role: Number
