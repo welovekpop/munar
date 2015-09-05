@@ -58,7 +58,7 @@ export function spanToTime(span) {
   }
 
   // Fin
-  return toRemove
+  return moment().subtract(toRemove);
 }
 
 export function times(x) {
