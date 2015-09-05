@@ -35,9 +35,6 @@ export function spanToTime(span) {
     // ================== Complex Parse Start ==========================
     let choppedSpan = span.split('').filter(function(n){ return n !== ' ' })
 
-    // This is helpful if things go bad.
-    //console.log(choppedSpan);
-
     while(choppedSpan.length !== 0) {
       // This recipe has two ingredients:
       // First, we get a number.
