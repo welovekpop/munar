@@ -106,6 +106,7 @@ export default class Sekshi extends Plugged {
       promise = User.findById(user.id)
     }
     else {
+      name = name.replace(/^@/, '')
       let rx = new RegExp(`^${quote(name)}$`, 'i')
       promise = User.findOne({ username: rx })
     }
