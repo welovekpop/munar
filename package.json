@@ -2,6 +2,7 @@
   "name": "sekshibot",
   "description": "Modular plug.dj room bot for WE ♥ KPOP",
   "version": "0.16.7",
+  "license": "MIT",
   "main": "lib/Sekshi",
   "bin": "bin/sekshibot",
   "author": "Sooyou",
