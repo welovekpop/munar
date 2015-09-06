@@ -8,10 +8,10 @@
   "contributors": [
     "brookiebeast",
     "faw",
-    "PlugLynn <PlugLynn@Hushmail.com>",
+    "René Kooi <rene@kooi.me>",
     "schrobby"
   ],
-  "homepage": "http://welovekpop.club/sekshibot",
+  "homepage": "https://welovekpop.club/sekshibot",
   "dependencies": {
     "array-find": "^0.1.1",
     "array-findindex": "^0.1.0",
