@@ -22,10 +22,14 @@ export default class WLKSekshiData extends SekshiModule {
 
   @command('profile')
   showProfileLink(user, targetName = null) {
-    let target = targetName && this.sekshi.getUserByName(targetName) || user
-    let slug = target.slug || target.id
-
-    this.sekshi.sendChat(`@${target.username}'s profile page: ${this.base()}user/${slug}`)
+    this.sekshi.findUser(targetName, user)
+      .then(target => {
+        let slug = target.slug || target.id
+        this.sekshi.sendChat(`@${target.username}'s profile page: ${this.base()}user/${slug}`)
+      })
+      .catch(e => {
+        this.sekshi.sendChat(`@${user.username} ${e.message}`)
+      })
   }
 
   @command('songpage', 'mediapage')
