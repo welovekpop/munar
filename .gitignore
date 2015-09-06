@@ -3,3 +3,4 @@ creds.json
 config.json
 lib
 .config
+npm-debug.log
