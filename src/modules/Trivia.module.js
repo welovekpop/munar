@@ -16,7 +16,6 @@ const TriviaHistory = mongoose.modelNames().indexOf('Trivia') === -1
   : mongoose.model('Trivia')
 
 export default class Trivia extends TriviaCore {
-
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -39,9 +38,8 @@ export default class Trivia extends TriviaCore {
       if (winner) {
         this.addPoints(winner)
         if (this.getPoints(winner) >= target) {
-          this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly and reached ${target} points!` +
-                               ` Congratulations! :D`)
-          this.sekshi.moveDJ(winner.id, this.options.winPosition - 1)
+          this.adapter.send(`[Trivia] @${winner.username} answered correctly and reached ${target} points!` +
+                            ` Congratulations! :D`)
           this.stopTrivia()
           if (this.model) {
             this.model.set('winner', winner.id).save()
@@ -49,19 +47,19 @@ export default class Trivia extends TriviaCore {
           }
         }
         else {
-          this.sekshi.sendChat(`[Trivia] @${winner.username} answered correctly! Next question in ${interval} seconds!`)
+          this.adapter.send(`[Trivia] @${winner.username} answered correctly! Next question in ${interval} seconds!`)
           this._currentQuestion = null
           setTimeout(() => this.nextQuestion(), interval * 1000)
         }
       }
       else {
-        this.sekshi.sendChat(`[Trivia] Nobody answered correctly! ` +
-                             `The right answer was "${question.answers[0]}". Next question in ${interval} seconds!`)
+        this.adapter.send(`[Trivia] Nobody answered correctly! ` +
+                          `The right answer was "${question.answers[0]}". Next question in ${interval} seconds!`)
         this._currentQuestion = null
         setTimeout(() => this.nextQuestion(), interval * 1000)
       }
     }).catch(e => {
-      this.sekshi.sendChat(`[Trivia] Something went wrong! Stopping trivia before I explode... :boom:`)
+      this.adapter.send(`[Trivia] Something went wrong! Stopping trivia before I explode... :boom:`)
       this.stopTrivia()
       console.error('trivia', e)
     })
@@ -95,34 +93,35 @@ export default class Trivia extends TriviaCore {
   }
 
   @command('trivia', { role: command.ROLE.BOUNCER })
-  trivia(user) {
+  trivia(message) {
     if (!this.isRunning()) {
-      this.sekshi.sendChat(`[Trivia] @djs ${user.username} started Trivia! ` +
-                           `First to ${this.options.points} points gets waitlist spot #${this.options.winPosition} :)`)
+      this.adapter = message.source
+      message.send(`@here ${message.username} started Trivia! ` +
+                   `First to ${this.options.points} points gets waitlist spot #${this.options.winPosition} :)`)
       this.startTrivia().then(() => {
-        this.sekshi.sendChat(`Loaded ${this.questions.length} questions. First question in 5 seconds!`)
+        message.send(`Loaded ${this.questions.length} questions. First question in 5 seconds!`)
         setTimeout(() => this.nextQuestion(), 5 * 1000)
 
-        this.model = new TriviaHistory({ user: user.id })
-        this.model.save()
-          .then(() => { debug('created history item') })
-          .catch(e => console.error(e))
+        // this.model = new TriviaHistory({ user: message.user.id })
+        // this.model.save()
+        //   .then(() => { debug('created history item') })
+        //   .catch(e => console.error(e))
       })
     }
   }
 
   @command('trivquit', 'stoptrivia', { role: command.ROLE.BOUNCER })
-  trivquit(user) {
+  trivquit(message) {
     if (this.isRunning()) {
       this.stopTrivia()
-      if (user) {
-        this.sekshi.sendChat(`[Trivia] ${user.username} stopped Trivia.`)
+      if (message.user) {
+        this.adapter.send(`[Trivia] ${message.user.username} stopped Trivia.`)
       }
     }
   }
 
   @command('trivpoints')
-  trivpoints(user) {
+  trivpoints(message) {
     if (this.isRunning()) {
       let points = Object.keys(this._points)
         .map(uid => ({ uid: uid
@@ -133,7 +132,7 @@ export default class Trivia extends TriviaCore {
         .filter(entry => entry.user)
         .sort((a, b) => a.points > b.points ? -1 : a.points < b.points ? 1 : 0)
 
-      this.sekshi.sendChat(
+      message.reply(
         'Current top points: ' +
         points.slice(0, 5)
           .map((entry, i) => `#${i + 1} ${entry.user.username} (${entry.points})`)
@@ -143,11 +142,11 @@ export default class Trivia extends TriviaCore {
   }
 
   @command('question')
-  question(user) {
+  question(message) {
     if (this.isRunning()) {
       let question = this.getCurrentQuestion()
       if (question) {
-        this.sekshi.sendChat(`[Trivia] @${user.username} The current question is: ${question.question}`)
+        message.reply(`The current question is: ${question.question}`)
       }
     }
   }

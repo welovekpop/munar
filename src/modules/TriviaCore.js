@@ -5,6 +5,8 @@ const request = require('request')
 const includes = require('array-includes')
 const parseCsv = require('csv-parse')
 
+const debug = require('debug')('sekshi:trivia')
+
 function normalizeAnswer(a) {
   return a.toLowerCase()
     .replace(/\s+/g, ' ')      // spaces
@@ -13,7 +15,6 @@ function normalizeAnswer(a) {
 }
 
 export default class TriviaCore extends SekshiModule {
-
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -41,12 +42,13 @@ export default class TriviaCore extends SekshiModule {
   }
 
   startTrivia() {
+    debug('starting')
     this._running = true
     this._history = []
     this._points = {}
     this.questions = []
     this._currentQuestion = null
-    this.sekshi.on(this.sekshi.CHAT, this.onChat)
+    this.sekshi.on('message', this.onChat)
 
     return this._load()
   }
@@ -66,7 +68,7 @@ export default class TriviaCore extends SekshiModule {
 
   askQuestion(question) {
     return new Promise((resolve, reject) => {
-      this.sekshi.sendChat(`[Trivia] From the "${question.category}" category: ${question.question}`)
+      this.adapter.send(`[Trivia] From the "${question.category}" category: ${question.question}`)
 
       this._currentQuestion = question
       this._history.push(question)
@@ -82,7 +84,7 @@ export default class TriviaCore extends SekshiModule {
   }
 
   showWinner(winner, answer) {
-    this.sekshi.sendChat(`[Trivia] "${answer}" is correct! ${winner.username} wins the round.`)
+    this.adapter.send(`[Trivia] "${answer}" is correct! ${winner.username} wins the round.`)
 
     clearTimeout(this._timeout)
 
@@ -110,15 +112,14 @@ export default class TriviaCore extends SekshiModule {
   stopTrivia() {
     this._running = false
     clearTimeout(this._timeout)
-    this.sekshi.removeListener(this.sekshi.CHAT, this.onChat)
+    this.sekshi.removeListener('message', this.onChat)
   }
 
-  onChat(msg) {
+  onChat(message) {
     if (this._running && this._currentQuestion) {
-      const answer = normalizeAnswer(msg.message)
+      const answer = normalizeAnswer(message.text)
       if (this._currentQuestion.check(answer)) {
-        const user = this.sekshi.getUserByID(msg.id)
-        this.showWinner(user, msg.message)
+        this.showWinner(message.user, message.text)
       }
     }
   }
