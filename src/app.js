@@ -1,3 +1,4 @@
+const Slack = require('./adapters/Slack')
 const Sekshi = require('./Sekshi')
 const config = require('../config.json')
 const debug = require('debug')('sekshi:app')
@@ -5,8 +6,9 @@ const pkg = require('../package.json')
 
 function start() {
   const sekshi = new Sekshi(config)
+  sekshi.adapter(Slack, { token: process.env.SLACK_TOKEN })
 
-  sekshi.start(require('../creds.json'))
+  sekshi.start()
 
   let timeout
   const onError = e => {

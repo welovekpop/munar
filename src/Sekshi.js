@@ -1,4 +1,4 @@
-const Plugged = require('plugged')
+const { EventEmitter } = require('events')
 const path = require('path')
 const fs = require('fs')
 const debug = require('debug')('sekshi:sekshi')
@@ -16,42 +16,32 @@ const quote = require('regexp-quote')
 
 mongoose.Promise = Promise
 
-export default class Sekshi extends Plugged {
+export default class Sekshi extends EventEmitter {
   constructor(args) {
-    super({ messageProc: splitMessageSemiProperlyMaybe })
-    this.invokeLogger(this._debug)
-
+    super()
     this.options = args
     this.db = mongoose.connect(args.mongo)
 
     this.modules = new ModuleManager(this, path.join(__dirname, 'modules'))
+    this.adapters = []
     this.delimiter = args.delimiter || '!'
 
-    this._room = args.room
     this._configDir = path.join(__dirname, '../.config')
 
-    this.onMessage = this.onMessage.bind(this)
+    this.onMessage = ::this.onMessage
   }
 
-  _debug(msg, verbosity, color) {
-    debug(msg)
+  adapter(Adapter, options) {
+    const adapter = new Adapter(this, options)
+    this.adapters.push(adapter)
+    adapter.on('message', this.onMessage)
   }
 
   start(creds, cb) {
-    this.login(creds)
-
-    this.once(this.LOGIN_SUCCESS, () => {
-      this.cacheChat(true)
-      this.connect(this.options.room)
-      this.loadModules()
-    })
-
-    this.on(this.CHAT, this.onMessage)
-
-    this.once(this.JOINED_ROOM, (room) => {
-      mkdirp(this._configDir, (e) => {
-        if (cb) cb(e || null, room || null)
-      })
+    this.adapters.forEach(adapter => adapter.enable())
+    this.loadModules()
+    mkdirp(this._configDir, (e) => {
+      if (cb) cb(e || null)
     })
 
     // the event is fired on nextTick so modules can simply listen for "moduleloaded"
@@ -67,7 +57,6 @@ export default class Sekshi extends Plugged {
 
   stop(cb) {
     this.unloadModules()
-    this.logout()
     // should *probably* also wait for this before callback-ing
     mongoose.disconnect()
 
@@ -84,11 +73,6 @@ export default class Sekshi extends Plugged {
         cb(e)
       }
     })
-  }
-
-  setRoom(room) {
-    this.options.room = room
-    this.connect(room)
   }
 
   // Find a user model or default to something.
@@ -115,41 +99,17 @@ export default class Sekshi extends Plugged {
     })
   }
 
-  onMessage(msg) {
-    if (!this.getCurrentRoomStats()) {
-      return
-    }
-    if (this.getSelf().id === msg.uid) {
-      return
-    }
-
-    msg.message = msg.message.replace(/\\"/g, '"')
-
-    logChat(msg.username, msg.message)
-    if (msg.message.charAt(0) === this.delimiter) {
-      let user = msg.id === 'sekshi' ? { role: this.USERROLE.HOST }
-                                     : this.getUserByID(msg.id, true)
-
-      // nonexistent user
-      if (!user) return
-      // Somehow plug decided to not handle chat levels on the server side, so if people
-      // work around the client side chat level restriction, we can still get messages
-      // from people whose level is below the minimum chat level for the room -.-
-      if ('level' in user && user.level < this.getRoomMeta().minChatLevel) {
-        return
-      }
-
-      user.role = user.role || this.USERROLE.NONE
-
-      this.execute(user, msg.message, msg)
-        .catch(e => {
-          this.sendChat(`@${msg.username} ${e.message}`, 5 * 1000)
-        })
+  onMessage(message) {
+    if (message.text && message.text.startsWith(this.delimiter)) {
+      this.executeMessage(message)
+        .catch(e => message.reply(`Error: ${e.message}`))
     }
   }
 
-  execute(user, message, msg = null) {
-    let args = this.parseArguments(message)
+  executeMessage(message) {
+    const { source } = message
+
+    let args = this.parseArguments(message.text)
     let commandName = args.shift().replace(this.delimiter, '').toLowerCase()
 
     let promise = Promise.resolve()
@@ -160,21 +120,19 @@ export default class Sekshi extends Plugged {
       let command = find(mod.commands, com => includes(com.names, commandName))
       if (!command) return
 
-      if (command.ninjaVanish && msg) {
-        this.deleteMessage(msg.cid)
+      if (command.ninjaVanish && message) {
+        message.delete()
       }
-      if (user.role >= command.role) {
+      if (source.canExecute(message)) {
         if (command.method) {
-          mod[command.method](user, ...args)
+          mod[command.method](message, ...args)
         }
         else {
-          command.callback.call(mod, user, ...args)
+          command.callback.call(mod, message, ...args)
         }
       }
       else {
-        promise = Promise.reject(new Error(
-          `You need to be a ${roleName(command.role)} to use this command.`
-        ))
+        promise = Promise.reject(new Error('You cannot use this command.'))
       }
     })
     return promise
@@ -246,33 +204,6 @@ export default class Sekshi extends Plugged {
     }
 
     return args
-  }
-
-  lockskipDJ(id, position, cb) {
-    const skipDJ = Promise.promisify(this.skipDJ, this)
-    const addToWaitlist = Promise.promisify(this.addToWaitlist, this)
-    const moveDJ = Promise.promisify(this.moveDJ, this)
-    const setLock = Promise.promisify(this.setLock, this)
-
-    if (this.doesWaitlistCycle()) {
-      skipDJ(id)
-        .then(() => moveDJ(id, position))
-        .nodeify(cb)
-    }
-    else {
-      let locked = this.isWaitlistLocked()
-      // DJ cycle is off
-      // first, lock the wait list so no-one can steal the 50th spot before the DJ is put back
-      setLock(true, false)
-        // then skip & add the DJ again
-        .then(() => skipDJ(id))
-        .then(() => addToWaitlist(id))
-        .then(() => moveDJ(id, position))
-        // and finally revert to the old wait list lock status
-        .then(() => setLock(locked, false),
-              () => setLock(locked, false))
-        .nodeify(cb)
-    }
   }
 
   getModule(name) {

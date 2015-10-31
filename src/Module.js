@@ -9,7 +9,6 @@ const debug = require('debug')('sekshi:module')
 const command = require('./command')
 
 export default class Module extends EventEmitter {
-
   constructor(sekshi, optionsFile) {
     super()
 
@@ -121,5 +120,4 @@ export default class Module extends EventEmitter {
     mkdirp.sync(dirname(this._optionsFile))
     fs.writeFileSync(this._optionsFile, JSON.stringify(options, null, 2), 'utf8')
   }
-
 }
