@@ -1,0 +1,11 @@
+{
+  "name": "sekshibot-adapter-slack",
+  "version": "0.0.0",
+  "description": "SekshiBot Adapter for Slack.com",
+  "dependencies": {
+    "autobind-decorator": "^1.3.2",
+    "object-assign": "^4.0.1",
+    "slack-client": "^1.4.1"
+  },
+  "devDependencies": {}
+}
