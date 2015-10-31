@@ -47,7 +47,7 @@ export default class Slack extends EventEmitter {
   }
 
   normalizeMessage(text) {
-    const slack = this.client
+    const client = this.client
     return text.trim()
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
