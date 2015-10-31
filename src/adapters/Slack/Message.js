@@ -1,3 +1,4 @@
+import SlackUser from './User'
 import Message from '../../Message'
 
 export default class SlackMessage extends Message {
@@ -7,11 +8,11 @@ export default class SlackMessage extends Message {
   }
 
   get user() {
-    return this.slack.getUser(this.sourceMessage.user)
+    return new SlackUser(this.slack, this.slack.getUser(this.sourceMessage.user))
   }
 
   get username() {
-    return this.user.name
+    return this.user.username
   }
 
   delete() {
