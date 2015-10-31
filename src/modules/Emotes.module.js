@@ -36,15 +36,12 @@ export default class Emotes extends SekshiModule {
     }
   }
 
-  sendEmote(msg, username) {
-    if (username) {
-      let user = this.sekshi.getUserByName(username, true)
-      if (user) {
-        this.sekshi.sendChat(`@${user.username} ${msg}`)
-        return
-      }
+  sendEmote(message, target, emote) {
+    if (target) {
+      message.send(`@${target.name} ${emote}`)
+    } else {
+      message.reply(emote)
     }
-    this.sekshi.sendChat(msg)
   }
 
   saveEmote(user, id, url) {
@@ -86,17 +83,18 @@ export default class Emotes extends SekshiModule {
   }
 
   @command('addemote', { role: command.ROLE.BOUNCER, ninjaVanish: true })
-  addemote(user, id, url) {
+  addemote(message, id, url) {
+    const user = message.user
     id = cleanId(id)
     debug('addemote', id, url)
     let promise = null
     if (this.options.reupload && this.options.key && !IMGUR.test(url)) {
-      this.sekshi.sendChat(`@${user.username} :satellite: Reuploading to imgur`, 10 * 1000)
+      message.reply(`:satellite: Reuploading to imgur`, 10 * 1000)
       promise = this.reupload(id, url)
         .then(imgurUrl => this.saveEmote(user, id, imgurUrl))
         .catch(err => {
-          this.sekshi.sendChat(
-            `@${user.username} :warning: Could not reupload to imgur, ` +
+          message.reply(
+            `:warning: Could not reupload to imgur, ` +
             `using the original URL instead...`
           , 3 * 1000
           )
@@ -106,80 +104,60 @@ export default class Emotes extends SekshiModule {
     else {
       promise = this.saveEmote(user, id, url)
     }
-    promise
-      .then(emote => {
-        debug('added', id, url)
-        this.sekshi.sendChat(`@${user.username} Emote "${id}" updated!`, 10 * 1000)
-      })
-      .catch(err => {
-        debug('add-err', err)
-        this.sekshi.sendChat(`@${user.username} Emote "${id}" could not be updated`, 10 * 1000)
-      })
+    return promise.then(emote => {
+      debug('added', id, url)
+      message.reply(`Emote "${id}" updated!`, 10 * 1000)
+    })
   }
 
   @command('delemote', { role: command.ROLE.BOUNCER })
   delemote(user, id) {
     debug('delemote', id)
-    Emote.remove({ _id: id }).exec()
+    return Emote.remove({ _id: id }).exec()
       .then(() => {
         debug('deleted', id)
-        this.sekshi.sendChat(`@${user.username} Emote "${id}" removed!`, 10 * 1000)
-      })
-      .catch(err => {
-        debug('del-err', err)
-        this.sekshi.sendChat(`@${user.username} Emote "${id}" could not be updated`, 10 * 1000)
+        message.reply(`Emote "${id}" removed!`, 10 * 1000)
       })
   }
 
   @command('emotes')
-  emotes({ username }) {
+  emotes(message) {
     debug('listing emotes')
     if (this.options.url) {
-      this.sekshi.sendChat(`@${username} Emotes can be found at ${this.options.url} !`)
+      message.reply(`Emotes can be found at ${this.options.url} !`)
       return
     }
 
-    Emote.find({}).sort('id').exec()
-      .then(emotes => {
-        let message = `@${username} Emotes: `
-        let messages = []
-        debug('got emotes', emotes.length)
-        emotes.forEach(e => {
-          if (message.length + e.id.length > 250) {
-            messages.push(message)
-            message = ''
-          }
-          message += e.id + ', '
-        })
-        messages.push(message.substr(0, message.length - 2))
-        messages.forEach((msg, i) => {
-          this.sekshi.sendChat(msg, 20 * 1000)
-        })
-      })
-      .catch(err => { console.error(err) })
+    return Emote.find({}).sort('id').exec()
+      .map(e => e.id)
+      .then(emotes => message.reply(`Emotes: ${emotes.join(', ')}`))
   }
 
   @command('emote', 'e')
-  emote(user, id, username) {
+  emote(message, id, username) {
     if (!id) return
 
     let target
     if (username) {
       if (username.charAt(0) === '@') username = username.slice(1)
-      target = this.sekshi.getUserByName(username)
+      target = message.source.getUserByName(username)
     }
-    if (!target) target = user
+    if (!target) target = message.user
 
     Emote.findById(cleanId(id)).exec().then(emote => {
       if (emote) {
-        this.sendEmote(emote.url, target.username)
+        this.sendEmote(message, target, emote.url)
       }
     })
   }
 
   @command('thatsnono')
-  thatsnono(user, username) {
-    if (username && username.charAt(0) === '@') username = username.slice(1)
-    this.sendEmote('That\'s no no http://a.pomf.se/lcmeuw.webm', username)
+  thatsnono(message, username) {
+    let target
+    if (username) {
+      if (username.charAt(0) === '@') username = username.slice(1)
+      target = message.source.getUserByName(username)
+    }
+    this.sendEmote(message, target, 'That\'s no no http://a.pomf.se/lcmeuw.webm')
   }
 }
