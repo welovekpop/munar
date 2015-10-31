@@ -1,6 +1,4 @@
-const { Buffer } = require('buffer')
 const moment = require('moment')
-const { decode } = require('plugged/utils')
 
 // converts user input into moments.js input
 const SPANS = {
@@ -73,58 +71,10 @@ export function days(h) {
   return x === 1 ? 'day' : `${x} days`
 }
 
-// inverse of plugged's decode utility
-export function encode(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&#34;')
-    .replace(/'/g, '&#39;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-}
-
-// attempt to split chat messages for plug without messing up the contents
-export function splitMessageSemiProperlyMaybe(string, chunkSize = 250) {
-  let parts = []
-  // HTML-encode everything first, because plug truncates messages _after_
-  // encoding (WTF‽)
-  string = encode(string)
-  // Plug also doesn't do a very good job of truncating messages with
-  // multibyte characters, so we attempt to do something silly here that
-  // sorta kinda wraps words before 250 bytes
-  // It's not very good because I don't know how this should be done
-  let buffer = new Buffer(string, 'utf8')
-  let i = 0
-  while (i < buffer.length) {
-    let end = i + chunkSize
-    if (end < buffer.length) {
-      // search for last whitespace (just space lol.)
-      while (buffer[end] !== 0x20 && end > i) {
-        end--
-      }
-      if (end === 0) {
-        // I DON'T KNOW WHAT TO DO
-        // this breaks if it ends up in the middle of an HTML-encoded char
-        // but what can you do *shrug* (at least it's not very likely to
-        // happen!)
-        end = i + chunkSize
-      }
-    }
-    parts.push(buffer.slice(i, end))
-    i += end
-  }
-  // stringify and decode stuff again
-  return parts.map(buf => decode(buf.toString('utf8')).replace(/\\"/g, '"'))
-}
-
 export function joinList(args, sep = ', ', lastSep = ' and ') {
   let tail = args.pop()
   let head = args.join(sep)
   return head ? head + lastSep + tail : tail
-}
-
-export function roleName(role) {
-  return 'user, resident DJ, bouncer, manager, cohost, host'.split(', ')[role]
 }
 
 // channel names that we can auto-fix

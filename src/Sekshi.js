@@ -11,7 +11,6 @@ const mkdirp = require('mkdirp')
 const User = require('./models/User')
 const commandsSymbol = require('./command').symbol
 const ModuleManager = require('./ModuleManager')
-const { splitMessageSemiProperlyMaybe, roleName } = require('./utils')
 const quote = require('regexp-quote')
 
 mongoose.Promise = Promise
