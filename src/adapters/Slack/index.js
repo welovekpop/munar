@@ -39,11 +39,25 @@ export default class Slack extends EventEmitter {
 
   @autobind
   onMessage(slackMessage) {
+    debug(slackMessage.type, assign({ user: slackMessage.user }, slackMessage.toJSON()))
     if (slackMessage.type === 'message') {
       const channel = new Channel(this, this.getChannel(slackMessage.channel))
-      this.emit('message', new Message(this, channel, slackMessage.text, slackMessage))
-    } else {
-      debug(slackMessage.type, slackMessage)
+      this.emit('message', new Message(this, channel, this.normalizeMessage(slackMessage.text), slackMessage))
     }
+  }
+
+  normalizeMessage(text) {
+    const slack = this.client
+    return text.trim()
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/<!channel>/g, '@channel')
+      .replace(/<!group>/g, '@group')
+      .replace(/<!everyone>/g, '@everyone')
+      .replace(/<#(C\w+)\|?(\w+)?>/g, (_, channelId) => `#${client.getChannelByID(channelId).name}`)
+      .replace(/<@(U\w+)\|?(\w+)?>/g, (_, userId) => `@${client.getUserByID(userId).name}`)
+      .replace(/<(?!!)(\S+)>/g, (_, link) => link)
+      .replace(/<!(\w+)\|?(\w+)?>/g, (_, command, label) => `<${label || command}>`)
   }
 }
