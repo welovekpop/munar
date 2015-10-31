@@ -10,10 +10,10 @@ export default class SlackChannel {
   }
 
   reply(message, text) {
-    this.channel.send(`@${message.username} ${text}`)
+    this.send(`@${message.username} ${text}`)
   }
 
   send(text) {
-    this.channel.send(text)
+    this.channel.postMessage({ text, as_user: true, link_names: true })
   }
 }
