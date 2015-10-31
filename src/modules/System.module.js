@@ -5,7 +5,6 @@ const plugged = require('plugged/package.json')
 const mongoose = require('mongoose/package.json')
 
 export default class System extends SekshiModule {
-
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -18,63 +17,61 @@ export default class System extends SekshiModule {
   }
 
   @command('version')
-  version(user) {
+  version(message) {
     const str = pkg => `${pkg.name} v${pkg.version}`
-    this.sekshi.sendChat(
-      `@${user.username} Running ${str(sekshibot)} on ${str(plugged)}, ${str(mongoose)}`
-    )
+    message.reply(`Running ${str(sekshibot)} on ${str(plugged)}, ${str(mongoose)}`)
   }
 
   @command('reloadmodule', 'reload', { role: command.ROLE.MANAGER })
-  reloadmodule(user, name) {
+  reloadmodule(message, name) {
     try {
       this.manager().reload(name)
-      this.sekshi.sendChat(`@${user.username} Reloaded module "${name}".`)
+      message.reply(`Reloaded module "${name}".`)
     }
     catch (e) {
-      this.sekshi.sendChat(`@${user.username} Could not reload "${name}": ${e.message}`)
+      message.reply(`Could not reload "${name}": ${e.message}`)
     }
   }
 
   @command('unloadmodule', 'unload', { role: command.ROLE.MANAGER })
-  unloadmodule(user, name) {
+  unloadmodule(message, name) {
     try {
       this.manager().unload(name)
-      this.sekshi.sendChat(`@${user.username} Unloaded module "${name}."`)
+      message.reply(`Unloaded module "${name}."`)
     }
     catch (e) {
-      this.sekshi.sendChat(`@${user.username} Could not unload "${name}": ${e.message}`)
+      message.reply(`Could not unload "${name}": ${e.message}`)
     }
   }
   @command('loadmodule', 'load', { role: command.ROLE.MANAGER })
-  loadmodule(user, name) {
+  loadmodule(message, name) {
     try {
       this.manager().load(name)
-      this.sekshi.sendChat(`@${user.username} Loaded module "${name}".`)
+      message.reply(`Loaded module "${name}".`)
     }
     catch (e) {
-      this.sekshi.sendChat(`@${user.username} Could not load "${name}": ${e.message}`)
+      message.reply(`Could not load "${name}": ${e.message}`)
     }
   }
 
   @command('disablemodule', 'disable', { role: command.ROLE.MANAGER })
-  disablemodule(user, name) {
+  disablemodule(message, name) {
     if (name.toLowerCase() === 'system') {
-      this.sekshi.sendChat(`@${user.username} Cannot disable the System module.`)
+      message.reply(`Cannot disable the System module.`)
     }
     else {
       const mod = this.manager().get(name)
       if (mod) {
         mod.disable()
-        this.sekshi.sendChat(`@${user.username} Module "${name}" disabled.`)
+        message.reply(`Module "${name}" disabled.`)
       }
       else {
-        this.sekshi.sendChat(`@${user.username} Could not find the "${name}" module.`)
+        message.reply(`Could not find the "${name}" module.`)
       }
     }
   }
   @command('enablemodule', 'enable', { role: command.ROLE.MANAGER })
-  enablemodule(user, name) {
+  enablemodule(message, name) {
     let mod = this.manager().get(name)
     if (!mod) {
       try {
@@ -82,45 +79,47 @@ export default class System extends SekshiModule {
       }
       catch (e) {
         console.error(e)
-        return this.sekshi.sendChat(`@${user.username} Could not load the "${name}" module.`)
+        message.reply(`Could not load the "${name}" module.`)
       }
     }
     mod.enable()
-    this.sekshi.sendChat(`@${user.username} Module "${name}" enabled.`)
+    message.reply(`Module "${name}" enabled.`)
   }
 
   @command('moduleinfo', { role: command.ROLE.MANAGER })
-  moduleinfo(user, name) {
-    if(!name || name.length === 0) {
-        this.sekshi.sendChat(`usage: !moduleinfo "modulename"`)
-        return;
+  moduleinfo(message, name) {
+    if (!name || name.length === 0) {
+      message.reply(`usage: !moduleinfo "modulename"`)
+      return;
     }
 
     const mod = this.manager().get(name)
     if (mod) {
-      [ `:small_blue_diamond: Module info for "${name}"`,
-        `:white_small_square: Status: ${mod.enabled() ? 'enabled' : 'disabled'}`,
-        `:white_small_square: Author: ${mod.author}`,
-        `:white_small_square: Description: ${mod.description}`,
-      ].forEach(this.sekshi.sendChat, this.sekshi)
+      message.reply(
+        [ `:small_blue_diamond: Module info for "${name}"`,
+          `:white_small_square: Status: ${mod.enabled() ? 'enabled' : 'disabled'}`,
+          `:white_small_square: Author: ${mod.author}`,
+          `:white_small_square: Description: ${mod.description}`,
+        ].join('\n')
+      )
     }
     else {
-      this.sekshi.sendChat(`@${user.username} Module "${name}" does not exist.`);
+      message.reply(`Module "${name}" does not exist.`);
     }
   }
 
   @command('listmodules', { role: command.ROLE.MANAGER })
-  listmodules(user) {
+  listmodules(message) {
     const text = this.manager().known().map(name => {
       const mod = this.manager().get(name)
       return `${name} ${mod && mod.enabled() ? '✔' : '✘'}`
     })
-    this.sekshi.sendChat(text.sort().join(', '), 20 * 1000)
+    message.reply(text.sort().join(', '))
   }
 
   @command('exit', { role: command.ROLE.MANAGER })
-  exit(user) {
-    this.sekshi.sendChat(`@${user.username} okay... </3 T_T`)
+  exit(message) {
+    message.reply(`okay... </3 T_T`)
     this.sekshi.stop()
   }
 }
