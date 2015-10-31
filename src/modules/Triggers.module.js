@@ -47,7 +47,6 @@ const vars = {
 }
 
 export default class Triggers extends SekshiModule {
-
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -62,8 +61,8 @@ export default class Triggers extends SekshiModule {
   }
 
   add(name, response) {
-    this.addCommand(name, (...params) => {
-      this.sekshi.sendChat(this.run(response, ...params))
+    this.addCommand(name, (message, ...params) => {
+      message.reply(this.run(response, message.user, ...params))
     })
   }
 
@@ -131,7 +130,7 @@ export default class Triggers extends SekshiModule {
   }
 
   @command('trigger', { role: command.ROLE.BOUNCER })
-  createTrigger(user, name, ...response) {
+  createTrigger(message, name, ...response) {
     name = name.toLowerCase()
     response = response.join(' ')
     if (name[0] === this.sekshi.delimiter) {
@@ -140,28 +139,28 @@ export default class Triggers extends SekshiModule {
     let trig = new Trigger({
       _id: name,
       response: response,
-      user: user.id
+      user: message.user.id
     })
     trig.save()
       .then(() => {
-        this.sekshi.sendChat(`@${user.username} Created trigger "!${name}"`)
+        message.reply(`Created trigger "!${name}"`)
         this.add(name, response)
       })
       .catch(e => {
         console.error(e.stack || e.message)
-        this.sekshi.sendChat(`@${user.username} Could not add trigger...`)
+        message.reply(`Could not add trigger...`)
       })
   }
 
   @command('deltrigger', { role: command.ROLE.BOUNCER })
-  removeTrigger(user, name) {
+  removeTrigger(message, name) {
     name = name.toLowerCase()
     if (name[0] === this.sekshi.delimiter) {
       name = name.slice(1)
     }
     Trigger.remove({ _id: name }).then(removed => {
       this.removeCommand(name)
-      this.sekshi.sendChat(`@${user.username} Removed trigger "!${name}"`)
+      message.reply(`Removed trigger "!${name}"`)
     })
   }
 }
