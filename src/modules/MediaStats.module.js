@@ -8,7 +8,6 @@ const moment = require('moment')
 const utils = require('../utils')
 
 export default class MediaStats extends SekshiModule {
-
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -120,7 +119,7 @@ export default class MediaStats extends SekshiModule {
   }
 
   @command('mostplayed', { role: command.ROLE.RESIDENTDJ })
-  mostplayed(user, amount = 3, time = 'f') {
+  mostplayed(message, amount = 3, time = 'f') {
     // !mostplayed can take 1, 2, or no parameters.
     // without parameters, it shows the top 3 most played songs
     // ever. With one parameter, it shows the top N most played
@@ -145,14 +144,14 @@ export default class MediaStats extends SekshiModule {
     const hours = moment().diff(since, 'hours')
     const allTime = time === 'f'
     // find most played songs
-    let title = `@${user.username} Most played songs`
-    if (!allTime) title += ` over the last ${utils.days(hours)}`
-    this.sekshi.sendChat(`${title}:`)
-    this.getMostPlayed(amount, time)
-      .each((m, i) => {
-        this.sekshi.sendChat(`#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`)
+    let response = 'Most played songs'
+    if (!allTime) response += ` over the last ${utils.days(hours)}`
+    response += ':\n'
+    return this.getMostPlayed(amount, time)
+      .then(mostPlayed => {
+        response += mostPlayed.map((m, i) => `#${i + 1} - ${m.author} - ${m.title} (${m.plays} plays)`).join('\n')
+        message.reply(response)
       })
-      .catch(e => { this.sekshi.sendChat(`ERR: ${e.message}`) })
   }
 
   @command('tagged', { role: command.ROLE.RESIDENTDJ })
