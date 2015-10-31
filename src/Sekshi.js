@@ -99,6 +99,7 @@ export default class Sekshi extends EventEmitter {
   }
 
   onMessage(message) {
+    this.emit('message', message)
     if (message.text && message.text.startsWith(this.delimiter)) {
       this.executeMessage(message)
         .catch(e => message.reply(`Error: ${e.message}`))
