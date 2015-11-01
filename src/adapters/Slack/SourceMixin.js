@@ -11,6 +11,10 @@ export default {
     return this.client.getChannelGroupOrDMByID(id)
   },
 
+  getChannelByName(name) {
+    return this.client.getChannelByName(name)
+  },
+
   canExecute(message) {
     return true
   }
