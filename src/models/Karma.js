@@ -1,14 +1,14 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+import { Model } from 'mongoose-model-decorators'
 
-const karmaSchema = new Schema({
-  date: { type: Date, default: Date.now, index: true }
-, target: { type: Number, ref: 'User', index: true }
-, reason: String
-, amount: { type: Number, default: 1 }
-, giver: { type: Number, ref: 'User', index: true }
-})
+@Model
+export default class Karma {
+  static timestamps = true
 
-const Karma = mongoose.model('Karma', karmaSchema)
-
-export default Karma
+  static schema = {
+    date: { type: Date, default: Date.now, index: true },
+    target: { type: Number, ref: 'User', index: true },
+    giver: { type: Number, ref: 'User', index: true },
+    amount: { type: Number, default: 1 },
+    reason: String
+  }
+}

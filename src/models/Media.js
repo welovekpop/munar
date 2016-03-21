@@ -1,17 +1,19 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+import { Model } from 'mongoose-model-decorators'
 
-const mediaSchema = new Schema({
-  author: String
-, title: String
-, image: String
-, duration: Number
-, format: Number
-, cid: { type: String, index: true }
-})
+@Model
+export default class Media {
+  static timestamps = true
 
-mediaSchema.virtual('fullTitle').get(function () { return `${this.author} – ${this.title}` })
+  static schema = {
+    author: String,
+    title: String,
+    image: String,
+    duration: Number,
+    format: Number,
+    cid: { type: String, index: true }
+  }
 
-const Media = mongoose.model('Media', mediaSchema)
-
-export default Media
+  get fullTitle() {
+    return `${this.author} – ${this.title}`
+  }
+}

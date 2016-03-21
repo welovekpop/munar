@@ -1,10 +1,12 @@
-const mongoose = require('mongoose')
+import { Model } from 'mongoose-model-decorators'
 
-const Vote = mongoose.model('Vote', {
-  direction: Number
-, user: { type: Number, ref: 'User' }
-, history: { type: String, ref: 'HistoryEntry', index: true }
-, time: { type: Date, default: Date.now }
-})
+@Model
+export default class Vote {
+  static timestamps = true
 
-export default Vote
+  static schema = {
+    direction: Number,
+    user: { type: Number, ref: 'User' },
+    history: { type: String, ref: 'HistoryEntry', index: true }
+  }
+}

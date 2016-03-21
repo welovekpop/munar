@@ -1,13 +1,21 @@
-const mongoose = require('mongoose')
+import { Schema } from 'mongoose'
+import { Model } from 'mongoose-model-decorators'
 
-const ChatMessage = mongoose.model('ChatMessage', {
-  _id: String, // chat id
-  type: String,
-  user: { type: Number, ref: 'User', index: true },
-  message: String,
-  time: { type: Date, default: Date.now, index: true },
-  emoji: [ String ],
-  mentions: [ { type: Number, ref: 'User' } ]
-})
+const Types = Schema.Types
 
-export default ChatMessage
+@Model
+export default class ChatMessage {
+  static timestamps = true
+
+  static schema = {
+    type: String,
+    user: { type: Types.ObjectId, ref: 'User', index: true },
+    message: String,
+    emoji: [ String ],
+    mentions: [ { type: Types.ObjectId, ref: 'User' } ]
+  }
+
+  delete () {
+    this.source.deleteMessage(this)
+  }
+}

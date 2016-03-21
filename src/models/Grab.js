@@ -1,9 +1,13 @@
+import { Model } from 'mongoose-model-decorators'
+
 const mongoose = require('mongoose')
 
-const Grab = mongoose.model('Grab', {
-  user: { type: Number, ref: 'User' }
-, history: { type: String, ref: 'HistoryEntry', index: true }
-, time: { type: Date, default: Date.now }
-})
+@Model
+export default class Grab {
+  static timestamps = true
 
-export default Grab
+  static schema = {
+    user: { type: Number, ref: 'User' }
+  , history: { type: String, ref: 'HistoryEntry', index: true }
+  }
+}
