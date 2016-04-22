@@ -1,6 +1,9 @@
-const ROLE = require('plugged').prototype.USERROLE
-const assign = require('object-assign')
+import assign from 'object-assign'
+import Plugged from 'plugged'
+
 const commandsSym = Symbol('commands')
+
+const ROLE = Plugged.prototype.USERROLE
 
 const defaults = {
   role: ROLE.NONE
@@ -8,22 +11,25 @@ const defaults = {
 
 const last = arr => arr[arr.length - 1]
 
-export default function command(...names) {
+export {
+  ROLE,
+  defaults,
+  commandsSym as symbol
+}
 
+Object.assign(command, { ROLE, defaults, symbol: commandsSym })
+
+export default function command(...names) {
   let opts = typeof last(names) === 'object' ? names.pop() : {}
 
   return function (target, method, descriptor) {
     target[commandsSym] || (target[commandsSym] = [])
-    let com = assign({}, defaults, opts, {
-      names: names
-    , method: method
-    })
+    let com = {
+      ...defaults,
+      ...opts,
+      names,
+      method
+    }
     target[commandsSym].push(com)
   }
 }
-
-assign(command, {
-  ROLE: ROLE
-, defaults: defaults
-, symbol: commandsSym
-})

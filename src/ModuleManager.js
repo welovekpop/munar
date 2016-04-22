@@ -1,24 +1,24 @@
-const find = require('array-find')
-const findIndex = require('array-findindex')
-const includes = require('array-includes')
-const Promise = require('bluebird')
+import find from 'array-find'
+import findIndex from 'array-findindex'
+import includes from 'array-includes'
+import Promise from 'bluebird'
+import path from 'path'
+import { EventEmitter } from 'events'
+
 const fs = Promise.promisifyAll(require('fs'))
 const readdir = Promise.promisify(require('recursive-readdir'))
-const path = require('path')
-const { EventEmitter } = require('events')
 const debug = require('debug')('sekshi:modulemanager')
 
 const moduleRx = /\.module\.js$/
 
 export default class ModuleManager extends EventEmitter {
-
-  constructor(sekshi, dir) {
+  constructor(bot, dir) {
     super()
     this.moduleNames = []
     this.moduleNameMap = {}
     this.modules = []
     this.dir = dir
-    this.sekshi = sekshi
+    this.bot = bot
   }
 
   // fix case in module names
@@ -32,7 +32,7 @@ export default class ModuleManager extends EventEmitter {
   }
 
   getConfigFile(name) {
-    return path.join(this.sekshi.getConfigDir(), `${name.toLowerCase()}.json`)
+    return path.join(this.bot.getConfigDir(), `${name.toLowerCase()}.json`)
   }
 
   known() {
@@ -89,8 +89,8 @@ export default class ModuleManager extends EventEmitter {
     if (mod) return mod
 
     let modulePath = this.getModulePath(moduleName)
-    const ModuleClass = require(modulePath)
-    this.register(moduleName, new ModuleClass(this.sekshi, this.getConfigFile(moduleName)))
+    const ModuleClass = require(modulePath).default
+    this.register(moduleName, new ModuleClass(this.bot, this.getConfigFile(moduleName)))
     mod = this.get(moduleName)
 
     // enable system modules by default
@@ -141,5 +141,4 @@ export default class ModuleManager extends EventEmitter {
       return map
     }, {})
   }
-
 }

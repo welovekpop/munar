@@ -1,21 +1,21 @@
 export default {
-  getUser(id) {
+  getUser (id) {
     return this.client.getUserByID(id)
   },
 
-  getUserByName(name) {
+  getUserByName (name) {
     return this.client.getUserByName(name)
   },
 
-  getChannel(id) {
+  getChannel (id) {
     return this.client.getChannelGroupOrDMByID(id)
   },
 
-  getChannelByName(name) {
+  getChannelByName (name) {
     return this.client.getChannelByName(name)
   },
 
-  canExecute(message) {
+  canExecute (message) {
     return true
   }
 }

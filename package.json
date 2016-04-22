@@ -40,11 +40,24 @@
     "snoocore": "2.x"
   },
   "devDependencies": {
-    "babel": "5.x"
+    "babel-cli": "^6.7.7",
+    "babel-plugin-transform-class-properties": "^6.6.0",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-plugin-transform-export-extensions": "^6.5.0",
+    "babel-plugin-transform-flow-comments": "^6.7.0",
+    "babel-preset-es2015-node4": "^2.0.3",
+    "babel-preset-stage-2": "^6.5.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-newer": "^1.1.0",
+    "gulp-util": "^3.0.7",
+    "through2": "^2.0.1"
   },
   "scripts": {
     "start": "node lib/app.js",
     "babel-start": "babel-node src/app.js",
-    "babel": "babel --out-dir lib src"
+    "watch": "gulp watch",
+    "build": "gulp",
+    "prepublish": "npm run build"
   }
 }

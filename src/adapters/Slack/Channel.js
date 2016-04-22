@@ -1,10 +1,9 @@
-import assign from 'object-assign'
 import SourceMixin from './SourceMixin'
 import { linkNames } from './utils'
 
 export default class SlackChannel {
   constructor(slack, channel) {
-    assign(this, SourceMixin)
+    Object.assign(this, SourceMixin)
     this.slack = slack
     this.client = slack.client
     this.channel = channel
@@ -16,5 +15,9 @@ export default class SlackChannel {
 
   send(text) {
     this.channel.send(linkNames(this.slack, text))
+  }
+
+  toString () {
+    return `slack:${this.channel.name}`
   }
 }

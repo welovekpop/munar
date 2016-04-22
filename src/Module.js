@@ -1,23 +1,24 @@
-const assign = require('object-assign')
-const find = require('array-find')
-const includes = require('array-includes')
-const mkdirp = require('mkdirp')
-const { EventEmitter } = require('events')
-const fs = require('fs')
-const { dirname } = require('path')
+import find from 'array-find'
+import includes from 'array-includes'
+import mkdirp from 'mkdirp'
+import { EventEmitter } from 'events'
+import fs from 'fs'
+import { dirname } from 'path'
+import command from './command'
+
 const debug = require('debug')('sekshi:module')
-const command = require('./command')
 
 export default class Module extends EventEmitter {
-  constructor(sekshi, optionsFile) {
+  constructor(bot, optionsFile) {
     super()
 
     this._enabled = false
     this._optionsFile = optionsFile
     this.commands = []
 
-    this.sekshi = sekshi
-    this.options = assign({}, this.defaultOptions(), this.loadOptions())
+    this.bot = bot
+    this.sekshi = bot
+    this.options = { ...this.defaultOptions(), ...this.loadOptions() }
 
     debug('init', this.constructor.name, optionsFile)
   }
@@ -29,6 +30,10 @@ export default class Module extends EventEmitter {
   init() {
   }
   destroy() {
+  }
+
+  adapter (name) {
+    return this.bot.getAdapter(name)
   }
 
   enable(opts = {}) {
@@ -64,10 +69,12 @@ export default class Module extends EventEmitter {
     if (cb === null) {
       [ opts, cb ] = [ {}, opts ]
     }
-    this.commands.push(assign({}, command.defaults, opts, {
+    this.commands.push({
+      ...command.defaults,
+      ...opts,
       names: [ name ],
       callback: cb
-    }))
+    })
     return this
   }
 
@@ -116,7 +123,7 @@ export default class Module extends EventEmitter {
 
   saveOptions(options = this.getOptions()) {
     debug('saving options', this._optionsFile)
-    options = assign({}, options, { $enabled: this.enabled() })
+    options = { ...options, $enabled: this.enabled() }
     mkdirp.sync(dirname(this._optionsFile))
     fs.writeFileSync(this._optionsFile, JSON.stringify(options, null, 2), 'utf8')
   }

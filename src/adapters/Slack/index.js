@@ -1,7 +1,8 @@
-import assign from 'object-assign'
-import autobind from 'autobind-decorator'
-import { EventEmitter } from 'events'
+import EventEmitter from 'events'
 import SlackClient from 'slack-client'
+
+import { Adapter } from '../../'
+
 import Channel from './Channel'
 import Message from './Message'
 import SourceMixin from './SourceMixin'
@@ -11,42 +12,53 @@ const debug = require('debug')('sekshi:adapter:slack')
 const AUTORECONNECT = true
 const AUTOMARK = true
 
-export default class Slack extends EventEmitter {
-  constructor(sekshi, options) {
-    super()
-    assign(this, SourceMixin)
-    this.sekshi = sekshi
+export default class Slack extends Adapter {
+  static adapterName = 'slack'
+
+  constructor (bot, options) {
+    super(bot)
+
+    Object.assign(this, SourceMixin)
+
     this.options = options
   }
 
-  enable() {
-    this.client = new SlackClient(this.options.token, AUTORECONNECT, AUTOMARK)
-    this.client.on('open', () => {
-      debug('connected', this.client.team.name)
-    })
-    this.client.on('message', this.onMessage)
-    this.client.on('error', e => {
-      throw e
-    })
+  async connect () {
+    return new Promise((resolve, reject) => {
+      this.client = new SlackClient(this.options.token, AUTORECONNECT, AUTOMARK)
+      this.client.on('open', () => {
+        debug('connected', this.client.team.name)
+        resolve()
+      })
+      this.client.on('message', this.onMessage)
+      this.client.on('error', e => {
+        reject(e)
+      })
 
-    this.client.login()
+      this.client.login()
+    })
   }
 
-  disable() {
+  disconnect () {
     this.client.disconnect()
     this.client = null
   }
 
-  @autobind
-  onMessage(slackMessage) {
-    debug(slackMessage.type, assign({ user: slackMessage.user }, slackMessage.toJSON()))
+  onMessage = (slackMessage) => {
+    debug([slackMessage.type, slackMessage.subtype].filter(Boolean).join(':'), {
+      user: slackMessage.user,
+      ...slackMessage.toJSON()
+    })
     if (slackMessage.type === 'message') {
+      if (slackMessage.subtype === 'message_changed') {
+        return
+      }
       const channel = new Channel(this, this.getChannel(slackMessage.channel))
       this.emit('message', new Message(this, channel, this.normalizeMessage(slackMessage.text), slackMessage))
     }
   }
 
-  normalizeMessage(text) {
+  normalizeMessage (text = '') {
     const client = this.client
     return text.trim()
       .replace(/&amp;/g, '&')

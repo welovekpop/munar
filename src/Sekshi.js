@@ -1,43 +1,57 @@
-const { EventEmitter } = require('events')
-const path = require('path')
-const fs = require('fs')
+import EventEmitter from 'events'
+import path from 'path'
+import fs from 'fs'
+import mongoose from 'mongoose'
+import Promise from 'bluebird'
+import find from 'array-find'
+import includes from 'array-includes'
+import mkdirp from 'mkdirp'
+import User from './models/User'
+import { symbol as commandsSymbol } from './command'
+import ModuleManager from './ModuleManager'
+import quote from 'regexp-quote'
+
 const debug = require('debug')('sekshi:sekshi')
 const logChat = require('debug')('sekshi:chat')
-const mongoose = require('mongoose')
-const Promise = require('bluebird')
-const find = require('array-find')
-const includes = require('array-includes')
-const mkdirp = require('mkdirp')
-const User = require('./models/User')
-const commandsSymbol = require('./command').symbol
-const ModuleManager = require('./ModuleManager')
-const quote = require('regexp-quote')
 
 mongoose.Promise = Promise
 
 export default class Sekshi extends EventEmitter {
-  constructor(args) {
+  constructor (options) {
     super()
-    this.options = args
-    this.db = mongoose.connect(args.mongo)
+    this.options = options
+    this.db = mongoose.connect(options.mongo)
 
     this.modules = new ModuleManager(this, path.join(__dirname, 'modules'))
-    this.adapters = []
-    this.delimiter = args.delimiter || '!'
+    this.adapters = {}
+    this.trigger = options.trigger || '!'
 
     this._configDir = path.join(__dirname, '../.config')
-
-    this.onMessage = ::this.onMessage
   }
 
-  adapter(Adapter, options) {
-    const adapter = new Adapter(this, options)
-    this.adapters.push(adapter)
-    adapter.on('message', this.onMessage)
+  adapter(SourceAdapter, options) {
+    const name = SourceAdapter.adapterName
+    const adapter = new SourceAdapter(this, options)
+    this.adapters[name] = adapter
   }
 
-  start(creds, cb) {
-    this.adapters.forEach(adapter => adapter.enable())
+  getAdapter (name) {
+    return this.adapters[name]
+  }
+
+  async start(creds, cb) {
+    await Promise.all(
+      Object.keys(this.adapters).map((adapterName) => {
+        const adapter = this.adapters[adapterName]
+        return adapter.connect()
+      })
+    )
+
+    Object.keys(this.adapters).map((adapterName) => {
+      const adapter = this.adapters[adapterName]
+      adapter.on('message', this.onMessage)
+    })
+
     this.loadModules()
     mkdirp(this._configDir, (e) => {
       if (cb) cb(e || null)
@@ -56,6 +70,10 @@ export default class Sekshi extends EventEmitter {
 
   stop(cb) {
     this.unloadModules()
+    Object.keys(this.adapters).map((adapterName) => {
+      const adapter = this.adapters[adapterName]
+      return adapter.disconnect()
+    })
     // should *probably* also wait for this before callback-ing
     mongoose.disconnect()
 
@@ -98,9 +116,9 @@ export default class Sekshi extends EventEmitter {
     })
   }
 
-  onMessage(message) {
+  onMessage = (message) => {
     this.emit('message', message)
-    if (message.text && message.text.startsWith(this.delimiter)) {
+    if (message.text && message.text.startsWith(this.trigger)) {
       this.executeMessage(message)
         .catch(e => message.reply(`Error: ${e.message}`))
     }
@@ -110,7 +128,7 @@ export default class Sekshi extends EventEmitter {
     const { source } = message
 
     let args = this.parseArguments(message.text)
-    let commandName = args.shift().replace(this.delimiter, '').toLowerCase()
+    let commandName = args.shift().replace(this.trigger, '').toLowerCase()
 
     let promise = Promise.resolve()
     this.modules.loaded().forEach(name => {

@@ -1,8 +1,8 @@
-export const User = require('./models/User')
-export const Media = require('./models/Media')
-export const Karma = require('./models/Karma')
-export const HistoryEntry = require('./models/HistoryEntry')
-export const Vote = require('./models/Vote')
-export const Grab = require('./models/Grab')
-export const ChatMessage = require('./models/ChatMessage')
-export const Trigger = require('./models/Trigger')
+export User from './models/User'
+export Media from './models/Media'
+export Karma from './models/Karma'
+export HistoryEntry from './models/HistoryEntry'
+export Vote from './models/Vote'
+export Grab from './models/Grab'
+export ChatMessage from './models/ChatMessage'
+export Trigger from './models/Trigger'
