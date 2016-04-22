@@ -1,7 +1,8 @@
-const debug = require('debug')('sekshi:history-skip')
-const SekshiModule = require('../Module')
+import { Module } from '../'
 
-export default class HistorySkip extends SekshiModule {
+const debug = require('debug')('sekshi:history-skip')
+
+export default class HistorySkip extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

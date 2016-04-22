@@ -1,8 +1,9 @@
-const SekshiModule = require('../Module')
-const debug = require('debug')('sekshi:youtube-available')
-const request = require('request')
+import { Module } from '../'
+import request from 'request'
 
-export default class YouTubeAvailable extends SekshiModule {
+const debug = require('debug')('sekshi:youtube-available')
+
+export default class YouTubeAvailable extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

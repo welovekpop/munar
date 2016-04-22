@@ -1,13 +1,13 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
-const debug = require('debug')('sekshi:check-plays')
-const assign = require('object-assign')
-const Media = require('../models/Media')
-const HistoryEntry = require('../models/HistoryEntry')
-const moment = require('moment')
-const utils = require('../utils')
+import { Module, command } from '../'
+import Media from '../models/Media'
+import HistoryEntry from '../models/HistoryEntry'
+import assign from 'object-assign'
+import moment from 'moment'
+import * as utils from '../utils'
 
-export default class MediaStats extends SekshiModule {
+const debug = require('debug')('sekshi:check-plays')
+
+export default class MediaStats extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -73,18 +73,18 @@ export default class MediaStats extends SekshiModule {
 
   // chat commands
   @command('lastplayed')
-  lastplayed(user) {
+  lastplayed (message) {
     const currentMedia = this.sekshi.getCurrentMedia()
     if (!currentMedia) return
     this.getLastPlay(currentMedia)
       .then(mostRecent => {
         if (mostRecent) {
-          let text = `@${user.username} This song was played ${moment(mostRecent.time).fromNow()}`
+          let text = `This song was played ${moment(mostRecent.time).fromNow()}`
           if (mostRecent.dj) text += ` by ${mostRecent.dj.username}`
-          this.sekshi.sendChat(`${text}.`)
+          message.reply(`${text}.`)
         }
         else {
-          this.sekshi.sendChat(`@${user.username} This song hasn't been played before.`)
+          message.reply(`This song hasn't been played before.`)
         }
       })
       .catch(e => { console.error(e) })

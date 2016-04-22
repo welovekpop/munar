@@ -1,14 +1,14 @@
-const debug = require('debug')('sekshi:karma')
-const assign = require('object-assign')
-const random = require('random-item')
-const User = require('../models/User')
-const Karma = require('../models/Karma')
-const SekshiModule = require('../Module')
-const command = require('../command')
-const moment = require('moment')
-const utils = require('../utils')
+import { Module, command } from '../'
+import User from '../models/User'
+import Karma from '../models/Karma'
+import assign from 'object-assign'
+import random from 'random-item'
+import moment from 'moment'
+import * as utils from '../utils'
 
-export default class UserKarma extends SekshiModule {
+const debug = require('debug')('sekshi:karma')
+
+export default class UserKarma extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 

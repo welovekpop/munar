@@ -1,16 +1,12 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
+import { Module, command } from '../'
+
 const debug = require('debug')('sekshi:config')
 
 const configCommands = [ 'set', 'get', 'add', 'remove' ]
 
-export default class Config extends SekshiModule {
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Keeps module configuration.'
-  }
+export default class Config extends Module {
+  author = 'ReAnna'
+  description = 'Keeps module configuration.'
 
   @command('set', { role: command.ROLE.MANAGER })
   setCommand(message, ns, option, value) {

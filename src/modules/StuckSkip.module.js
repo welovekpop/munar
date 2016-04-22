@@ -1,7 +1,8 @@
-const SekshiModule = require('../Module')
+import { Module } from '../'
+
 const debug = require('debug')('sekshi:stuck-skip')
 
-export default class StuckSkip extends SekshiModule {
+export default class StuckSkip extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

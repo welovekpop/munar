@@ -1,26 +1,20 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
-const { joinList } = require('../utils')
+import { Module, command } from '../'
+import { joinList } from '../utils'
 
 const LINK_RX = /https?:\/\/(\S{4,})/i
 const COMMAND_RX = /^!\S+/i
 
-export default class ClearChat extends SekshiModule {
+export default class ClearChat extends Module {
+  author = 'ReAnna'
+  description = 'Provides a !clearchat command to clean up spam.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Provides a !clearchat command to clean up spam.'
-  }
-
-  init() {
+  init () {
     this.sekshi.cacheChat(true)
     // size of the default chat history in plug's UI
     this.sekshi.setChatCacheSize(512)
   }
 
-  _delete(filter) {
+  _delete (filter) {
     this.sekshi.getChat()
       .filter(filter)
       .reverse() // delete recent messages first
@@ -28,7 +22,7 @@ export default class ClearChat extends SekshiModule {
   }
 
   @command('clearchat', { role: command.ROLE.BOUNCER })
-  clearchat(user, ...types) {
+  clearchat (user, ...types) {
     if (types.length === 0) {
       types = [ 'all' ]
     }

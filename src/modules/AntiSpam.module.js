@@ -1,13 +1,11 @@
-const autobind = require('autobind-decorator')
-const SekshiModule = require('../Module')
+import { Module } from '../'
 
-export default class AntiSpam extends SekshiModule {
+export default class AntiSpam extends Module {
+  author = 'ReAnna'
+  description = 'Auto-deletes messages.'
 
   constructor(sekshi, options) {
     super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Auto-deletes messages.'
   }
 
   defaultOptions() {
@@ -34,12 +32,10 @@ export default class AntiSpam extends SekshiModule {
     return message.indexOf('//adf.ly') > -1
   }
 
-  @autobind
-  onMessage(message) {
+  onMessage = (message) => {
     if (this.options.afk && this.isAFK(message.text) ||
         this.options.spam && this.isSpam(message.text)) {
       message.delete()
     }
   }
-
 }

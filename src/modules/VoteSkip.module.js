@@ -1,8 +1,9 @@
-const debug = require('debug')('sekshi:vote-skip')
-const assign = require('object-assign')
-const SekshiModule = require('../Module')
+import { Module } from '../'
+import assign from 'object-assign'
 
-export default class VoteSkip extends SekshiModule {
+const debug = require('debug')('sekshi:vote-skip')
+
+export default class VoteSkip extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

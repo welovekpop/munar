@@ -1,13 +1,13 @@
+import { Module, command } from '../'
+import User from '../models/User'
+import HistoryEntry from '../models/HistoryEntry'
+import assign from 'object-assign'
+import random from 'random-item'
+import includes from 'array-includes'
+import moment from 'moment'
+import mongoose from 'mongoose'
+
 const debug = require('debug')('sekshi:roulette')
-const assign = require('object-assign')
-const random = require('random-item')
-const includes = require('array-includes')
-const SekshiModule = require('../Module')
-const command = require('../command')
-const moment = require('moment')
-const mongoose = require('mongoose')
-const User = require('../models/User')
-const HistoryEntry = require('../models/HistoryEntry')
 
 const RouletteHistory = mongoose.modelNames().indexOf('Roulette') === -1
   ? mongoose.model('Roulette', {
@@ -19,23 +19,23 @@ const RouletteHistory = mongoose.modelNames().indexOf('Roulette') === -1
     })
   : mongoose.model('Roulette')
 
-export default class Roulette extends SekshiModule {
+export default class Roulette extends Module {
+  author = 'ReAnna'
+  description = 'Runs random raffles for a set wait list position (probably #1/#2).'
+  Roulette = RouletteHistory
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
+  constructor (bot, options) {
+    super(bot, options)
 
-    this.author = 'ReAnna'
-    this.description = 'Runs random raffles for a set wait list position (probably #1/#2).'
-
-    this.Roulette = RouletteHistory
+    this.source = this.adapter('uwave').getChannel('main')
   }
 
-  defaultOptions() {
+  defaultOptions () {
     return {
-      duration: 120
-    , minPosition: 4
-    , timeout: 20 * 60 // seconds
-    , winnerPosition: 2
+      duration: 120,
+      minPosition: 4,
+      timeout: 20 * 60, // seconds
+      winnerPosition: 2
     }
   }
 
@@ -52,15 +52,16 @@ export default class Roulette extends SekshiModule {
   }
 
   players() {
-    let waitlist = this.sekshi.getWaitlist()
+    let waitlist = this.bot.getWaitlist()
     return this._players.filter(user => includes(waitlist, user.id))
   }
 
   @command('roulette', { role: command.ROLE.BOUNCER })
-  roulette(user) {
+  roulette(message) {
     if (this._running) {
       return
     }
+    const { user } = message
     this._running = true
     this._players = []
     this._roulette = {
@@ -74,34 +75,39 @@ export default class Roulette extends SekshiModule {
     debug('starting roulette')
     this._timer = setTimeout(this.onEnd.bind(this), this.options.duration * 1000)
     const duration = moment.duration(this.options.duration, 'seconds')
-    this.sekshi.sendChat(`@djs ${user.username} started Roulette! ` +
-                         `The winner will be moved to spot ${this.options.winnerPosition} in the wait list. ` +
-                         `Type "!play" (without quotes) to join. You have ${duration.humanize()}!`)
+    this.source.send(
+      `@djs ${user.username} started Roulette! ` +
+      `The winner will be moved to spot ${this.options.winnerPosition} in the wait list. ` +
+      `Type "!play" (without quotes) to join. You have ${duration.humanize()}!`
+    )
   }
 
   @command('play', { ninjaVanish: true })
-  play(user) {
+  play (message) {
     if (this._running && this._players.indexOf(user) === -1) {
-      var waitlist = this.sekshi.getWaitlist()
-        , idx = waitlist.indexOf(user.id)
+      const waitlist = this.source.getWaitlist()
+      const idx = waitlist.indexOf(user.id)
       if (idx === -1) {
         debug('player not in wait list', user.username)
-        this.sekshi.sendChat(`@${user.username} You need to be in the wait list if you want to join the roulette!`, 10 * 1000)
-      }
-      else if (idx < this.options.minPosition) {
+        message.reply(
+          `You need to be in the wait list if you want to join the roulette!`,
+          10 * 1000
+        )
+      } else if (idx < this.options.minPosition) {
         debug('player too high' /* lol */, user.username)
-        this.sekshi.sendChat(`@${user.username} You can only join the roulette if you are below position ${this.options.minPosition}!`, 10 * 1000)
-      }
-      else {
-        let diff = moment.duration(this.options.timeout, 'seconds')
-        this._userDJedRecently(user.id).then(did => {
+        message.reply(
+          `You can only join the roulette if you are below position ${this.options.minPosition}!`,
+          10 * 1000
+        )
+      } else {
+        const diff = moment.duration(this.options.timeout, 'seconds')
+        this._userDJedRecently(user.id).then((did) => {
           if (did) {
-            this.sekshi.sendChat(
-              `@${user.username} You can only join the roulette if ` +
+            message.reply(
+              `You can only join the roulette if ` +
               `you haven't DJ'd in the past ${diff.humanize()}!`
             )
-          }
-          else {
+          } else {
             this._players.push(user)
           }
         })
@@ -110,37 +116,40 @@ export default class Roulette extends SekshiModule {
   }
 
   @command('withdraw', { ninjaVanish: true })
-  withdraw(user) {
-    let i = this._players.indexOf(user)
+  withdraw (message) {
+    const { user } = message
+    let i = this._players.findIndex((player) => player.id === user.id)
     if (this._running && i !== -1) {
       this._players.splice(i, 1)
     }
   }
 
   @command('players')
-  showPlayers() {
+  showPlayers (message) {
     if (this._running) {
       debug('players', this._players.length)
-      this.sekshi.sendChat(`Roulette players [${this._players.length}]: ` +
-                           this._players.map(user => user.username).join(' | '))
+      message.send(
+        `Roulette players [${this._players.length}]: ` +
+        this._players.map((user) => user.username).join(' | ')
+      )
     }
   }
 
   @command('lastroulette', { role: command.ROLE.RESIDENTDJ })
-  lastroulette(user) {
+  lastroulette (message) {
     if (this._running) {
-      return this.sekshi.sendChat(`@${user.username} Roulette is going on right now!`)
+      return message.reply('Roulette is going on right now!')
     }
 
     const notPlayed = () => {
-      this.sekshi.sendChat(`@${user.username} I don't remember playing roulette!`)
+      message.reply('I don\'t remember playing roulette!')
     }
 
     RouletteHistory.findOne({}).select('time').sort({ time: -1 }).exec()
       .then(lastRoulette => {
         if (lastRoulette && lastRoulette.time) {
           const lastPlayed = moment(lastRoulette.time).utc()
-          this.sekshi.sendChat(`@${user.username} The last roulette was started ${lastPlayed.calendar()} (${lastPlayed.fromNow()}).`)
+          message.reply(`The last roulette was started ${lastPlayed.calendar()} (${lastPlayed.fromNow()}).`)
         }
         else {
           notPlayed()
@@ -150,19 +159,19 @@ export default class Roulette extends SekshiModule {
   }
 
   @command('stoproulette', { role: command.ROLE.BOUNCER })
-  stoproulette(user) {
+  stoproulette () {
     if (this._running) {
       clearTimeout(this._timer)
       this._timer = null
       this._roulette = null
       this._players = []
       this._running = false
-      this.sekshi.sendChat(`@${user.username} stopped roulette!`)
+      this.source.send(`@${user.username} stopped roulette!`)
     }
   }
 
   @command('luckybastards', { role: command.ROLE.RESIDENTDJ })
-  luckybastards(user, amount = 5) {
+  luckybastards (message, amount = 5) {
     RouletteHistory.aggregate()
       .group({ _id: '$winner', wins: { $sum: 1 } })
       .sort({ wins: -1 })
@@ -175,31 +184,31 @@ export default class Roulette extends SekshiModule {
         return User.where('_id').in(mostWins.map(w => w._id)).select('_id username').exec()
           .map(u => assign(u, { wins: wins[u._id] }))
           .then(users => {
-            this.sekshi.sendChat(`Lucky Bastards leaderboard:`)
+            message.send(`Lucky Bastards leaderboard:`)
             return users.sort((a, b) => a.wins > b.wins ? -1 : 1)
           })
-          .each((u, i) => { this.sekshi.sendChat(`#${i + 1} - ${u.username} (${u.wins} wins)`) })
+          .each((u, i) => { message.send(`#${i + 1} - ${u.username} (${u.wins} wins)`) })
       })
       .catch(e => console.error(e))
   }
 
-  onEnd() {
+  onEnd () {
     this._running = false
     this._timer = null
     let roulette = this._roulette
     let players = this.players()
     roulette.entrants = this._players.map(p => p.id)
     if (this._players.length === 0) {
-      this.sekshi.sendChat(`Nobody participated in the roulette... Do I get to win now?`)
+      this.source.send(`Nobody participated in the roulette... Do I get to win now?`)
     }
     else if (players.length === 0) {
-      this.sekshi.sendChat(`Nobody is eligible to win the roulette... Too bad!`)
+      this.source.send(`Nobody is eligible to win the roulette... Too bad!`)
     }
     else {
       let winner = random(players)
       debug('winner', winner.username)
-      this.sekshi.sendChat(`Roulette winner: @${winner.username}. Congratulations! https://i.imgur.com/TXKz7mt.gif`)
-      this.sekshi.moveDJ(winner.id, this.options.winnerPosition - 1, () => {
+      this.source.send(`Roulette winner: @${winner.username}. Congratulations! https://i.imgur.com/TXKz7mt.gif`)
+      this.bot.moveDJ(winner.id, this.options.winnerPosition - 1, () => {
         debug('winner moved')
       })
 
@@ -209,7 +218,7 @@ export default class Roulette extends SekshiModule {
     this._players = []
   }
 
-  _userDJedRecently(id) {
+  _userDJedRecently (id) {
     return HistoryEntry
       .where('dj').equals(id)
       .where('time').gt(Date.now() - this.options.timeout * 1000)

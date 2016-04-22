@@ -1,8 +1,9 @@
-const random = require('random-item')
-const debug = require('debug')('sekshi:greeting')
-const SekshiModule = require('../Module')
+import { Module } from '../'
+import random from 'random-item'
 
-export default class Greetings extends SekshiModule {
+const debug = require('debug')('sekshi:greeting')
+
+export default class Greetings extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

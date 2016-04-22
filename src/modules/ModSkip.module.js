@@ -1,8 +1,7 @@
-const assign = require('object-assign')
-const SekshiModule = require('../Module')
-const command = require('../command')
+import { Module, command } from '../'
+import assign from 'object-assign'
 
-export default class ModSkip extends SekshiModule {
+export default class ModSkip extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

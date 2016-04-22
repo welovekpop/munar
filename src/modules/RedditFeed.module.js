@@ -1,11 +1,11 @@
-const Snoocore = require('snoocore')
-const debug = require('debug')('sekshi:reddit-feed')
-const Promise = require('bluebird')
-const decode = require('ent/decode')
-const SekshiModule = require('../Module')
-const command = require('../command')
+import { Module, command } from '../'
+import Snoocore from 'snoocore'
+import Promise from 'bluebird'
+import decode from 'ent/decode'
 
-export default class RedditFeed extends SekshiModule {
+const debug = require('debug')('sekshi:reddit-feed')
+
+export default class RedditFeed extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

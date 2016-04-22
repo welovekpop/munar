@@ -1,9 +1,9 @@
+import { Module, command } from '../'
+import Trigger from '../models/Trigger'
+import random from 'random-item'
+import last from 'lodash.last'
+
 const debug = require('debug')('sekshi:triggers')
-const SekshiModule = require('../Module')
-const command = require('../command')
-const Trigger = require('../models/Trigger')
-const random = require('random-item')
-const last = require('lodash.last')
 
 // Available variables:
 //  * $user -> Username of the user who used the trigger
@@ -46,7 +46,7 @@ const vars = {
   }
 }
 
-export default class Triggers extends SekshiModule {
+export default class Triggers extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -133,7 +133,7 @@ export default class Triggers extends SekshiModule {
   createTrigger(message, name, ...response) {
     name = name.toLowerCase()
     response = response.join(' ')
-    if (name[0] === this.sekshi.delimiter) {
+    if (name[0] === this.sekshi.trigger) {
       name = name.slice(1)
     }
     let trig = new Trigger({
@@ -155,7 +155,7 @@ export default class Triggers extends SekshiModule {
   @command('deltrigger', { role: command.ROLE.BOUNCER })
   removeTrigger(message, name) {
     name = name.toLowerCase()
-    if (name[0] === this.sekshi.delimiter) {
+    if (name[0] === this.sekshi.trigger) {
       name = name.slice(1)
     }
     Trigger.remove({ _id: name }).then(removed => {

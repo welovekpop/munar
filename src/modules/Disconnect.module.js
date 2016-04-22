@@ -1,8 +1,8 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
+import { Module, command } from '../'
+import moment from 'moment'
+import mongoose from 'mongoose'
+
 const debug = require('debug')('sekshi:disconnect')
-const moment = require('moment')
-const mongoose = require('mongoose')
 
 const Disconnections = mongoose.modelNames().indexOf('Disconnections') === -1
   ? mongoose.model('Disconnections', {
@@ -14,20 +14,11 @@ const Disconnections = mongoose.modelNames().indexOf('Disconnections') === -1
 
 const MINUTE = 1000 * 60
 
-export default class Disconnect extends SekshiModule {
-  constructor(sekshi, options) {
-    super(sekshi, options)
+export default class Disconnect extends Module {
+  author = 'Sooyou'
+  description = 'Puts disconnected users back at their original wait list spot.'
 
-    this.author = 'Sooyou'
-    this.description = 'Puts disconnected users back at their original wait list spot.'
-
-    this.Disconnection = Disconnections
-
-    this.onWaitlistUpdate = this.onWaitlistUpdate.bind(this)
-    this.onWaitlistLock = this.onWaitlistLock.bind(this)
-    this.onUserLeave = this.onUserLeave.bind(this)
-    this.onUserJoin = this.onUserJoin.bind(this)
-  }
+  Disconnection = Disconnections
 
   defaultOptions() {
     return {
@@ -51,18 +42,18 @@ export default class Disconnect extends SekshiModule {
     this.sekshi.removeListener(this.sekshi.USER_JOIN, this.onUserJoin)
   }
 
-  onWaitlistUpdate(oldWaitlist, newWaitlist) {
+  onWaitlistUpdate = (oldWaitlist, newWaitlist) => {
     this.waitlist = oldWaitlist
   }
 
-  onWaitlistLock(e) {
+  onWaitlistLock = (e) => {
     if (e.clearWaitlist) {
       debug('wait list cleared, invalidating disconnects')
       Disconnections.remove({}).exec()
     }
   }
 
-  onUserLeave(user) {
+  onUserLeave = (user) => {
     if(!user)
       return;
 
@@ -79,7 +70,7 @@ export default class Disconnect extends SekshiModule {
     }
   }
 
-  onUserJoin(user) {
+  onUserJoin = (user) => {
     if (!this.options.autodc || !user || user.guest) {
       return
     }

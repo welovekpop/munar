@@ -1,12 +1,11 @@
-const SekshiModule = require('../../Module')
-const command = require('../../command')
+import { Module, command } from '../../'
 
-export default class WLKSekshiData extends SekshiModule {
+export default class WLKSekshiData extends Module {
+  author = 'ReAnna'
+  description = 'Quick links to sekshi-data pages.'
+
   constructor(sekshi, options) {
     super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Quick links to sekshi-data pages.'
   }
 
   defaultOptions() {

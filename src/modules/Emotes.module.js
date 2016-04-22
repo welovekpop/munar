@@ -1,9 +1,9 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
-const mongoose = require('mongoose')
+import { Module, command } from '../'
+import mongoose from 'mongoose'
+import request from 'request'
+import Promise from 'bluebird'
+
 const debug = require('debug')('sekshi:emotes')
-const request = require('request')
-const Promise = require('bluebird')
 
 const Emote = mongoose.modelNames().indexOf('Emote') === -1
   ? mongoose.model('Emote', {
@@ -18,17 +18,13 @@ const cleanId = id => id.toLowerCase()
 
 const IMGUR = /^https?:\/\/i\.imgur\.com\//
 
-export default class Emotes extends SekshiModule {
-  constructor(sekshi, options) {
-    super(sekshi, options)
+export default class Emotes extends Module {
+  author = 'ReAnna'
+  description = 'adds several emoticons as well as gifs and webms'
 
-    this.author = 'ReAnna'
-    this.description = 'adds several emoticons as well as gifs and webms'
+  Emote = Emote
 
-    this.Emote = Emote
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       url: false,
       reupload: false,
@@ -36,15 +32,15 @@ export default class Emotes extends SekshiModule {
     }
   }
 
-  sendEmote(message, target, emote) {
+  sendEmote (message, target, emote) {
     if (target) {
-      message.send(`@${target.name} ${emote}`)
+      message.send(`@${target.username} ${emote}`)
     } else {
       message.reply(emote)
     }
   }
 
-  saveEmote(user, id, url) {
+  saveEmote (user, id, url) {
     return Emote.findByIdAndUpdate(
       id,
       { url, addedBy: user.id },
@@ -52,7 +48,7 @@ export default class Emotes extends SekshiModule {
     ).exec()
   }
 
-  upload(form) {
+  upload (form) {
     return new Promise((resolve, reject) => {
       let upload = request.post('https://api.imgur.com/3/image', {
         headers: {
@@ -74,7 +70,7 @@ export default class Emotes extends SekshiModule {
     })
   }
 
-  reupload(title, url, cb) {
+  reupload (title, url, cb) {
     return this.upload({
       type: 'url',
       title: title,
@@ -83,7 +79,7 @@ export default class Emotes extends SekshiModule {
   }
 
   @command('addemote', { role: command.ROLE.BOUNCER, ninjaVanish: true })
-  addemote(message, id, url) {
+  addemote (message, id, url) {
     const user = message.user
     id = cleanId(id)
     debug('addemote', id, url)
@@ -111,7 +107,7 @@ export default class Emotes extends SekshiModule {
   }
 
   @command('delemote', { role: command.ROLE.BOUNCER })
-  delemote(user, id) {
+  delemote (message, id) {
     debug('delemote', id)
     return Emote.remove({ _id: id }).exec()
       .then(() => {
@@ -121,7 +117,7 @@ export default class Emotes extends SekshiModule {
   }
 
   @command('emotes')
-  emotes(message) {
+  emotes (message) {
     debug('listing emotes')
     if (this.options.url) {
       message.reply(`Emotes can be found at ${this.options.url} !`)
@@ -134,7 +130,7 @@ export default class Emotes extends SekshiModule {
   }
 
   @command('emote', 'e')
-  emote(message, id, username) {
+  emote (message, id, username) {
     if (!id) return
 
     let target
@@ -152,7 +148,7 @@ export default class Emotes extends SekshiModule {
   }
 
   @command('thatsnono')
-  thatsnono(message, username) {
+  thatsnono (message, username) {
     let target
     if (username) {
       if (username.charAt(0) === '@') username = username.slice(1)

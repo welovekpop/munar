@@ -1,9 +1,9 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
-const Media = require('../models/Media')
+import { Module, command } from '../'
+import Media from '../models/Media'
+import moment from 'moment'
+import mongoose from 'mongoose'
+
 const debug = require('debug')('sekshi:song-ban')
-const moment = require('moment')
-const mongoose = require('mongoose')
 
 const BannedMedia = mongoose.modelNames().indexOf('BannedMedia') === -1
   ? mongoose.model('BannedMedia', {
@@ -15,7 +15,7 @@ const BannedMedia = mongoose.modelNames().indexOf('BannedMedia') === -1
     })
   : mongoose.model('BannedMedia')
 
-export default class SongBan extends SekshiModule {
+export default class SongBan extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 

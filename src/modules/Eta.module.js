@@ -1,10 +1,9 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
+import { Module, command } from '../'
+import findIndex from 'array-findindex'
+
 const debug = require('debug')('sekshi:eta')
-const findIndex = require('array-findindex')
 
-export default class Misc extends SekshiModule {
-
+export default class Eta extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 

@@ -1,9 +1,9 @@
-const SekshiModule = require('../Module')
-const Promise = require('bluebird')
-const random = require('random-item')
-const request = require('request')
-const includes = require('array-includes')
-const parseCsv = require('csv-parse')
+import { Module } from '../'
+import Promise from 'bluebird'
+import random from 'random-item'
+import request from 'request'
+import includes from 'array-includes'
+import parseCsv from 'csv-parse'
 
 const debug = require('debug')('sekshi:trivia')
 
@@ -14,7 +14,7 @@ function normalizeAnswer(a) {
     .trim()
 }
 
-export default class TriviaCore extends SekshiModule {
+export default class TriviaCore extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 

@@ -1,8 +1,7 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
-const find = require('array-find')
+import { Module, command } from '../'
+import find from 'array-find'
 
-export default class Rules extends SekshiModule {
+export default class Rules extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

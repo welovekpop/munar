@@ -1,10 +1,10 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
+import { Module, command } from '../'
+
 const sekshibot = require('../../package.json')
 const plugged = require('plugged/package.json')
 const mongoose = require('mongoose/package.json')
 
-export default class System extends SekshiModule {
+export default class System extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 
@@ -17,13 +17,13 @@ export default class System extends SekshiModule {
   }
 
   @command('version')
-  version(message) {
+  version (message) {
     const str = pkg => `${pkg.name} v${pkg.version}`
     message.reply(`Running ${str(sekshibot)} on ${str(plugged)}, ${str(mongoose)}`)
   }
 
-  @command('reloadmodule', 'reload', { role: command.ROLE.MANAGER })
-  reloadmodule(message, name) {
+  @command('reload', { role: command.ROLE.MANAGER })
+  reloadmodule (message, name) {
     try {
       this.manager().reload(name)
       message.reply(`Reloaded module "${name}".`)
@@ -33,8 +33,8 @@ export default class System extends SekshiModule {
     }
   }
 
-  @command('unloadmodule', 'unload', { role: command.ROLE.MANAGER })
-  unloadmodule(message, name) {
+  @command('unload', { role: command.ROLE.MANAGER })
+  unloadmodule (message, name) {
     try {
       this.manager().unload(name)
       message.reply(`Unloaded module "${name}."`)
@@ -43,8 +43,8 @@ export default class System extends SekshiModule {
       message.reply(`Could not unload "${name}": ${e.message}`)
     }
   }
-  @command('loadmodule', 'load', { role: command.ROLE.MANAGER })
-  loadmodule(message, name) {
+  @command('load', { role: command.ROLE.MANAGER })
+  loadmodule (message, name) {
     try {
       this.manager().load(name)
       message.reply(`Loaded module "${name}".`)
@@ -54,8 +54,8 @@ export default class System extends SekshiModule {
     }
   }
 
-  @command('disablemodule', 'disable', { role: command.ROLE.MANAGER })
-  disablemodule(message, name) {
+  @command('disable', { role: command.ROLE.MANAGER })
+  disablemodule (message, name) {
     if (name.toLowerCase() === 'system') {
       message.reply(`Cannot disable the System module.`)
     }
@@ -70,8 +70,8 @@ export default class System extends SekshiModule {
       }
     }
   }
-  @command('enablemodule', 'enable', { role: command.ROLE.MANAGER })
-  enablemodule(message, name) {
+  @command('enable', { role: command.ROLE.MANAGER })
+  enablemodule (message, name) {
     let mod = this.manager().get(name)
     if (!mod) {
       try {
@@ -87,7 +87,7 @@ export default class System extends SekshiModule {
   }
 
   @command('moduleinfo', { role: command.ROLE.MANAGER })
-  moduleinfo(message, name) {
+  moduleinfo (message, name) {
     if (!name || name.length === 0) {
       message.reply(`usage: !moduleinfo "modulename"`)
       return;
@@ -109,7 +109,7 @@ export default class System extends SekshiModule {
   }
 
   @command('listmodules', { role: command.ROLE.MANAGER })
-  listmodules(message) {
+  listmodules (message) {
     const text = this.manager().known().map(name => {
       const mod = this.manager().get(name)
       return `${name} ${mod && mod.enabled() ? '✔' : '✘'}`
@@ -118,7 +118,7 @@ export default class System extends SekshiModule {
   }
 
   @command('exit', { role: command.ROLE.MANAGER })
-  exit(message) {
+  exit (message) {
     message.reply(`okay... </3 T_T`)
     this.sekshi.stop()
   }

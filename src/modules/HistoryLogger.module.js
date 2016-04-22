@@ -1,14 +1,15 @@
-const debug = require('debug')('sekshi:history-logging')
-const User = require('../models/User')
-const Media = require('../models/Media')
-const HistoryEntry = require('../models/HistoryEntry')
-const Vote = require('../models/Vote')
-const Grab = require('../models/Grab')
-const SekshiModule = require('../Module')
-const { fixTags } = require('../utils')
-const moment = require('moment')
+import { Module } from '../'
+import User from '../models/User'
+import Media from '../models/Media'
+import HistoryEntry from '../models/HistoryEntry'
+import Grab from '../models/Grab'
+import Vote from '../models/Vote'
+import { fixTags } from '../utils'
+import moment from 'moment'
 
-export default class HistoryLogger extends SekshiModule {
+const debug = require('debug')('sekshi:history-logging')
+
+export default class HistoryLogger extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

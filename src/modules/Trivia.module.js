@@ -1,11 +1,11 @@
-const TriviaCore = require('./TriviaCore')
-const command = require('../command')
-const Promise = require('bluebird')
-const request = require('request')
-const assign = require('object-assign')
+import { command } from '../'
+import TriviaCore from './TriviaCore'
+import Promise from 'bluebird'
+import request from 'request'
+import moment from 'moment'
+import mongoose from 'mongoose'
+
 const debug = require('debug')('sekshi:trivia')
-const moment = require('moment')
-const mongoose = require('mongoose')
 
 const TriviaHistory = mongoose.modelNames().indexOf('Trivia') === -1
   ? mongoose.model('Trivia', {
@@ -16,19 +16,21 @@ const TriviaHistory = mongoose.modelNames().indexOf('Trivia') === -1
   : mongoose.model('Trivia')
 
 export default class Trivia extends TriviaCore {
-  constructor(sekshi, options) {
-    super(sekshi, options)
+  static author = 'WE ♥ KPOP'
+  static description = ''
 
-    this.author = 'WE ♥ KPOP'
-    this.description = ''
+  constructor(bot, options) {
+    super(bot, options)
+
   }
 
   defaultOptions() {
-    return assign(super.defaultOptions(), {
+    return {
+      ...super.defaultOptions(),
       points: 3,
       interval: 5,
       winPosition: 2
-    })
+    }
   }
 
   nextQuestion() {
@@ -45,14 +47,12 @@ export default class Trivia extends TriviaCore {
             this.model.set('winner', winner.id).save()
             this.model = null
           }
-        }
-        else {
+        } else {
           this.adapter.send(`[Trivia] @${winner.username} answered correctly! Next question in ${interval} seconds!`)
           this._currentQuestion = null
           setTimeout(() => this.nextQuestion(), interval * 1000)
         }
-      }
-      else {
+      } else {
         this.adapter.send(`[Trivia] Nobody answered correctly! ` +
                           `The right answer was "${question.answers[0]}". Next question in ${interval} seconds!`)
         this._currentQuestion = null

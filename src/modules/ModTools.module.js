@@ -1,9 +1,8 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
+import { Module, command } from '../'
+
 const debug = require('debug')('sekshi:mod-tools')
 
-export default class ModTools extends SekshiModule {
-
+export default class ModTools extends Module {
   constructor(sekshi, options) {
     super(sekshi, options)
 

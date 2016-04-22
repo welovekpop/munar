@@ -1,7 +1,6 @@
-const SekshiModule = require('../Module')
-const command = require('../command')
-const mongoose = require('mongoose')
-const Promise = require('bluebird')
+import { Module, command } from '../'
+import mongoose from 'mongoose'
+import Promise from 'bluebird'
 
 const Achievement = mongoose.modelNames().indexOf('Achievement') === -1
   ? mongoose.model('Achievement', {
@@ -20,13 +19,12 @@ const AchievementUnlock = mongoose.modelNames().indexOf('AchievementUnlock') ===
     })
   : mongoose.model('AchievementUnlock')
 
-export default class Achievements extends SekshiModule {
+export default class Achievements extends Module {
+  version = '0.1.0'
+  description = 'Achievements.'
 
   constructor(sekshi, options) {
     super(sekshi, options)
-
-    this.version = '0.1.0'
-    this.description = 'Achievements.'
 
     this.Achievement = Achievement
     this.AchievementUnlock = AchievementUnlock

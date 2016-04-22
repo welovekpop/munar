@@ -1,12 +1,12 @@
-const SekshiModule = require('../../Module')
-const { Vote } = require('../../models')
+import { Module } from '../../'
+import Vote from '../../models/Vote'
 
-export default class WLKAutoAchievements extends SekshiModule {
+export default class WLKAutoAchievements extends Module {
+  author = 'WE ♥ KPOP'
+  description = 'Some automated achievements for WE ♥ KPOP.'
+
   constructor(sekshi, options) {
     super(sekshi, options)
-
-    this.author = 'WE ♥ KPOP'
-    this.description = 'Some automated achievements for WE ♥ KPOP.'
 
     this.onVote = this.onVote.bind(this)
     this.onGrab = this.onGrab.bind(this)

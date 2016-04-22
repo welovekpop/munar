@@ -1,10 +1,11 @@
-const debug = require('debug')('sekshi:user-logging')
-const assign = require('object-assign')
-const User = require('../models/User')
-const SekshiModule = require('../Module')
-const Promise = require('bluebird')
+import { Module } from '../'
+import User from '../models/User'
+import assign from 'object-assign'
+import Promise from 'bluebird'
 
-export default class UserLogger extends SekshiModule {
+const debug = require('debug')('sekshi:user-logging')
+
+export default class UserLogger extends Module {
 
   constructor(sekshi, options) {
     super(sekshi, options)

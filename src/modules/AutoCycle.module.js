@@ -1,13 +1,13 @@
-const SekshiModule = require('../Module')
+import { Module } from '../'
+
 const debug = require('debug')('sekshi:autocycle')
 
-export default class AutoCycle extends SekshiModule {
+export default class AutoCycle extends Module {
+  author = 'ReAnna'
+  description = 'Automatically enables/disables DJ cycle when the wait list is long.'
 
   constructor(sekshi, options) {
     super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Automatically enables/disables DJ cycle when the wait list is long.'
 
     this.onUpdate = this.onUpdate.bind(this)
   }
