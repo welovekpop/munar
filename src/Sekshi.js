@@ -127,7 +127,7 @@ export default class Sekshi extends EventEmitter {
   executeMessage(message) {
     const { source } = message
 
-    let args = this.parseArguments(message.text)
+    let args = this.parseArguments(message)
     let commandName = args.shift().replace(this.trigger, '').toLowerCase()
 
     let promise = Promise.resolve()
@@ -169,14 +169,15 @@ export default class Sekshi extends EventEmitter {
   // feature-bugs:
   // if you forget to close a quoted string it will go until the end of the line (might be unexpected)
   // if you forget to add a space after a quoted string, the rest will be read as a separate parameter
-  parseArguments(str = '') {
+  parseArguments(message) {
     let args = []
     let i = 0
     let chunk
+    const str = message.text || ''
+    const source = message.source
 
     let usernames = str.indexOf('@') !== -1 // might contain a username
-      ? [ this.getSelf(), ...this.getUsers() ]
-          .map(u => u.username)
+      ? source.getUsers().map((user) => user.username)
           // longest usernames first
           .sort((a, b) => a.length > b.length ? -1 : 1)
       : []
@@ -186,9 +187,8 @@ export default class Sekshi extends EventEmitter {
       if (chunk.charAt(0) === ' ') {
         i++
         continue
-      }
-      // quoted string
-      else if (chunk.charAt(0) === '"') {
+      } else if (chunk.charAt(0) === '"') {
+        // quoted string
         let end = chunk.indexOf('"', 1)
         // end of param string
         if (end === -1) {
@@ -198,11 +198,11 @@ export default class Sekshi extends EventEmitter {
         args.push(chunk.slice(1, end))
         i += end + 1
         continue
-      }
-      // possible username
-      else if (chunk.charAt(0) === '@') {
-        let username = find(usernames,
-                            name => chunk.slice(1, name.length + 1).toLowerCase() === name.toLowerCase())
+      } else if (chunk.charAt(0) === '@') {
+        // possible username
+        let username = usernames.find(
+          (name) => chunk.slice(1, name.length + 1).toLowerCase() === name.toLowerCase()
+        )
         if (username) {
           args.push(username)
           i += `@${username}`.length
