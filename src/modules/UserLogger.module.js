@@ -1,65 +1,57 @@
 import { Module } from '../'
 import User from '../models/User'
-import assign from 'object-assign'
-import Promise from 'bluebird'
 
 const debug = require('debug')('sekshi:user-logging')
 
 export default class UserLogger extends Module {
+  author = 'ReAnna'
+  description = 'Keeps track of users who visit the channel.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Keeps track of users who visit the channel.'
+  constructor (bot, options) {
+    super(bot, options)
 
     this.onUserJoin = this.onUserJoin.bind(this)
     this.onUserUpdate = this.onUserUpdate.bind(this)
   }
 
-  init() {
-    this.sekshi.on(this.sekshi.USER_JOIN, this.onUserJoin)
-    this.sekshi.on(this.sekshi.USER_UPDATE, this.onUserUpdate)
-    this.sekshi.on(this.sekshi.JOINED_ROOM, () => {
-      // ensure that users who are already online are entered into the
-      // database
-      Promise.all(this.sekshi.getUsers().map(User.fromPlugUser))
-        .then(users => { debug('updated users', users.length) })
+  init () {
+    this.bot.on('user:join', this.onUserJoin)
+    this.bot.on('user:update', this.onUserUpdate)
+
+    const adapterNames = Object.keys(this.bot.adapters)
+    const allUsers = adapterNames.reduce((users, name) => {
+      return [...users, ...this.adapter(name).getUsers()]
+    }, [])
+
+    Promise.all(allUsers.map(this.onUserJoin)).catch((error) => {
+      console.error('Could not register all joined users')
+      console.error(e.stack)
     })
   }
-  destroy() {
-    this.sekshi.removeListener(this.sekshi.USER_JOIN, this.onUserJoin)
-    this.sekshi.removeListener(this.sekshi.USER_UPDATE, this.onUserUpdate)
+
+  destroy () {
+    this.bot.removeListener('user:join', this.onUserJoin)
+    this.bot.removeListener('user:update', this.onUserUpdate)
   }
 
-  onUserJoin(user) {
+  async onUserJoin (user) {
     debug('join', `${user.username} (${user.id})`)
-    User.fromPlugUser(user).then(user => {
-      user.set('visits', user.get('visits') + 1)
-      user.set('lastVisit', Date.now())
-      return user.save()
-    })
+    try {
+      const userModel = await User.from(user)
+      if (!userModel && user.source) {
+        await User.create({
+          adapter: user.source.constructor.adapterName,
+          sourceId: user.id,
+          username: user.username
+        })
+      }
+    } catch (e) {
+      console.error(e.stack || e)
+    }
   }
 
-  // updates user name, avatar and level
-  onUserUpdate(update) {
-    const user = this.sekshi.getUserByID(update.id)
+  async onUserUpdate (user, update) {
     if (!user) return
-    User.findById(user.id).exec().then(model => {
-      if (!model) return
-      if (update.level) {
-        user.level = update.level
-        model.set('level', update.level)
-      }
-      if (update.avatarID) {
-        user.avatarID = update.avatarID
-        model.set('avatar', update.avatarID)
-      }
-      if (update.username) {
-        user.username = update.username
-        model.set('username', update.username)
-      }
-      model.save()
-    })
+    debug('update', update)
   }
 }
