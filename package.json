@@ -37,7 +37,8 @@
     "recursive-readdir": "^1.2.1",
     "regexp-quote": "0.0.0",
     "request": "^2.58.0",
-    "snoocore": "2.x"
+    "snoocore": "2.x",
+    "ultron": "^1.0.2"
   },
   "devDependencies": {
     "babel-cli": "^6.7.7",

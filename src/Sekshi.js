@@ -10,11 +10,14 @@ import User from './models/User'
 import { symbol as commandsSymbol } from './command'
 import ModuleManager from './ModuleManager'
 import quote from 'regexp-quote'
+import Ultron from 'ultron'
 
 const debug = require('debug')('sekshi:sekshi')
 const logChat = require('debug')('sekshi:chat')
 
 mongoose.Promise = Promise
+
+const attachedAdapterEventsSymbol = Symbol('attached adapter events')
 
 export default class Sekshi extends EventEmitter {
   constructor (options) {
@@ -48,8 +51,7 @@ export default class Sekshi extends EventEmitter {
     )
 
     Object.keys(this.adapters).map((adapterName) => {
-      const adapter = this.adapters[adapterName]
-      adapter.on('message', this.onMessage)
+      this.attachAdapter(this.adapters[adapterName])
     })
 
     this.loadModules()
@@ -72,6 +74,7 @@ export default class Sekshi extends EventEmitter {
     this.unloadModules()
     Object.keys(this.adapters).map((adapterName) => {
       const adapter = this.adapters[adapterName]
+      this.detachAdapter(adapter)
       return adapter.disconnect()
     })
     // should *probably* also wait for this before callback-ing
@@ -90,6 +93,25 @@ export default class Sekshi extends EventEmitter {
         cb(e)
       }
     })
+  }
+
+  attachAdapter (adapter) {
+    const events = new Ultron(adapter)
+    events.on('message', this.onMessage)
+    events.on('user:join', (user) => {
+      this.emit('user:join', user)
+    })
+    events.on('user:leave', (user) => {
+      this.emit('user:leave', user)
+    })
+    adapter[attachedAdapterEventsSymbol] = events
+  }
+
+  detachAdapter (adapter) {
+    if (attachedAdapterEventsSymbol in adapter) {
+      adapter[attachedAdapterEventsSymbol].remove()
+      adapter[attachedAdapterEventsSymbol] = null
+    }
   }
 
   // Find a user model or default to something.
