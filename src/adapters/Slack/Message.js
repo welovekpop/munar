@@ -8,7 +8,7 @@ export default class SlackMessage extends Message {
   }
 
   get user() {
-    return new SlackUser(this.slack, this.slack.getUser(this.sourceMessage.user))
+    return this.slack.getUser(this.sourceMessage.user)
   }
 
   get username() {

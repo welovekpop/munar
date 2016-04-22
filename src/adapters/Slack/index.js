@@ -5,6 +5,8 @@ import { Adapter } from '../../'
 
 import Channel from './Channel'
 import Message from './Message'
+import User from './User'
+
 import SourceMixin from './SourceMixin'
 
 const debug = require('debug')('sekshi:adapter:slack')
@@ -44,6 +46,20 @@ export default class Slack extends Adapter {
     this.client = null
   }
 
+  getUsers () {
+    const users = this.client.users
+    return Object.keys(users).map((id) => {
+      return new User(this, this.client.users[id])
+    })
+  }
+
+  getChannels () {
+    const channels = this.client.channels
+    return Object.keys(channels).map((id) => {
+      return new Channel(this, this.client.channels[id])
+    })
+  }
+
   onMessage = (slackMessage) => {
     debug([slackMessage.type, slackMessage.subtype].filter(Boolean).join(':'), {
       user: slackMessage.user,
@@ -53,7 +69,7 @@ export default class Slack extends Adapter {
       if (slackMessage.subtype === 'message_changed') {
         return
       }
-      const channel = new Channel(this, this.getChannel(slackMessage.channel))
+      const channel = this.getChannel(slackMessage.channel)
       this.emit('message', new Message(this, channel, this.normalizeMessage(slackMessage.text), slackMessage))
     }
   }

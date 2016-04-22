@@ -1,18 +1,12 @@
+import Channel from './Channel'
+
 export default {
-  getUser (id) {
-    return this.client.getUserByID(id)
-  },
-
-  getUserByName (name) {
-    return this.client.getUserByName(name)
-  },
-
   getChannel (id) {
-    return this.client.getChannelGroupOrDMByID(id)
+    return new Channel(this, this.client.getChannelGroupOrDMByID(id))
   },
 
   getChannelByName (name) {
-    return this.client.getChannelByName(name)
+    return new Channel(this, this.client.getChannelByName(name))
   },
 
   canExecute (message) {
