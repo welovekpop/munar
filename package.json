@@ -56,7 +56,11 @@
     "standard": "^6.0.8",
     "through2": "^2.0.1"
   },
+  "standard": {
+    "parser": "babel-eslint"
+  },
   "scripts": {
+    "test": "standard src/**/*.js",
     "start": "node lib/app.js",
     "babel-start": "babel-node src/app.js",
     "watch": "gulp watch",
