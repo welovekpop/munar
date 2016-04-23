@@ -1,35 +1,25 @@
 import { Module } from '../'
 
-const debug = require('debug')('sekshi:stuck-skip')
-
 export default class StuckSkip extends Module {
+  author = 'ReAnna'
+  description = 'Skips songs when plug.dj forgets to push advance messages.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Skips songs when plug.dj forgets to push advance messages.'
-
-    this.onAdvance = this.onAdvance.bind(this)
-    this._skip = this._skip.bind(this)
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       delay: 3.0
     }
   }
 
-  init() {
+  init () {
     this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
   }
 
-  destroy() {
+  destroy () {
     clearTimeout(this._timer)
     this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
   }
 
-  onAdvance(booth, { media }, previous) {
+  onAdvance = (booth, { media }, previous) => {
     clearTimeout(this._timer)
     if (media && media.cid) {
       let delay = parseFloat(this.options.delay)
@@ -37,9 +27,8 @@ export default class StuckSkip extends Module {
     }
   }
 
-  _skip() {
+  _skip = () => {
     this.sekshi.sendChat('/me Song stuck, skipping...', 5000)
     this.sekshi.skipDJ(this.sekshi.getCurrentDJ().id)
   }
-
 }

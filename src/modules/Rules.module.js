@@ -1,38 +1,31 @@
 import { Module, command } from '../'
-import find from 'array-find'
 
 export default class Rules extends Module {
+  author = 'ReAnna'
+  description = 'Adds a !rule command that tells people specific rules from the room description.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Adds a !rule command that tells people specific rules from the room description.'
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       url: 'https://my-room-website.com/rules'
     }
   }
 
   @command('rule', { role: command.ROLE.RESIDENTDJ })
-  rule(user, n, targetName = null) {
+  rule (message, n, targetName = null) {
     const descr = this.sekshi.getDescription()
     const rx = new RegExp(`^${n}. `)
-    const rule = find(descr.split('\n'), line => rx.test(line))
+    const rule = descr.split('\n').find((line) => rx.test(line))
 
     if (!rule) {
-      this.sekshi.sendChat(`@${user.username} I don't know that rule…`)
+      message.reply('I don\'t know that rule…')
       return
     }
 
     let targetPing = ''
     if (targetName) {
-      const target = this.sekshi.getUserByName(targetName)
+      const target = message.source.getUserByName(targetName)
       targetPing = target ? `@${target.username}` : targetName
     }
-    this.sekshi.sendChat(`${targetPing} ${rule} ${this.options.url}`)
+    message.send(`${targetPing} ${rule} ${this.options.url}`)
   }
-
 }

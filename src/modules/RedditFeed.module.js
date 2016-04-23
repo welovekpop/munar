@@ -6,17 +6,12 @@ import decode from 'ent/decode'
 const debug = require('debug')('sekshi:reddit-feed')
 
 export default class RedditFeed extends Module {
+  author = 'schrobby'
+  description = 'Announces new submissions from a configurable list of subreddits.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
+  reddit = new Snoocore({ userAgent: `RedditFeed v${this.version} by /u/schrobby` })
 
-    this.author = 'schrobby'
-    this.description = 'Announces new submissions from a configurable list of subreddits.'
-
-    this.reddit = new Snoocore({ userAgent: `RedditFeed v${this.version} by /u/schrobby` })
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       subreddits: [ 'kpop' ],
       interval: 300000,
@@ -24,12 +19,12 @@ export default class RedditFeed extends Module {
     }
   }
 
-  init() {
+  init () {
     this.lastPost = ''
     this.timer = setTimeout(this.runTimer.bind(this), 0)
   }
 
-  destroy() {
+  destroy () {
     if (this.timer) {
       clearTimeout(this.timer)
       this.timer = null
@@ -37,15 +32,14 @@ export default class RedditFeed extends Module {
   }
 
   @command('updatereddit', { role: command.ROLE.MANAGER })
-  updatereddit() {
+  updatereddit () {
     clearTimeout(this.timer)
     this.runTimer()
   }
 
-  runTimer() {
+  runTimer () {
     debug('fetching new posts')
     const subs = this.options.subreddits
-    var posts = []
     var requests = []
     var chunk = 50
 
@@ -53,22 +47,22 @@ export default class RedditFeed extends Module {
       requests.push(subs.slice(i, i + chunk).join('+'))
     }
 
-    let promises = requests.map(uri => {
+    let promises = requests.map((uri) => {
       return this.reddit('/r/$subreddit/new')
         .listing({
           $subreddit: uri,
           before: this.lastPost,
           limit: 100
         })
-        .then(result => result.children)
+        .then((result) => result.children)
     })
 
     Promise.all(promises)
-      .then(results => {
+      .then((results) => {
         let posts = results.reduce((posts, list) => posts.concat(list), [])
         debug('got new posts', posts.length)
         if (this.lastPost && this.enabled()) {
-          posts.forEach(post => {
+          posts.forEach((post) => {
             let message = this.options.format
               .replace(/\$subreddit\b/g, post.data.subreddit)
               .replace(/\$poster\b/g, post.data.author)
@@ -80,13 +74,12 @@ export default class RedditFeed extends Module {
         }
 
         if (posts.length > 0) {
-          /*@TODO: find a way to reliably get the most recent post */
+          /* @TODO: find a way to reliably get the most recent post */
           this.lastPost = posts[0].data.name
         }
 
         this.timer = setTimeout(this.runTimer.bind(this), this.options.interval)
       })
-      .catch(e => { debug('reddit error', e) })
+      .catch((e) => { debug('reddit error', e) })
   }
-
 }

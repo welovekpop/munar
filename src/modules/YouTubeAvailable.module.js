@@ -4,17 +4,10 @@ import request from 'request'
 const debug = require('debug')('sekshi:youtube-available')
 
 export default class YouTubeAvailable extends Module {
+  author = 'ReAnna'
+  description = 'Autoskips videos that are blocked and notifies staff if a video might not be available everywhere.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Autoskips videos that are blocked and notifies staff if a video might not be available everywhere.'
-
-    this.onAdvance = this.onAdvance.bind(this)
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       key: false,
       api: 'https://www.googleapis.com/youtube/v3/videos',
@@ -26,39 +19,41 @@ export default class YouTubeAvailable extends Module {
     }
   }
 
-  init() {
+  init () {
     if (!this.options.key) {
-      this.sekshi.sendChat(
-        `@staff The YouTube Availability module needs a YouTube API key. ` +
-        `Please set it using '!set youtubeavailable key API_KEY_HERE'.`
+      this.bot.sendChat(
+        '@staff The YouTube Availability module needs a YouTube API key. ' +
+        'Please set it using "!set youtubeavailable key API_KEY_HERE".'
       )
     }
 
-    this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
+    this.bot.on(this.bot.ADVANCE, this.onAdvance)
   }
-  destroy() {
-    this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
+  destroy () {
+    this.bot.removeListener(this.bot.ADVANCE, this.onAdvance)
   }
 
-  onAdvance() {
-    const media = this.sekshi.getCurrentMedia()
-    const modSkip = this.sekshi.getModule('modskip')
-    const sekshi = this.sekshi.getSelf()
+  onAdvance = () => {
+    const media = this.bot.getCurrentMedia()
+    const modSkip = this.bot.getModule('modskip')
+    const self = this.bot.getSelf()
     if (media && media.format === 1 && this.options.key) {
       let url = `${this.options.api}?id=${media.cid}&part=contentDetails,status&key=${this.options.key}`
       request(url, (e, _, body) => {
-        if (e) return debug('yt-api-err', e)
+        if (e) {
+          return debug('yt-api-err', e)
+        }
         try {
           let json = JSON.parse(body)
           if (this.options.skipTerminated) {
             if (json.items.length === 0) {
-              modSkip.lockskip(sekshi, 'unavailable')
+              modSkip.lockskip(self, 'unavailable')
               return
             }
 
             let status = json.items[0].status
             if (status.uploadStatus === 'rejected' || status.embeddable === false) {
-              modSkip.lockskip(sekshi, 'unavailable')
+              modSkip.lockskip(self, 'unavailable')
               return
             }
           }
@@ -72,23 +67,24 @@ export default class YouTubeAvailable extends Module {
             debug('blocked in', blocked ? blocked.length : null)
             debug('allowed in', allowed ? allowed.length : null)
             if (blocked && blocked.length > this.options.blockedThreshold) {
-              this.sekshi.sendChat(
+              this.bot.sendChat(
                 `@staff This video is unavailable in ${restriction.blocked.length} ` +
-                `countries. It may have to be skipped.`)
+                'countries. It may have to be skipped.'
+              )
               return
-            }
-            else if (allowed && allowed.length <= this.options.allowedThreshold) {
-              this.sekshi.sendChat(
+            } else if (allowed && allowed.length <= this.options.allowedThreshold) {
+              this.bot.sendChat(
                 `@staff This video is only available in ${restriction.allowed.length} ` +
-                `countries. It may have to be skipped.`)
+                'countries. It may have to be skipped.'
+              )
               return
             }
           }
           debug('not region blocked')
+        } catch (e) {
+          // Nothing
         }
-        catch (e) {}
       })
     }
   }
-
 }

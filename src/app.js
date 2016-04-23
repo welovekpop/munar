@@ -3,9 +3,7 @@ import Sekshi from './Sekshi'
 import config from '../config.json'
 import pkg from '../package.json'
 
-const debug = require('debug')('sekshi:app')
-
-function start() {
+function start () {
   const sekshi = new Sekshi(config)
 
   sekshi.adapter(Slack, {
@@ -14,7 +12,6 @@ function start() {
 
   sekshi.start()
 
-  let timeout
   const onError = (e) => {
     console.error(e.stack || e)
     sekshi.stop(() => {

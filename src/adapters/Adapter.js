@@ -6,7 +6,7 @@ function unimplemented (adapter, method) {
 }
 
 export default class Adapter extends EventEmitter {
-  constructor(bot) {
+  constructor (bot) {
     super()
 
     this.bot = bot

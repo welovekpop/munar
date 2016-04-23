@@ -1,19 +1,15 @@
 import EventEmitter from 'events'
 import path from 'path'
-import fs from 'fs'
 import mongoose from 'mongoose'
 import Promise from 'bluebird'
-import find from 'array-find'
 import includes from 'array-includes'
 import mkdirp from 'mkdirp'
 import User from './models/User'
-import { symbol as commandsSymbol } from './command'
 import ModuleManager from './ModuleManager'
-import quote from 'regexp-quote'
+import escapeStringRegExp from 'escape-string-regexp'
 import Ultron from 'ultron'
 
 const debug = require('debug')('sekshi:sekshi')
-const logChat = require('debug')('sekshi:chat')
 
 mongoose.Promise = Promise
 
@@ -32,7 +28,7 @@ export default class Sekshi extends EventEmitter {
     this._configDir = path.join(__dirname, '../.config')
   }
 
-  adapter(SourceAdapter, options) {
+  adapter (SourceAdapter, options) {
     const name = SourceAdapter.adapterName
     const adapter = new SourceAdapter(this, options)
     this.adapters[name] = adapter
@@ -42,7 +38,7 @@ export default class Sekshi extends EventEmitter {
     return this.adapters[name]
   }
 
-  async start(creds, cb) {
+  async start (creds, cb) {
     await Promise.all(
       Object.keys(this.adapters).map((adapterName) => {
         const adapter = this.adapters[adapterName]
@@ -70,7 +66,7 @@ export default class Sekshi extends EventEmitter {
     })
   }
 
-  stop(cb) {
+  stop (cb) {
     this.unloadModules()
     Object.keys(this.adapters).map((adapterName) => {
       const adapter = this.adapters[adapterName]
@@ -86,7 +82,7 @@ export default class Sekshi extends EventEmitter {
         cb()
       }
     })
-    this.once(this.LOGOUT_ERROR, e => {
+    this.once(this.LOGOUT_ERROR, (e) => {
       // TODO figure out something useful to do here
       this.removeAllListeners()
       if (cb) {
@@ -116,7 +112,7 @@ export default class Sekshi extends EventEmitter {
 
   // Find a user model or default to something.
   // Useful for commands that can optionally take a target user.
-  findUser(name, _default = null) {
+  findUser (name, _default = null) {
     if (!name) {
       return _default
         ? Promise.resolve(_default)
@@ -127,13 +123,12 @@ export default class Sekshi extends EventEmitter {
     let user = this.getUserByName(name)
     if (user) {
       promise = User.findById(user.id)
-    }
-    else {
+    } else {
       name = name.replace(/^@/, '')
-      let rx = new RegExp(`^${quote(name)}$`, 'i')
+      let rx = new RegExp(`^${escapeStringRegExp(name)}$`, 'i')
       promise = User.findOne({ username: rx })
     }
-    return promise.then(user => {
+    return promise.then((user) => {
       return user || Promise.reject(new Error('User not found'))
     })
   }
@@ -142,40 +137,45 @@ export default class Sekshi extends EventEmitter {
     this.emit('message', message)
     if (message.text && message.text.startsWith(this.trigger)) {
       this.executeMessage(message)
-        .catch(e => message.reply(`Error: ${e.message}`))
+        .catch((e) => message.reply(`Error: ${e.message}`))
     }
   }
 
-  executeMessage(message) {
+  executeMessage (message) {
     const { source } = message
 
     let args = this.parseArguments(message)
     let commandName = args.shift().replace(this.trigger, '').toLowerCase()
 
-    let promise = Promise.resolve()
-    this.modules.loaded().forEach(name => {
-      let mod = this.modules.get(name)
-      if (!mod || !mod.enabled() || !Array.isArray(mod.commands)) return
+    async function tryCommand (moduleName) {
+      const mod = this.modules.get(moduleName)
+      if (!mod || !mod.enabled() || !Array.isArray(mod.commands)) {
+        return
+      }
 
-      let command = find(mod.commands, com => includes(com.names, commandName))
+      const command = mod.commands.find(
+        (com) => includes(com.names, commandName)
+      )
       if (!command) return
 
       if (command.ninjaVanish && message) {
         message.delete()
       }
+
       if (source.canExecute(message)) {
         if (command.method) {
-          mod[command.method](message, ...args)
+          await mod[command.method](message, ...args)
+        } else {
+          await command.callback.call(mod, message, ...args)
         }
-        else {
-          command.callback.call(mod, message, ...args)
-        }
+      } else {
+        throw new Error('You cannot use this command.')
       }
-      else {
-        promise = Promise.reject(new Error('You cannot use this command.'))
-      }
-    })
-    return promise
+    }
+
+    return Promise.all(
+      this.modules.loaded().map(tryCommand, this)
+    )
   }
 
   // Parses space-separated chat command arguments.
@@ -191,7 +191,7 @@ export default class Sekshi extends EventEmitter {
   // feature-bugs:
   // if you forget to close a quoted string it will go until the end of the line (might be unexpected)
   // if you forget to add a space after a quoted string, the rest will be read as a separate parameter
-  parseArguments(message) {
+  parseArguments (message) {
     let args = []
     let i = 0
     let chunk
@@ -204,7 +204,7 @@ export default class Sekshi extends EventEmitter {
           .sort((a, b) => a.length > b.length ? -1 : 1)
       : []
 
-    while (chunk = str.slice(i)) {
+    while ((chunk = str.slice(i))) {
       // separator
       if (chunk.charAt(0) === ' ') {
         i++
@@ -246,23 +246,23 @@ export default class Sekshi extends EventEmitter {
     return args
   }
 
-  getModule(name) {
+  getModule (name) {
     return this.modules.get(name)
   }
 
-  loadModules() {
+  loadModules () {
     debug('load all')
     this.modules.update()
-      .each(name => this.modules.load(name))
+      .each((name) => this.modules.load(name))
   }
 
-  unloadModules() {
+  unloadModules () {
     debug('unload all')
     this.modules.loaded()
-      .forEach(name => this.modules.unload(name))
+      .forEach((name) => this.modules.unload(name))
   }
 
-  getConfigDir() {
+  getConfigDir () {
     return this._configDir
   }
 }

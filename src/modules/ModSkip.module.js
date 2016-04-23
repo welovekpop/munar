@@ -1,16 +1,12 @@
 import { Module, command } from '../'
-import assign from 'object-assign'
 
 export default class ModSkip extends Module {
+  author = 'ReAnna'
+  description = 'Simple DJ skipping tools'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
+  source = this.adapter('uwave').getChannel('main')
 
-    this.author = 'ReAnna'
-    this.description = 'Simple DJ skipping tools'
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       reasons: {
         kpop: 'This is a Korean music dedicated room, please only play music by Korean artists.',
@@ -29,66 +25,67 @@ export default class ModSkip extends Module {
     }
   }
 
-  init() {
+  init () {
     this._lastSkip = 0
   }
 
-  getSkipMessage(reason) {
+  getSkipMessage (message, reason) {
     if (this.options.reasons.hasOwnProperty(reason)) {
       reason = this.options.reasons[reason]
     }
-    let dj = this.sekshi.getCurrentDJ()
+    const dj = message.source.getCurrentDJ()
     return `@${dj.username} ${reason}`
   }
 
-  _skipMessage(user, reason = false) {
+  _skipMessage (message, reason = false) {
     return reason
-      ? this.getSkipMessage(reason)
-      : `/me ${user.username} used skip!`
+      ? this.getSkipMessage(message, reason)
+      : `/me ${message.username} used skip!`
   }
 
-  _saveSkip(user, reason, isLockskip = false) {
+  _saveSkip (user, reason, isLockskip = false) {
     const history = this.sekshi.getModule('historylogger')
     if (history) {
       let entry = history.getCurrentEntry()
       if (entry) {
-        entry.set('skip', { kind: isLockskip ? 'lockskip' : 'skip'
-                          , user: user.id
-                          , reason: reason
-                          , time: Date.now() })
+        entry.set('skip', {
+          kind: isLockskip ? 'lockskip' : 'skip',
+          user: user.id,
+          reason: reason,
+          time: Date.now()
+        })
         entry.save()
       }
     }
   }
 
   @command('skip', { role: command.ROLE.BOUNCER })
-  skip(user, ...reason) {
-    const dj = this.sekshi.getCurrentDJ()
+  skip (message, ...reason) {
+    const dj = this.source.getCurrentDJ()
     if (!dj || !dj.id) {
-      return this.sekshi.sendChat(`@${user.username} Nobody is DJing currently...`)
+      return message.reply('Nobody is DJing currently...')
     }
-    let isSekshi = user === this.sekshi.getSelf()
+    let isSekshi = message.user.id === message.source.getBotUser().id
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
-      this._saveSkip(user, reason.join(' ') || false)
-      this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
-      this.sekshi.skipDJ(dj.id)
+      this._saveSkip(message.user, reason.join(' ') || false)
+      this.source.send(this._skipMessage(message, reason.join(' ')))
+      this.source.skipDJ(dj.id)
     }
   }
 
   @command('lockskip', 'ls', { role: command.ROLE.BOUNCER })
-  lockskip(user, ...reason) {
-    const dj = this.sekshi.getCurrentDJ()
+  lockskip (message, ...reason) {
+    const dj = this.source.getCurrentDJ()
     if (!dj || !dj.id) {
-      return this.sekshi.sendChat(`@${user.username} Nobody is DJing currently...`)
+      return message.reply('Nobody is DJing currently...')
     }
-    let isSekshi = user === this.sekshi.getSelf()
+    let isSekshi = message.user.id === message.source.getBotUser().id
     if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
-      this._saveSkip(user, reason.join(' ') || false, true)
-      this.sekshi.sendChat(this._skipMessage(user, reason.join(' ')))
+      this._saveSkip(message.user, reason.join(' ') || false, true)
+      this.sekshi.sendChat(this._skipMessage(message, reason.join(' ')))
       this.sekshi.lockskipDJ(dj.id, this.options.lockskipPos)
     }
   }
-
 }

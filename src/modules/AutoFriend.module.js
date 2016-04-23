@@ -19,7 +19,7 @@ export default class AutoFriend extends Module {
 
   onRequest (user) {
     debug('new request', user.username)
-    this.bot.addFriend(user.id, e => {
+    this.bot.addFriend(user.id, (e) => {
       if (e) debug('friend error', e)
       else debug('added friend')
     })

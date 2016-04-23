@@ -25,7 +25,7 @@ export default class UserLogger extends Module {
 
     Promise.all(allUsers.map(this.onUserJoin)).catch((error) => {
       console.error('Could not register all joined users')
-      console.error(e.stack)
+      console.error(error.stack)
     })
   }
 

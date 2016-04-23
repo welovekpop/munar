@@ -1,30 +1,22 @@
 import { command } from '../'
 import TriviaCore from './TriviaCore'
-import Promise from 'bluebird'
-import request from 'request'
 import moment from 'moment'
 import mongoose from 'mongoose'
 
-const debug = require('debug')('sekshi:trivia')
-
+const triviaSchema = {
+  time: { type: Date, default: Date.now },
+  user: { type: Number, ref: 'User' },
+  winner: { type: Number, ref: 'User' }
+}
 const TriviaHistory = mongoose.modelNames().indexOf('Trivia') === -1
-  ? mongoose.model('Trivia', {
-      time: { type: Date, default: Date.now },
-      user: { type: Number, ref: 'User' },
-      winner: { type: Number, ref: 'User' }
-    })
+  ? mongoose.model('Trivia', triviaSchema)
   : mongoose.model('Trivia')
 
 export default class Trivia extends TriviaCore {
-  static author = 'WE ♥ KPOP'
-  static description = ''
+  author = 'WE ♥ KPOP'
+  description = ''
 
-  constructor(bot, options) {
-    super(bot, options)
-
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       ...super.defaultOptions(),
       points: 3,
@@ -33,33 +25,39 @@ export default class Trivia extends TriviaCore {
     }
   }
 
-  nextQuestion() {
+  nextQuestion () {
     const target = this.options.points
     const interval = this.options.interval
     super.nextQuestion().then(({ winner, question }) => {
       if (winner) {
         this.addPoints(winner)
         if (this.getPoints(winner) >= target) {
-          this.adapter.send(`[Trivia] @${winner.username} answered correctly and reached ${target} points!` +
-                            ` Congratulations! :D`)
+          this.adapter.send(
+            `[Trivia] @${winner.username} answered correctly and reached ${target} points! ` +
+            'Congratulations! :D')
           this.stopTrivia()
           if (this.model) {
             this.model.set('winner', winner.id).save()
             this.model = null
           }
         } else {
-          this.adapter.send(`[Trivia] @${winner.username} answered correctly! Next question in ${interval} seconds!`)
+          this.adapter.send(
+            `[Trivia] @${winner.username} answered correctly! ` +
+            `Next question in ${interval} seconds!`
+          )
           this._currentQuestion = null
           setTimeout(() => this.nextQuestion(), interval * 1000)
         }
       } else {
-        this.adapter.send(`[Trivia] Nobody answered correctly! ` +
-                          `The right answer was "${question.answers[0]}". Next question in ${interval} seconds!`)
+        this.adapter.send(
+          '[Trivia] Nobody answered correctly! ' +
+          `The right answer was "${question.answers[0]}". Next question in ${interval} seconds!`
+        )
         this._currentQuestion = null
         setTimeout(() => this.nextQuestion(), interval * 1000)
       }
-    }).catch(e => {
-      this.adapter.send(`[Trivia] Something went wrong! Stopping trivia before I explode... :boom:`)
+    }).catch((e) => {
+      this.adapter.send('[Trivia] Something went wrong! Stopping trivia before I explode... :boom:')
       this.stopTrivia()
       console.error('trivia', e)
     })
@@ -67,33 +65,30 @@ export default class Trivia extends TriviaCore {
 
   // Chat Commands
   @command('lasttrivia', { role: command.ROLE.BOUNCER })
-  lasttrivia(user) {
+  lasttrivia (message) {
     if (this.isRunning()) {
-      return this.sekshi.sendChat(`@${user.username} Trivia is going on right now!`)
-    }
-
-    const notPlayed = () => {
-      this.sekshi.sendChat(`@${user.username} I don't remember playing trivia!`)
+      return message.reply('Trivia is going on right now!')
     }
 
     TriviaHistory.findOne({})
                  .select('time')
                  .sort({ time: -1 })
                  .exec()
-      .then(last => {
+      .then((last) => {
         if (last && last.time) {
           const lastPlayed = moment(last.time).utc()
-          this.sekshi.sendChat(`@${user.username} The last trivia was started ${lastPlayed.calendar()} (${lastPlayed.fromNow()}).`)
-        }
-        else {
-          notPlayed()
+          message.reply(`The last trivia was started ${lastPlayed.calendar()} (${lastPlayed.fromNow()}).`)
+        } else {
+          message.reply('I don\'t remember playing trivia!')
         }
       })
-      .catch(notPlayed)
+      .catch(() => {
+        message.reply('I don\'t remember playing trivia!')
+      })
   }
 
   @command('trivia', { role: command.ROLE.BOUNCER })
-  trivia(message) {
+  trivia (message) {
     if (!this.isRunning()) {
       this.adapter = message.source
       message.send(`@here ${message.username} started Trivia! ` +
@@ -101,17 +96,12 @@ export default class Trivia extends TriviaCore {
       this.startTrivia().then(() => {
         message.send(`Loaded ${this.questions.length} questions. First question in 5 seconds!`)
         setTimeout(() => this.nextQuestion(), 5 * 1000)
-
-        // this.model = new TriviaHistory({ user: message.user.id })
-        // this.model.save()
-        //   .then(() => { debug('created history item') })
-        //   .catch(e => console.error(e))
       })
     }
   }
 
   @command('trivquit', 'stoptrivia', { role: command.ROLE.BOUNCER })
-  trivquit(message) {
+  trivquit (message) {
     if (this.isRunning()) {
       this.stopTrivia()
       if (message.user) {
@@ -121,15 +111,17 @@ export default class Trivia extends TriviaCore {
   }
 
   @command('trivpoints')
-  trivpoints(message) {
+  trivpoints (message) {
     if (this.isRunning()) {
-      let points = Object.keys(this._points)
-        .map(uid => ({ uid: uid
-                     , user: this.sekshi.getUserByID(uid, true)
-                     , points: this._points[uid] }))
+      const points = Object.keys(this._points)
+        .map((uid) => ({
+          uid: uid,
+          user: this.sekshi.getUserByID(uid, true),
+          points: this._points[uid]
+        }))
         // exclude users who left the room
         // not ideal, but Good Enough™ in 99.99% of cases
-        .filter(entry => entry.user)
+        .filter((entry) => entry.user)
         .sort((a, b) => a.points > b.points ? -1 : a.points < b.points ? 1 : 0)
 
       message.reply(
@@ -142,7 +134,7 @@ export default class Trivia extends TriviaCore {
   }
 
   @command('question')
-  question(message) {
+  question (message) {
     if (this.isRunning()) {
       let question = this.getCurrentQuestion()
       if (question) {
@@ -150,5 +142,4 @@ export default class Trivia extends TriviaCore {
       }
     }
   }
-
 }

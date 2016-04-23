@@ -1,35 +1,25 @@
 import { Module } from '../'
-import assign from 'object-assign'
-
-const debug = require('debug')('sekshi:vote-skip')
 
 export default class SongLengthSkip extends Module {
+  author = 'ReAnna'
+  description = 'Autoskip songs that are too long.'
 
-  constructor(sekshi, options = {}) {
-    super(sekshi, options)
-
-    this.author = 'ReAnna'
-    this.description = 'Autoskip songs that are too long.'
-
-    this.onAdvance = this.onAdvance.bind(this)
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       limit: 7 * 60
     }
   }
 
-  init() {
+  init () {
     this._skipping = false
     this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
   }
 
-  destroy() {
+  destroy () {
     this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
   }
 
-  onAdvance(booth, { media }) {
+  onAdvance = (booth, { media }) => {
     if (media.duration > this.options.limit) {
       let seconds = this.options.limit % 60
       let formatted = `${Math.floor(this.options.limit / 60)}:${seconds < 10 ? `0${seconds}` : seconds}`
@@ -40,5 +30,4 @@ export default class SongLengthSkip extends Module {
       })
     }
   }
-
 }

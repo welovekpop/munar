@@ -7,7 +7,7 @@ import parseCsv from 'csv-parse'
 
 const debug = require('debug')('sekshi:trivia')
 
-function normalizeAnswer(a) {
+function normalizeAnswer (a) {
   return a.toLowerCase()
     .replace(/\s+/g, ' ')      // spaces
     .replace(/!\.,-\?:'/g, '') // punctuation
@@ -15,20 +15,14 @@ function normalizeAnswer(a) {
 }
 
 export default class TriviaCore extends Module {
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.onChat = this.onChat.bind(this)
-  }
-
-  destroy() {
+  destroy () {
     if (this.isRunning()) {
       this.stopTrivia()
     }
     this.questions = []
   }
 
-  defaultOptions() {
+  defaultOptions () {
     return {
       data: 'https://docs.google.com/spreadsheets/d/1agQloBvRb1zS3Kf9NPZVD9iI5hE-sdNw62adcna4HPE/pub?gid=0&single=true&output=csv',
       type: 'csv',
@@ -37,11 +31,11 @@ export default class TriviaCore extends Module {
     }
   }
 
-  isRunning() {
+  isRunning () {
     return this._running
   }
 
-  startTrivia() {
+  startTrivia () {
     debug('starting')
     this._running = true
     this._history = []
@@ -54,7 +48,7 @@ export default class TriviaCore extends Module {
   }
 
   // public api
-  nextQuestion() {
+  nextQuestion () {
     if (this.isRunning()) {
       let question
       do {
@@ -66,7 +60,7 @@ export default class TriviaCore extends Module {
     return Promise.reject(new Error('Trivia is not running'))
   }
 
-  askQuestion(question) {
+  askQuestion (question) {
     return new Promise((resolve, reject) => {
       this.adapter.send(`[Trivia] From the "${question.category}" category: ${question.question}`)
 
@@ -83,7 +77,7 @@ export default class TriviaCore extends Module {
     })
   }
 
-  showWinner(winner, answer) {
+  showWinner (winner, answer) {
     this.adapter.send(`[Trivia] "${answer}" is correct! ${winner.username} wins the round.`)
 
     clearTimeout(this._timeout)
@@ -93,29 +87,29 @@ export default class TriviaCore extends Module {
     this._currentQuestion = null
   }
 
-  notAnswered() {
+  notAnswered () {
     this._resolve({ winner: null, question: this._currentQuestion })
     this._currentQuestion = null
   }
 
-  addPoints(user, points = 1) {
+  addPoints (user, points = 1) {
     this._points[user.id] = (this._points[user.id] || 0) + points
   }
-  getPoints(user) {
+  getPoints (user) {
     return this._points[user.id] || 0
   }
 
-  getCurrentQuestion() {
+  getCurrentQuestion () {
     return this._currentQuestion
   }
 
-  stopTrivia() {
+  stopTrivia () {
     this._running = false
     clearTimeout(this._timeout)
     this.sekshi.removeListener('message', this.onChat)
   }
 
-  onChat(message) {
+  onChat = (message) => {
     if (this._running && this._currentQuestion) {
       const answer = normalizeAnswer(message.text)
       if (this._currentQuestion.check(answer)) {
@@ -124,54 +118,58 @@ export default class TriviaCore extends Module {
     }
   }
 
-  addQuestion(question) {
+  addQuestion (question) {
     this.questions.push(question)
   }
 
-  _load() {
+  _load () {
     return new Promise((resolve, reject) => {
       request({ uri: this.options.data }, (e, _, body) => {
-        if (e) reject(e)
-        else resolve(body)
+        if (e) {
+          reject(e)
+        } else {
+          resolve(body)
+        }
       })
     })
-    .then(body => this.parse(body, this.options.type))
-    .then(questions => this.questions = questions)
+    .then((body) => this.parse(body, this.options.type))
+    .then((questions) => {
+      this.questions = questions
+    })
   }
-  parse(data, type) {
+  parse (data, type) {
     if (type === 'csv') {
       return new Promise((resolve, reject) => {
         parseCsv(data.slice(data.indexOf('\n')), (e, questions) => {
-          if (e) reject(e)
-          else {
+          if (e) {
+            reject(e)
+          } else {
             resolve(
-              questions.map(arr => new Question(arr[0], arr[1], arr.slice(3), arr[2]))
+              questions.map((arr) => new Question(arr[0], arr[1], arr.slice(3), arr[2]))
             )
           }
         })
       })
-    }
-    else {
+    } else {
       return Promise.reject(new Error('Unknown data type'))
     }
   }
 
-  _historySize() {
+  _historySize () {
     return this.options.historySize === 'auto'
       ? 0.75 * this.questions.length
       : this.options.historySize
   }
-
 }
 
 class Question {
-  constructor(category, question, answers, points = 1) {
+  constructor (category, question, answers, points = 1) {
     this.category = category
     this.question = question
-    this.answers = answers.map(normalizeAnswer).filter(a => a.length > 0)
+    this.answers = answers.map(normalizeAnswer).filter((answer) => answer.length > 0)
   }
 
-  check(answer) {
+  check (answer) {
     return includes(this.answers, answer)
   }
 }

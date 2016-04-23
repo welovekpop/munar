@@ -1,20 +1,11 @@
 import { Module } from '../'
 import random from 'random-item'
 
-const debug = require('debug')('sekshi:greeting')
-
 export default class Greetings extends Module {
+  author = 'Sooyou'
+  description = 'Greets users.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
-
-    this.author = 'Sooyou'
-    this.description = 'Greets users.'
-
-    this.greet = this.greet.bind(this)
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       greetings: [
         'Hai @',
@@ -35,33 +26,29 @@ export default class Greetings extends Module {
     }
   }
 
-  init() {
+  init () {
     this.lastGreeted = -1
-    this.sekshi.on(this.sekshi.USER_JOIN, this.greet)
-    this.sekshi.on(this.sekshi.FRIEND_JOIN, this.greet)
+    this.sekshi.on('user:join', this.greet)
   }
 
-  destroy() {
-    this.sekshi.removeListener(this.sekshi.USER_JOIN, this.greet)
-    this.sekshi.removeListener(this.sekshi.FRIEND_JOIN, this.greet)
+  destroy () {
+    this.sekshi.removeListener('user:join', this.greet)
   }
 
-  greet(user) {
-    if (this.lastGreeted == user.id ||
-        user.username === this.sekshi.getSelf().username ||
+  greet = (user) => {
+    if (this.lastGreeted === user.id ||
         // guest users
-        user.username == '') {
+        user.username === '') {
       return
     }
 
-    let { greetings, emoji } = this.options
     this.lastGreeted = user.id
 
-    let greeting = random(greetings)
-    let message = greeting.replace(/@/g, `@${user.username}`)
-                + (this.sekshi.isFriend(user.id) ? ` ${random(emoji)}` : '')
+    const greeting = random(this.options.greetings)
+    const message = greeting.replace(/@/g, `@${user.username}`) +
+      ` ${random(this.options.emoji)}`
     setTimeout(() => {
-      this.sekshi.sendChat(message)
+      user.source.send(message)
     }, 2 * 1000)
   }
 }

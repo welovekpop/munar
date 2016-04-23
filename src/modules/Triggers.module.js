@@ -3,8 +3,6 @@ import Trigger from '../models/Trigger'
 import random from 'random-item'
 import last from 'lodash.last'
 
-const debug = require('debug')('sekshi:triggers')
-
 // Available variables:
 //  * $user -> Username of the user who used the trigger
 //  * $dj -> Username of the current DJ
@@ -18,65 +16,88 @@ const debug = require('debug')('sekshi:triggers')
 //                           (The expression can also contain variables.)
 //  * $e{expression} -> URL-encoded version of `expression`.
 const vars = {
-  user({ user }) { return user.username },
-  dj() { return this.getCurrentDJ().username },
-  bot() { return this.getSelf().username },
-  artist() { return this.getCurrentMedia().author },
-  title() { return this.getCurrentMedia().title },
-  song() {
-    let media = this.getCurrentMedia()
+  user ({ user }) { return user.username },
+  dj () {
+    const source = this.getAdapter('uwave')
+    return source.getCurrentDJ().username
+  },
+  bot ({ source }) {
+    return source.getBotUser().username
+  },
+  artist () {
+    const source = this.getAdapter('uwave')
+    return source.getCurrentMedia().artist
+  },
+  title () {
+    const source = this.getAdapter('uwave')
+    return source.getCurrentMedia().title
+  },
+  song () {
+    const source = this.getAdapter('uwave')
+    let media = source.getCurrentMedia()
     return `${media.author} – ${media.title}`
   },
-  anyone() {
-    let anyone = random(this.getUsers())
+  anyone ({ source }) {
+    let anyone = random(source.getUsers())
     return anyone ? anyone.username : ''
   },
-  target({ user, args, params }) {
-    let targetName = args.join(' ')
-    let defaultTarget = params.length > 0 ? params[0] : null
-    let target = this.getUserByName(targetName)
-    return target ? target.username
-         : targetName ? targetName
-         : defaultTarget ? defaultTarget
-         : user.username
+  target ({ source, user, args, params }) {
+    const targetName = args.join(' ')
+    const defaultTarget = params.length > 0 ? params[0] : null
+    const target = source.getUserByName(targetName)
+    if (target) {
+      return target.username
+    }
+    if (targetName) {
+      return targetName
+    }
+    if (defaultTarget) {
+      return defaultTarget
+    }
+    return user.username
   },
 
-  e({ params }) {
+  e ({ params }) {
     return encodeURIComponent(params[0])
   }
 }
 
 export default class Triggers extends Module {
-  constructor(sekshi, options) {
-    super(sekshi, options)
+  author = 'ReAnna'
+  description = 'Throws text at people.'
 
-    this.author = 'ReAnna'
-    this.description = 'Throws text at people.'
-  }
-
-  init() {
-    Trigger.find().exec().each(link => {
+  init () {
+    Trigger.find().exec().each((link) => {
       this.add(link._id, link.response)
     })
   }
 
-  add(name, response) {
+  add (name, response) {
     this.addCommand(name, (message, ...params) => {
-      message.reply(this.run(response, message.user, ...params))
+      message.reply(this.run(response, message, ...params))
     })
   }
 
   // Parses a response string with $variables.
-  run(str, user, ...args) {
-    const stringifyList = tokens => tokens.map(stringify).join('')
-    const stringifyBack = token => {
-      return `$${token.name}` + token.params.map(stringifyList).map(str => `{${str}}`).join('')
+  run (str, message, ...args) {
+    const stringifyList = (tokens) => tokens.map(stringify).join('')
+    const stringifyBack = (token) => {
+      return `$${token.name}` + token.params
+        .map(stringifyList)
+        .map((str) => `{${str}}`)
+        .join('')
     }
-    const stringify = token => {
+    const stringify = (token) => {
       if (token.type === 'raw') return token.value
-      let fn = vars[token.name]
+      const fn = vars[token.name]
       if (fn) {
-        return fn.call(this.sekshi, { user, args, params: token.params.map(stringifyList) })
+        return fn.call(this.bot, {
+          message,
+          args,
+          user: message.user,
+          source: message.source,
+          params: token.params.map(stringifyList)
+        })
       }
       return stringifyBack(token)
     }
@@ -84,14 +105,14 @@ export default class Triggers extends Module {
     return stringifyList(tokens)
   }
 
-  parse(str) {
+  parse (str) {
     let tokens = []
     let lastToken = {}
     let stack = [ tokens ]
     let depth = 0
     let i = 0
     let chunk
-    while (chunk = str.slice(i)) {
+    while ((chunk = str.slice(i))) {
       if (chunk[0] === '{' && last(tokens).type === 'var') {
         let param = []
         let params = last(tokens).params
@@ -99,30 +120,27 @@ export default class Triggers extends Module {
         stack.push(tokens = param)
         depth++
         i++
-      }
-      else if (chunk[0] === '}' && depth > 0) {
+      } else if (chunk[0] === '}' && depth > 0) {
         stack.pop()
         tokens = last(stack)
         depth--
         i++
-      }
-      else if (chunk[0] === '$') {
-        let match = /^\$(\w+)\b/.exec(chunk)
+      } else if (chunk[0] === '$') {
+        const match = /^\$(\w+)\b/.exec(chunk)
         if (match) {
           tokens.push(lastToken = { type: 'var', name: match[1], params: [] })
           i += match[0].length
-        }
-        else {
+        } else {
           tokens.push(lastToken = { type: 'raw', value: chunk[0] })
           i++
         }
-      }
-      else {
-        let end$ = chunk.indexOf('$', 1)
-        let endO = chunk.indexOf('{', 1)
-        let endC = depth > 0 ? chunk.indexOf('}', 1) : -1
-        let end = Math.min(...[ end$, endO, endC ].filter(i => i > 0))
-        tokens.push(lastToken = { type: 'raw', value: chunk.slice(0, end) })
+      } else {
+        const end$ = chunk.indexOf('$', 1)
+        const endO = chunk.indexOf('{', 1)
+        const endC = depth > 0 ? chunk.indexOf('}', 1) : -1
+        const end = Math.min(...[end$, endO, endC].filter((i) => i !== -1))
+        lastToken = { type: 'raw', value: chunk.slice(0, end) }
+        tokens.push(lastToken)
         i += end
       }
     }
@@ -130,10 +148,10 @@ export default class Triggers extends Module {
   }
 
   @command('trigger', { role: command.ROLE.BOUNCER })
-  createTrigger(message, name, ...response) {
+  async createTrigger (message, name, ...response) {
     name = name.toLowerCase()
     response = response.join(' ')
-    if (name[0] === this.sekshi.trigger) {
+    if (name[0] === this.bot.trigger) {
       name = name.slice(1)
     }
     let trig = new Trigger({
@@ -141,26 +159,20 @@ export default class Triggers extends Module {
       response: response,
       user: message.user.id
     })
-    trig.save()
-      .then(() => {
-        message.reply(`Created trigger "!${name}"`)
-        this.add(name, response)
-      })
-      .catch(e => {
-        console.error(e.stack || e.message)
-        message.reply(`Could not add trigger...`)
-      })
+
+    await trig.save()
+    message.reply(`Created trigger "!${name}"`)
+    this.add(name, response)
   }
 
   @command('deltrigger', { role: command.ROLE.BOUNCER })
-  removeTrigger(message, name) {
+  async removeTrigger (message, name) {
     name = name.toLowerCase()
-    if (name[0] === this.sekshi.trigger) {
+    if (name[0] === this.bot.trigger) {
       name = name.slice(1)
     }
-    Trigger.remove({ _id: name }).then(removed => {
-      this.removeCommand(name)
-      message.reply(`Removed trigger "!${name}"`)
-    })
+    await Trigger.remove({ _id: name })
+    this.removeCommand(name)
+    message.reply(`Removed trigger "!${name}"`)
   }
 }

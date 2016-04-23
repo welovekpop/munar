@@ -1,89 +1,86 @@
 import { Module, command } from '../'
 import Media from '../models/Media'
-import moment from 'moment'
 import mongoose from 'mongoose'
 
-const debug = require('debug')('sekshi:song-ban')
-
+const bannedMediaSchema = {
+  format: Number,
+  cid: String,
+  reason: String,
+  time: { type: Date, default: Date.now },
+  moderator: { type: Number, ref: 'User' }
+}
 const BannedMedia = mongoose.modelNames().indexOf('BannedMedia') === -1
-  ? mongoose.model('BannedMedia', {
-      format: Number,
-      cid: String,
-      reason: String,
-      time: { type: Date, default: Date.now },
-      moderator: { type: Number, ref: 'User' }
-    })
+  ? mongoose.model('BannedMedia', bannedMediaSchema)
   : mongoose.model('BannedMedia')
 
 export default class SongBan extends Module {
-  constructor(sekshi, options) {
-    super(sekshi, options)
+  author = 'ReAnna'
+  description = 'Bans songs from being played ever again.'
 
-    this.author = 'ReAnna'
-    this.description = 'Bans songs from being played ever again.'
+  BannedMedia = BannedMedia
 
-    this.BannedMedia = BannedMedia
-
-    this.onAdvance = this.onAdvance.bind(this)
+  init () {
+    this.bot.on(this.bot.ADVANCE, this.onAdvance)
+  }
+  destroy () {
+    this.bot.removeListener(this.bot.ADVANCE, this.onAdvance)
   }
 
-  init() {
-    this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
-  }
-  destroy() {
-    this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
-  }
-
-  onAdvance(booth, { media }) {
+  onAdvance = (booth, { media }) => {
     BannedMedia.findOne({ cid: media.cid, format: media.format }).exec()
-      .then(banned => {
-        const modSkip = this.sekshi.getModule('modskip')
+      .then((banned) => {
+        const modSkip = this.bot.getModule('modskip')
         if (banned && modSkip) {
-          modSkip.lockskip(this.sekshi.getSelf(),
-                           banned.reason || 'This song was blacklisted.')
+          modSkip.lockskip(
+            this.bot.getSelf(),
+            banned.reason || 'This song was blacklisted.'
+          )
         }
       })
   }
 
   @command('songban', 'bansong', { role: command.ROLE.BOUNCER })
-  songban(user, cid, ...reason) {
+  songban (message, cid, ...reason) {
     Media.findOne({ cid: cid })
-      .then(media => {
+      .then((media) => {
         if (!media) {
           reason.unshift(cid)
-          return this.sekshi.getCurrentMedia()
+          return this.bot.getCurrentMedia()
         }
         return media
       })
-      .then(media => {
+      .then((media) => {
         return BannedMedia.create({
           format: media.format,
           cid: media.cid,
           reason: reason.join(' '),
-          moderator: user.id
-        }).then(banned => {
+          moderator: message.user.id
+        }).then((banned) => {
           if (media && media.author) {
-            this.sekshi.sendChat(`@${user.username} ${media.author} - ${media.title} is now blacklisted.`)
-          }
-          else {
-            this.sekshi.sendChat(`@${user.username} That song is now blacklisted.`)
+            message.reply(`${media.author} - ${media.title} is now blacklisted.`)
+          } else {
+            message.reply('That song is now blacklisted.')
           }
         })
       })
   }
 
   @command('songunban', 'unbansong', { role: command.ROLE.BOUNCER })
-  songunban(user, cid) {
+  songunban (message, cid) {
     BannedMedia.findOne({ cid: cid }).exec()
-      .then(banned => {
+      .then((banned) => {
         if (banned) BannedMedia.remove({ _id: banned._id })
       })
   }
 
   @command('banskip', 'bs', { role: command.ROLE.BOUNCER })
-  banskip(user, ...reason) {
-    const modSkip = this.sekshi.getModule('modskip')
-    if (modSkip) modSkip.skip(user, ...reason)
-    setTimeout(() => { this.songban(user, ...reason) }, 300)
+  banskip (message, ...reason) {
+    const modSkip = this.bot.getModule('modskip')
+    if (modSkip) {
+      modSkip.skip(message, ...reason)
+    }
+    setTimeout(() => {
+      this.songban(message, ...reason)
+    }, 300)
   }
 }

@@ -1,5 +1,5 @@
-import assign from 'object-assign'
 import Plugged from 'plugged'
+import last from 'lodash.last'
 
 const commandsSym = Symbol('commands')
 
@@ -9,8 +9,6 @@ const defaults = {
   role: ROLE.NONE
 }
 
-const last = arr => arr[arr.length - 1]
-
 export {
   ROLE,
   defaults,
@@ -19,7 +17,7 @@ export {
 
 Object.assign(command, { ROLE, defaults, symbol: commandsSym })
 
-export default function command(...names) {
+export default function command (...names) {
   let opts = typeof last(names) === 'object' ? names.pop() : {}
 
   return function (target, method, descriptor) {

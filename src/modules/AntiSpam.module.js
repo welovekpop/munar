@@ -4,31 +4,27 @@ export default class AntiSpam extends Module {
   author = 'ReAnna'
   description = 'Auto-deletes messages.'
 
-  constructor(sekshi, options) {
-    super(sekshi, options)
-  }
-
-  defaultOptions() {
+  defaultOptions () {
     return {
       afk: true,
       spam: true
     }
   }
 
-  init() {
+  init () {
     this.sekshi.on('message', this.onMessage)
   }
 
-  destroy() {
+  destroy () {
     this.sekshi.removeListener('message', this.onMessage)
   }
 
-  isAFK(message) {
+  isAFK (message) {
     return message.indexOf('[AFK] ') === 0 ||
       /^@(.*?) \[AFK\] /.test(message)
   }
 
-  isSpam(message) {
+  isSpam (message) {
     return message.indexOf('//adf.ly') > -1
   }
 

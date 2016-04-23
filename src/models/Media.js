@@ -13,7 +13,7 @@ export default class Media {
     cid: { type: String, index: true }
   }
 
-  get fullTitle() {
+  get fullTitle () {
     return `${this.author} – ${this.title}`
   }
 }

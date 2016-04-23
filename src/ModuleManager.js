@@ -1,18 +1,15 @@
-import find from 'array-find'
-import findIndex from 'array-findindex'
 import includes from 'array-includes'
 import Promise from 'bluebird'
 import path from 'path'
 import { EventEmitter } from 'events'
 
-const fs = Promise.promisifyAll(require('fs'))
 const readdir = Promise.promisify(require('recursive-readdir'))
 const debug = require('debug')('sekshi:modulemanager')
 
 const moduleRx = /\.module\.js$/
 
 export default class ModuleManager extends EventEmitter {
-  constructor(bot, dir) {
+  constructor (bot, dir) {
     super()
     this.moduleNames = []
     this.moduleNameMap = {}
@@ -22,36 +19,36 @@ export default class ModuleManager extends EventEmitter {
   }
 
   // fix case in module names
-  getModuleName(name) {
+  getModuleName (name) {
     let lname = name.toLowerCase()
     return this.moduleNameMap[lname]
   }
 
-  getModulePath(name) {
+  getModulePath (name) {
     return path.join(this.dir, `${this.getModuleName(name)}.module.js`)
   }
 
-  getConfigFile(name) {
+  getConfigFile (name) {
     return path.join(this.bot.getConfigDir(), `${name.toLowerCase()}.json`)
   }
 
-  known() {
+  known () {
     return this.moduleNames
   }
 
-  loaded() {
-    return this.modules.map(mod => mod.name)
+  loaded () {
+    return this.modules.map((mod) => mod.name)
   }
 
-  update() {
+  update () {
     return readdir(this.dir)
-      .filter(name => moduleRx.test(name))
-      .map(name => path.relative(this.dir, name))
-      .map(name => name.replace(moduleRx, ''))
-      .tap(names => this._setModuleNames(names))
+      .filter((name) => moduleRx.test(name))
+      .map((name) => path.relative(this.dir, name))
+      .map((name) => name.replace(moduleRx, ''))
+      .tap((names) => this._setModuleNames(names))
   }
 
-  register(name, instance) {
+  register (name, instance) {
     this.modules.push({
       name, instance
     })
@@ -59,9 +56,9 @@ export default class ModuleManager extends EventEmitter {
     this.emit('register', instance, name)
   }
 
-  unregister(rawName) {
+  unregister (rawName) {
     let lname = rawName.toLowerCase()
-    let i = findIndex(this.modules, mod => mod.name.toLowerCase() === lname)
+    let i = this.modules.findIndex((mod) => mod.name.toLowerCase() === lname)
     if (i !== -1) {
       let mod = this.modules[i]
       this.modules.splice(i, 1)
@@ -73,13 +70,13 @@ export default class ModuleManager extends EventEmitter {
     return false
   }
 
-  get(rawName) {
+  get (rawName) {
     let moduleName = this.getModuleName(rawName)
-    let mod = find(this.modules, mod => mod.name == moduleName)
+    let mod = this.modules.find((mod) => mod.name === moduleName)
     return mod ? mod.instance : null
   }
 
-  load(rawName) {
+  load (rawName) {
     let moduleName = this.getModuleName(rawName)
     if (!moduleName) {
       throw new Error(`Module "${moduleName}" not found`)
@@ -103,7 +100,7 @@ export default class ModuleManager extends EventEmitter {
     return mod
   }
 
-  unload(name) {
+  unload (name) {
     let mod = this.get(name)
     if (mod) {
       mod.saveOptions()
@@ -117,20 +114,20 @@ export default class ModuleManager extends EventEmitter {
     return mod
   }
 
-  reload(name) {
+  reload (name) {
     this.unload(name)
     return this.load(name)
   }
 
-  _setModuleNames(names) {
+  _setModuleNames (names) {
     debug('names', ...names)
     let previous = this.moduleNames
-    previous.forEach(name => {
+    previous.forEach((name) => {
       if (!includes(names, name)) {
         this.emit('lost', name)
       }
     })
-    names.forEach(name => {
+    names.forEach((name) => {
       if (!includes(previous, name)) {
         this.emit('discovered', name)
       }

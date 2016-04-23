@@ -1,7 +1,5 @@
-import find from 'array-find'
-import includes from 'array-includes'
 import mkdirp from 'mkdirp'
-import { EventEmitter } from 'events'
+import EventEmitter from 'events'
 import fs from 'fs'
 import { dirname } from 'path'
 import command from './command'
@@ -9,7 +7,7 @@ import command from './command'
 const debug = require('debug')('sekshi:module')
 
 export default class Module extends EventEmitter {
-  constructor(bot, optionsFile) {
+  constructor (bot, optionsFile) {
     super()
 
     this._enabled = false
@@ -18,25 +16,28 @@ export default class Module extends EventEmitter {
 
     this.bot = bot
     this.sekshi = bot
-    this.options = { ...this.defaultOptions(), ...this.loadOptions() }
+    this.options = {
+      ...this.defaultOptions(),
+      ...this.loadOptions()
+    }
 
     debug('init', this.constructor.name, optionsFile)
   }
 
-  defaultOptions() {
+  defaultOptions () {
     return {}
   }
 
-  init() {
+  init () {
   }
-  destroy() {
+  destroy () {
   }
 
   adapter (name) {
     return this.bot.getAdapter(name)
   }
 
-  enable(opts = {}) {
+  enable (opts = {}) {
     if (!this.enabled()) {
       this._enabled = true
       // don't save immediately on boot
@@ -51,7 +52,7 @@ export default class Module extends EventEmitter {
       this.init()
     }
   }
-  disable(opts = {}) {
+  disable (opts = {}) {
     if (this.enabled()) {
       this.destroy()
       this._enabled = false
@@ -61,11 +62,11 @@ export default class Module extends EventEmitter {
       }
     }
   }
-  enabled() {
+  enabled () {
     return this._enabled
   }
 
-  addCommand(name, opts, cb = null) {
+  addCommand (name, opts, cb = null) {
     if (cb === null) {
       [ opts, cb ] = [ {}, opts ]
     }
@@ -78,8 +79,8 @@ export default class Module extends EventEmitter {
     return this
   }
 
-  removeCommand(name) {
-    this.commands = this.commands.filter(com => {
+  removeCommand (name) {
+    this.commands = this.commands.filter((com) => {
       let i = com.names.indexOf(name)
       if (i !== -1) {
         com.names.splice(i, 1)
@@ -89,17 +90,17 @@ export default class Module extends EventEmitter {
     })
   }
 
-  _getOptionName(name) {
+  _getOptionName (name) {
     const names = Object.keys(this.options)
     const lname = name.toLowerCase()
-    return find(names, n => n.toLowerCase() == lname) || name
+    return names.find((n) => n.toLowerCase() === lname) || name
   }
 
-  getOption(name) {
+  getOption (name) {
     return this.options[this._getOptionName(name)]
   }
 
-  setOption(name, value) {
+  setOption (name, value) {
     const oname = this._getOptionName(name)
     if (oname in this.options) {
       this.options[oname] = value
@@ -107,23 +108,25 @@ export default class Module extends EventEmitter {
     }
   }
 
-  getOptions() {
+  getOptions () {
     return this.options
   }
 
-  loadOptions() {
+  loadOptions () {
     try {
       debug('loading options', this._optionsFile)
       return JSON.parse(fs.readFileSync(this._optionsFile, 'utf8'))
-    }
-    catch (e) {
+    } catch (e) {
       return {}
     }
   }
 
-  saveOptions(options = this.getOptions()) {
+  saveOptions (options = this.getOptions()) {
     debug('saving options', this._optionsFile)
-    options = { ...options, $enabled: this.enabled() }
+    options = {
+      ...options,
+      $enabled: this.enabled()
+    }
     mkdirp.sync(dirname(this._optionsFile))
     fs.writeFileSync(this._optionsFile, JSON.stringify(options, null, 2), 'utf8')
   }

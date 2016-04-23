@@ -18,7 +18,7 @@ export default class ClearChat extends Module {
     this.sekshi.getChat()
       .filter(filter)
       .reverse() // delete recent messages first
-      .forEach(msg => this.sekshi.removeChatMessage(msg.cid))
+      .forEach((msg) => this.sekshi.removeChatMessage(msg.cid))
   }
 
   @command('clearchat', { role: command.ROLE.BOUNCER })
@@ -27,7 +27,7 @@ export default class ClearChat extends Module {
       types = [ 'all' ]
     }
     if (types.indexOf('all') !== -1) {
-      this._delete(msg => true)
+      this._delete(() => true)
       this.sekshi.sendChat(`@${user.username} Clearing chat!`)
       return
     }
@@ -35,19 +35,17 @@ export default class ClearChat extends Module {
     let dels = []
     let deletedUsers = []
 
-    types.forEach(type => {
+    types.forEach((type) => {
       if (type === 'link' || type === 'links') {
-        this._delete(msg => LINK_RX.test(msg.message))
+        this._delete((msg) => LINK_RX.test(msg.message))
         dels.push('links')
-      }
-      else if (type === 'commands') {
-        this._delete(msg => COMMAND_RX.test(msg.message))
+      } else if (type === 'commands') {
+        this._delete((msg) => COMMAND_RX.test(msg.message))
         dels.push('commands')
-      }
-      else if (type) {
+      } else if (type) {
         if (type.charAt(0) === '@') type = type.slice(1)
         let username = type.toLowerCase()
-        this._delete(msg => msg.username.toLowerCase() === username)
+        this._delete((msg) => msg.username.toLowerCase() === username)
         // get proper capitalisation for users who are in the room
         let user = this.sekshi.getUserByName(type)
         deletedUsers.push(user ? user.username : type)
@@ -59,5 +57,4 @@ export default class ClearChat extends Module {
     }
     this.sekshi.sendChat(`@${user.username} Deleting ${joinList(dels)} from chat!`)
   }
-
 }

@@ -1,4 +1,3 @@
-import EventEmitter from 'events'
 import SlackClient from 'slack-client'
 
 import { Adapter } from '../../'
@@ -33,9 +32,7 @@ export default class Slack extends Adapter {
         resolve()
       })
       this.client.on('message', this.onMessage)
-      this.client.on('error', e => {
-        reject(e)
-      })
+      this.client.on('error', reject)
 
       this.client.login()
     })

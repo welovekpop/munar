@@ -1,4 +1,4 @@
-export function linkNames(slack, text) {
+export function linkNames (slack, text) {
   return text
     .replace(/@(channel|everyone|group|here)/g, (match, name) => `<!${name}|${name}>`)
     .replace(/@([\w_-]+)/g, (match, name) => {

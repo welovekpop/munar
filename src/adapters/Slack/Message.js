@@ -1,21 +1,20 @@
-import SlackUser from './User'
 import Message from '../../Message'
 
 export default class SlackMessage extends Message {
-  constructor(slack, ...args) {
+  constructor (slack, ...args) {
     super(...args)
     this.slack = slack
   }
 
-  get user() {
+  get user () {
     return this.slack.getUser(this.sourceMessage.user)
   }
 
-  get username() {
+  get username () {
     return this.user.username
   }
 
-  delete() {
+  delete () {
     this.sourceMessage.deleteMessage()
   }
 }
