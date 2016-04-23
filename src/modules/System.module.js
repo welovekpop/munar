@@ -1,21 +1,18 @@
 import { Module, command } from '../'
 
-const sekshibot = require('../../package.json')
-const plugged = require('plugged/package.json')
-const mongoose = require('mongoose/package.json')
+const pkg = require('../../package.json')
 
 export default class System extends Module {
   author = 'Sooyou'
   description = 'Simple tools for module management & system information'
 
   manager () {
-    return this.sekshi.plugins
+    return this.bot.plugins
   }
 
   @command('version')
   version (message) {
-    const str = (pkg) => `${pkg.name} v${pkg.version}`
-    message.reply(`Running ${str(sekshibot)} on ${str(plugged)}, ${str(mongoose)}`)
+    message.reply(`Running ${pkg.name} v${pkg.version}`)
   }
 
   @command('reload', { role: command.ROLE.MANAGER })

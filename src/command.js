@@ -1,12 +1,19 @@
-import Plugged from 'plugged'
+import * as permissions from './permissions'
 import last from 'lodash.last'
 
 const commandsSym = Symbol('commands')
 
-const ROLE = Plugged.prototype.USERROLE
-
 const defaults = {
-  role: ROLE.NONE
+  role: permissions.NONE
+}
+
+const ROLE = {
+  NONE: permissions.NONE,
+  RESIDENTDJ: permissions.REGULAR,
+  BOUNCER: permissions.MODERATOR,
+  MANAGER: permissions.MODERATOR,
+  COHOST: permissions.ADMIN,
+  HOST: permissions.ADMIN
 }
 
 export {
@@ -15,7 +22,9 @@ export {
   commandsSym as symbol
 }
 
-Object.assign(command, { ROLE, defaults, symbol: commandsSym })
+command.ROLE = ROLE
+command.defaults = defaults
+command.symbol = commandsSym
 
 export default function command (...names) {
   let opts = typeof last(names) === 'object' ? names.pop() : {}

@@ -32,7 +32,6 @@
     "mongoose-random": "^0.1.1",
     "mongoose-time": "^0.1.0",
     "object-assign": "^4.1.0",
-    "plugged": "2.x",
     "promise": "^6.1.0",
     "random-item": "^1.0.0",
     "recursive-readdir": "^1.2.1",
