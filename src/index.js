@@ -1,4 +1,4 @@
-export Adapter from './adapters/Adapter'
+export Adapter from './Adapter'
 export Module from './Module'
 export command from './command'
 
