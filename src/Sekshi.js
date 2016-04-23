@@ -5,7 +5,7 @@ import Promise from 'bluebird'
 import includes from 'array-includes'
 import mkdirp from 'mkdirp'
 import User from './models/User'
-import ModuleManager from './ModuleManager'
+import PluginManager from './PluginManager'
 import escapeStringRegExp from 'escape-string-regexp'
 import Ultron from 'ultron'
 
@@ -21,7 +21,7 @@ export default class Sekshi extends EventEmitter {
     this.options = options
     this.db = mongoose.connect(options.mongo)
 
-    this.modules = new ModuleManager(this, path.join(__dirname, 'modules'))
+    this.plugins = new PluginManager(this, path.join(__dirname, 'modules'))
     this.adapters = {}
     this.trigger = options.trigger || '!'
 
@@ -58,10 +58,10 @@ export default class Sekshi extends EventEmitter {
     // the event is fired on nextTick so modules can simply listen for "moduleloaded"
     // and get events for *all* the modules when loadModules() is called, even for those
     // that register earlier
-    this.modules.on('load', (mod, name) => {
+    this.plugins.on('load', (mod, name) => {
       setImmediate(() => { this.emit('moduleloaded', mod, name) })
     })
-    this.modules.on('unload', (mod, name) => {
+    this.plugins.on('unload', (mod, name) => {
       setImmediate(() => { this.emit('moduleunloaded', mod, name) })
     })
   }
@@ -148,7 +148,7 @@ export default class Sekshi extends EventEmitter {
     let commandName = args.shift().replace(this.trigger, '').toLowerCase()
 
     async function tryCommand (moduleName) {
-      const mod = this.modules.get(moduleName)
+      const mod = this.plugins.get(moduleName)
       if (!mod || !mod.enabled() || !Array.isArray(mod.commands)) {
         return
       }
@@ -174,7 +174,7 @@ export default class Sekshi extends EventEmitter {
     }
 
     return Promise.all(
-      this.modules.loaded().map(tryCommand, this)
+      this.plugins.loaded().map(tryCommand, this)
     )
   }
 
@@ -247,19 +247,19 @@ export default class Sekshi extends EventEmitter {
   }
 
   getModule (name) {
-    return this.modules.get(name)
+    return this.plugins.get(name)
   }
 
   loadModules () {
     debug('load all')
-    this.modules.update()
-      .each((name) => this.modules.load(name))
+    this.plugins.update()
+      .each((name) => this.plugins.load(name))
   }
 
   unloadModules () {
     debug('unload all')
-    this.modules.loaded()
-      .forEach((name) => this.modules.unload(name))
+    this.plugins.loaded()
+      .forEach((name) => this.plugins.unload(name))
   }
 
   getConfigDir () {

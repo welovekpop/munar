@@ -9,7 +9,7 @@ export default class System extends Module {
   description = 'Simple tools for module management & system information'
 
   manager () {
-    return this.sekshi.modules
+    return this.sekshi.plugins
   }
 
   @command('version')
