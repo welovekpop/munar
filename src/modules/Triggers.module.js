@@ -22,7 +22,7 @@ const vars = {
     return source.getCurrentDJ().username
   },
   bot ({ source }) {
-    return source.getBotUser().username
+    return source.getSelf().username
   },
   artist () {
     const source = this.getAdapter('uwave')

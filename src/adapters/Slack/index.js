@@ -31,6 +31,9 @@ export default class Slack extends Adapter {
         debug('connected', this.client.team.name)
         resolve()
       })
+      this.client.on('loggedIn', (self) => {
+        this.self = new User(this, self)
+      })
       this.client.on('message', this.onMessage)
       this.client.on('error', reject)
 
@@ -41,6 +44,10 @@ export default class Slack extends Adapter {
   disconnect () {
     this.client.disconnect()
     this.client = null
+  }
+
+  getSelf () {
+    return this.self
   }
 
   getUsers () {

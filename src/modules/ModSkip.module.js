@@ -65,8 +65,8 @@ export default class ModSkip extends Module {
     if (!dj || !dj.id) {
       return message.reply('Nobody is DJing currently...')
     }
-    let isSekshi = message.user.id === message.source.getBotUser().id
-    if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
+    let isSelf = message.user.id === message.source.getSelf().id
+    if (isSelf || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
       this._saveSkip(message.user, reason.join(' ') || false)
       this.source.send(this._skipMessage(message, reason.join(' ')))
@@ -80,8 +80,8 @@ export default class ModSkip extends Module {
     if (!dj || !dj.id) {
       return message.reply('Nobody is DJing currently...')
     }
-    let isSekshi = message.user.id === message.source.getBotUser().id
-    if (isSekshi || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
+    let isSelf = message.user.id === message.source.getSelf().id
+    if (isSelf || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
       this._saveSkip(message.user, reason.join(' ') || false, true)
       this.sekshi.sendChat(this._skipMessage(message, reason.join(' ')))
