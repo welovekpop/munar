@@ -1,32 +1,26 @@
 import includes from 'array-includes'
 import Promise from 'bluebird'
-import path from 'path'
-import { EventEmitter } from 'events'
+import * as path from 'path'
+import EventEmitter from 'events'
+import readdirCallback from 'recursive-readdir'
 
-const readdir = Promise.promisify(require('recursive-readdir'))
+const readdir = Promise.promisify(readdirCallback)
 const debug = require('debug')('sekshi:pluginmanager')
 
 const pluginRx = /\.module\.js$/
 
 export default class PluginManager extends EventEmitter {
-  pluginNames = []
-  pluginNameMap = {}
   plugins = []
 
-  constructor (bot, dir) {
+  constructor (bot, options = {}) {
     super()
-    this.dir = dir
+
+    if (typeof options === 'string') {
+      options = { dir: options }
+    }
+
+    this.options = options
     this.bot = bot
-  }
-
-  // fix case in plugin names
-  getPluginName (name) {
-    let lname = name.toLowerCase()
-    return this.pluginNameMap[lname]
-  }
-
-  getPluginPath (name) {
-    return path.join(this.dir, `${this.getPluginName(name)}.module.js`)
   }
 
   getConfigFile (name) {
@@ -34,27 +28,64 @@ export default class PluginManager extends EventEmitter {
   }
 
   known () {
-    return this.pluginNames
-  }
-
-  loaded () {
     return this.plugins.map((plugin) => plugin.name)
   }
 
-  update () {
-    return readdir(this.dir)
-      .filter((name) => pluginRx.test(name))
-      .map((name) => path.relative(this.dir, name))
-      .map((name) => name.replace(pluginRx, ''))
-      .tap((names) => this._setPluginNames(names))
+  loaded () {
+    return this.plugins
+      .filter((plugin) => !!plugin.instance)
+      .map((plugin) => plugin.name)
   }
 
-  register (name, instance) {
+  async updateLocalPlugins (dir) {
+    const plugins = []
+    // Plugins have file names ending in ".module.js"
+    const pluginFiles = await readdir(dir)
+      .filter((name) => pluginRx.test(name))
+    for (const filePath of pluginFiles) {
+      try {
+        const name = path.relative(this.options.dir, filePath).replace(pluginRx, '')
+        const requirePath = require.resolve(filePath)
+        plugins.push({
+          name,
+          path: requirePath
+        })
+      } catch (e) {
+        debug('could not resolve plugin', filePath)
+      }
+    }
+    return plugins
+  }
+
+  async update () {
+    let plugins = []
+    if (this.options.dir) {
+      const localPlugins = await this.updateLocalPlugins(this.options.dir)
+      plugins = [ ...plugins, ...localPlugins ]
+    }
+
+    for (const { name, path } of plugins) {
+      if (!this.plugins.some((plugin) => plugin.name === name)) {
+        this.register(name, path)
+      }
+    }
+
+    const pluginNames = plugins.map((plugin) => plugin.name)
+    for (const plugin of this.plugins) {
+      if (!includes(pluginNames, plugin.name)) {
+        this.unregister(plugin.name)
+      }
+    }
+
+    return this.known()
+  }
+
+  register (name, path) {
     this.plugins.push({
-      name, instance
+      name, path
     })
 
-    this.emit('register', instance, name)
+    this.emit('discovered', name, path)
   }
 
   unregister (rawName) {
@@ -64,79 +95,62 @@ export default class PluginManager extends EventEmitter {
       let plugin = this.plugins[i]
       this.plugins.splice(i, 1)
 
-      this.emit('unregister', plugin.instance, plugin.name)
+      this.emit('lost', plugin.instance, plugin.name)
 
       return true
     }
     return false
   }
 
-  get (rawName) {
-    let pluginName = this.getPluginName(rawName)
-    let plugin = this.plugins.find((plugin) => plugin.name === pluginName)
-    return plugin ? plugin.instance : null
+  getMeta (pluginName) {
+    return this.plugins.find(
+      (plugin) => plugin.name.toLowerCase() === pluginName.toLowerCase()
+    )
   }
 
-  load (rawName) {
-    let pluginName = this.getPluginName(rawName)
-    if (!pluginName) {
-      throw new Error(`Plugin "${pluginName}" not found`)
-    }
+  get (pluginName) {
+    const meta = this.getMeta(pluginName)
+    return meta ? meta.instance : null
+  }
 
-    let plugin = this.get(pluginName)
-    if (plugin) return plugin
+  load (pluginName) {
+    const meta = this.getMeta(pluginName)
 
-    let pluginPath = this.getPluginPath(pluginName)
-    const PluginClass = require(pluginPath).default
-    this.register(pluginName, new PluginClass(this.bot, this.getConfigFile(pluginName)))
-    plugin = this.get(pluginName)
+    if (meta.instance) return meta.instance
+
+    const m = require(meta.path)
+    const PluginClass = m.default || m
+    const plugin = new PluginClass(this.bot, this.getConfigFile(meta.name))
+
+    meta.instance = plugin
 
     // enable system plugins by default
-    if (pluginName === 'System' || plugin.getOption('$enabled')) {
+    if (meta.name === 'System' || plugin.getOption('$enabled')) {
       plugin.enable({ silent: true })
     }
 
-    this.emit('load', plugin, pluginName)
+    this.emit('load', plugin, meta.name)
 
     return plugin
   }
 
-  unload (name) {
-    let plugin = this.get(name)
-    if (plugin) {
-      plugin.saveOptions()
-      plugin.disable({ silent: true })
-      delete require.cache[path.resolve(this.getPluginPath(name))]
-      this.unregister(name)
+  unload (pluginName) {
+    const meta = this.getMeta(name)
+    if (meta) {
+      meta.instance.saveOptions()
+      meta.instance.disable({ silent: true })
+      delete require.cache[meta.path]
+      this.unregister(meta.name)
 
-      this.emit('unload', plugin, this.getPluginName(name))
+      this.emit('unload', meta.instance, meta.name)
+      return meta.instance
     }
 
-    return plugin
+    return null
   }
 
   reload (name) {
     this.unload(name)
     return this.load(name)
-  }
-
-  _setPluginNames (names) {
-    debug('names', ...names)
-    let previous = this.pluginNames
-    previous.forEach((name) => {
-      if (!includes(names, name)) {
-        this.emit('lost', name)
-      }
-    })
-    names.forEach((name) => {
-      if (!includes(previous, name)) {
-        this.emit('discovered', name)
-      }
-    })
-    this.pluginNames = names
-    this.pluginNameMap = names.reduce((map, name) => {
-      map[name.toLowerCase()] = name
-      return map
-    }, {})
   }
 }
