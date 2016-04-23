@@ -13,14 +13,14 @@ export default class HistoryLogger extends Module {
   description = 'Keeps a history of all songs that are played in the room.'
 
   init () {
-    this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
-    this.sekshi.on(this.sekshi.VOTE, this.onVote)
-    this.sekshi.on(this.sekshi.GRAB_UPDATE, this.onGrab)
+    this.bot.on(this.bot.ADVANCE, this.onAdvance)
+    this.bot.on(this.bot.VOTE, this.onVote)
+    this.bot.on(this.bot.GRAB_UPDATE, this.onGrab)
 
     this._currentEntry = null
   }
   destroy () {
-    this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
+    this.bot.removeListener(this.bot.ADVANCE, this.onAdvance)
   }
 
   getCurrentEntry () {
@@ -28,17 +28,17 @@ export default class HistoryLogger extends Module {
   }
 
   onAdvance = (booth, newPlay, previous) => {
-    const sekshi = this.sekshi
+    const bot = this.bot
 
     this._grabs = []
 
     if (this._currentEntry && previous && previous.score) {
-      previous.score.listeners = sekshi.getUsers().length
+      previous.score.listeners = bot.getUsers().length
       this._currentEntry.set('score', previous.score).save()
     }
 
-    let currentMedia = sekshi.getCurrentMedia()
-    let dj = sekshi.getCurrentDJ()
+    let currentMedia = bot.getCurrentMedia()
+    let dj = bot.getCurrentDJ()
     if (!currentMedia || !currentMedia.cid) {
       return
     }

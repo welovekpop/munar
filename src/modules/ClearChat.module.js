@@ -9,26 +9,26 @@ export default class ClearChat extends Module {
   description = 'Provides a !clearchat command to clean up spam.'
 
   init () {
-    this.sekshi.cacheChat(true)
+    this.bot.cacheChat(true)
     // size of the default chat history in plug's UI
-    this.sekshi.setChatCacheSize(512)
+    this.bot.setChatCacheSize(512)
   }
 
   _delete (filter) {
-    this.sekshi.getChat()
+    this.bot.getChat()
       .filter(filter)
       .reverse() // delete recent messages first
-      .forEach((msg) => this.sekshi.removeChatMessage(msg.cid))
+      .forEach((msg) => this.bot.removeChatMessage(msg.cid))
   }
 
   @command('clearchat', { role: command.ROLE.BOUNCER })
-  clearchat (user, ...types) {
+  clearchat (message, ...types) {
     if (types.length === 0) {
       types = [ 'all' ]
     }
     if (types.indexOf('all') !== -1) {
       this._delete(() => true)
-      this.sekshi.sendChat(`@${user.username} Clearing chat!`)
+      message.reply('Clearing chat!')
       return
     }
 
@@ -47,7 +47,7 @@ export default class ClearChat extends Module {
         let username = type.toLowerCase()
         this._delete((msg) => msg.username.toLowerCase() === username)
         // get proper capitalisation for users who are in the room
-        let user = this.sekshi.getUserByName(type)
+        let user = message.source.getUserByName(type)
         deletedUsers.push(user ? user.username : type)
       }
     })
@@ -55,6 +55,6 @@ export default class ClearChat extends Module {
     if (deletedUsers.length > 0) {
       dels.push(`messages by ${joinList(deletedUsers)}`)
     }
-    this.sekshi.sendChat(`@${user.username} Deleting ${joinList(dels)} from chat!`)
+    message.reply(`Deleting ${joinList(dels)} from chat!`)
   }
 }

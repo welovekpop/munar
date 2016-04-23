@@ -22,7 +22,7 @@ export default class YouTubeAvailable extends Module {
   init () {
     if (!this.options.key) {
       this.bot.sendChat(
-        '@staff The YouTube Availability module needs a YouTube API key. ' +
+        '@staff The YouTube Availability plugin needs a YouTube API key. ' +
         'Please set it using "!set youtubeavailable key API_KEY_HERE".'
       )
     }
@@ -35,7 +35,7 @@ export default class YouTubeAvailable extends Module {
 
   onAdvance = () => {
     const media = this.bot.getCurrentMedia()
-    const modSkip = this.bot.getModule('modskip')
+    const modSkip = this.bot.getPlugin('modskip')
     const self = this.bot.getSelf()
     if (media && media.format === 1 && this.options.key) {
       let url = `${this.options.api}?id=${media.cid}&part=contentDetails,status&key=${this.options.key}`

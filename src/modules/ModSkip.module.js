@@ -44,7 +44,7 @@ export default class ModSkip extends Module {
   }
 
   _saveSkip (user, reason, isLockskip = false) {
-    const history = this.sekshi.getModule('historylogger')
+    const history = this.bot.getPlugin('historylogger')
     if (history) {
       let entry = history.getCurrentEntry()
       if (entry) {
@@ -84,8 +84,8 @@ export default class ModSkip extends Module {
     if (isSelf || Date.now() - this.options.cooldown * 1000 > this._lastSkip) {
       this._lastSkip = Date.now()
       this._saveSkip(message.user, reason.join(' ') || false, true)
-      this.sekshi.sendChat(this._skipMessage(message, reason.join(' ')))
-      this.sekshi.lockskipDJ(dj.id, this.options.lockskipPos)
+      this.bot.sendChat(this._skipMessage(message, reason.join(' ')))
+      this.bot.lockskipDJ(dj.id, this.options.lockskipPos)
     }
   }
 }

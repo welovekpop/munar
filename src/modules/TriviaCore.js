@@ -42,7 +42,7 @@ export default class TriviaCore extends Module {
     this._points = {}
     this.questions = []
     this._currentQuestion = null
-    this.sekshi.on('message', this.onChat)
+    this.bot.on('message', this.onChat)
 
     return this._load()
   }
@@ -106,7 +106,7 @@ export default class TriviaCore extends Module {
   stopTrivia () {
     this._running = false
     clearTimeout(this._timeout)
-    this.sekshi.removeListener('message', this.onChat)
+    this.bot.removeListener('message', this.onChat)
   }
 
   onChat = (message) => {

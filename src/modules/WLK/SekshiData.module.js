@@ -16,26 +16,26 @@ export default class WLKSekshiData extends Module {
   }
 
   @command('profile')
-  showProfileLink (user, targetName = null) {
-    this.sekshi.findUser(targetName, user)
+  showProfileLink (message, targetName = null) {
+    this.bot.findUser(targetName, message.user)
       .then((target) => {
         let slug = target.slug || target.id
-        this.sekshi.sendChat(`@${target.username}'s profile page: ${this.base()}user/${slug}`)
+        message.send(`@${target.username}'s profile page: ${this.base()}user/${slug}`)
       })
       .catch((e) => {
-        this.sekshi.sendChat(`@${user.username} ${e.message}`)
+        message.reply(e.message)
       })
   }
 
   @command('songpage', 'mediapage')
-  showMediaLink (user) {
-    let media = this.sekshi.getCurrentMedia()
+  showMediaLink (message) {
+    let media = this.bot.getCurrentMedia()
     if (!media) {
-      this.sekshi.sendChat(`@${user.username} No song is playing right now.`)
+      message.reply('No song is playing right now.')
       return
     }
-    this.sekshi.sendChat(
-      `@${user.username} Statistics & more for this video can be found at: ` +
+    message.reply(
+      'Statistics & more for this video can be found at: ' +
       `${this.base()}media/${media.cid}`
     )
   }

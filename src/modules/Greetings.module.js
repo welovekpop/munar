@@ -28,11 +28,11 @@ export default class Greetings extends Module {
 
   init () {
     this.lastGreeted = -1
-    this.sekshi.on('user:join', this.greet)
+    this.bot.on('user:join', this.greet)
   }
 
   destroy () {
-    this.sekshi.removeListener('user:join', this.greet)
+    this.bot.removeListener('user:join', this.greet)
   }
 
   greet = (user) => {

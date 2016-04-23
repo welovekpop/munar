@@ -4,18 +4,18 @@ import fs from 'fs'
 import { dirname } from 'path'
 import command from './command'
 
-const debug = require('debug')('sekshi:module')
+const debug = require('debug')('sekshi:plugin')
 
-export default class Module extends EventEmitter {
+export default class Plugin extends EventEmitter {
+  _enabled = false
+  commands = []
+
   constructor (bot, optionsFile) {
     super()
 
-    this._enabled = false
     this._optionsFile = optionsFile
-    this.commands = []
 
     this.bot = bot
-    this.sekshi = bot
     this.options = {
       ...this.defaultOptions(),
       ...this.loadOptions()

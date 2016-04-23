@@ -19,21 +19,21 @@ export default class HistorySkip extends Module {
   }
 
   init () {
-    this.sekshi.on(this.sekshi.ADVANCE, this.onAdvance)
+    this.bot.on(this.bot.ADVANCE, this.onAdvance)
   }
   destroy () {
-    this.sekshi.removeListener(this.sekshi.ADVANCE, this.onAdvance)
+    this.bot.removeListener(this.bot.ADVANCE, this.onAdvance)
   }
 
   onAdvance = (booth, { media }) => {
-    let dj = this.sekshi.getCurrentDJ()
-    const modSkip = this.sekshi.getModule('modskip')
+    let dj = this.bot.getCurrentDJ()
+    const modSkip = this.bot.getPlugin('modskip')
 
-    // nobody is playing anymore, or the skip module is
+    // nobody is playing anymore, or the skip plugin is
     // not loaded
     if (!dj || !modSkip) return
 
-    this.sekshi.getRoomHistory((e, history) => {
+    this.bot.getRoomHistory((e, history) => {
       if (e) return debug('error loading history', e)
       const shouldSkip = history
         .slice(0, this.options.limit)
@@ -41,10 +41,10 @@ export default class HistorySkip extends Module {
       if (shouldSkip) {
         this._skipCount[dj.id] = (this._skipCount[dj.id] || 0) + 1
         if (this._skipCount[dj.id] >= this.options.autoremove) {
-          this.sekshi.sendChat(modSkip.getSkipMessage('history'))
-          this.sekshi.removeDJ(dj.id)
+          this.bot.sendChat(modSkip.getSkipMessage('history'))
+          this.bot.removeDJ(dj.id)
         } else {
-          modSkip.lockskip(this.sekshi.getSelf(), 'history')
+          modSkip.lockskip(this.bot.getSelf(), 'history')
         }
       } else {
         delete this._skipCount[dj.id]

@@ -50,29 +50,31 @@ export default class Sekshi extends EventEmitter {
       this.attachAdapter(this.adapters[adapterName])
     })
 
-    this.loadModules()
+    this.loadPlugins()
     mkdirp(this._configDir, (e) => {
       if (cb) cb(e || null)
     })
 
-    // the event is fired on nextTick so modules can simply listen for "moduleloaded"
-    // and get events for *all* the modules when loadModules() is called, even for those
+    // the event is fired on nextTick so plugins can simply listen for "pluginloaded"
+    // and get events for *all* the plugins when loadPlugins() is called, even for those
     // that register earlier
     this.plugins.on('load', (mod, name) => {
-      setImmediate(() => { this.emit('moduleloaded', mod, name) })
+      setImmediate(() => { this.emit('pluginloaded', mod, name) })
     })
     this.plugins.on('unload', (mod, name) => {
-      setImmediate(() => { this.emit('moduleunloaded', mod, name) })
+      setImmediate(() => { this.emit('pluginunloaded', mod, name) })
     })
   }
 
   stop (cb) {
-    this.unloadModules()
+    this.unloadPlugins()
+
     Object.keys(this.adapters).map((adapterName) => {
       const adapter = this.adapters[adapterName]
       this.detachAdapter(adapter)
       return adapter.disconnect()
     })
+
     // should *probably* also wait for this before callback-ing
     mongoose.disconnect()
 
@@ -147,13 +149,13 @@ export default class Sekshi extends EventEmitter {
     let args = this.parseArguments(message)
     let commandName = args.shift().replace(this.trigger, '').toLowerCase()
 
-    async function tryCommand (moduleName) {
-      const mod = this.plugins.get(moduleName)
-      if (!mod || !mod.enabled() || !Array.isArray(mod.commands)) {
+    async function tryCommand (pluginName) {
+      const plugin = this.plugins.get(pluginName)
+      if (!plugin || !plugin.enabled() || !Array.isArray(plugin.commands)) {
         return
       }
 
-      const command = mod.commands.find(
+      const command = plugin.commands.find(
         (com) => includes(com.names, commandName)
       )
       if (!command) return
@@ -164,9 +166,9 @@ export default class Sekshi extends EventEmitter {
 
       if (source.canExecute(message)) {
         if (command.method) {
-          await mod[command.method](message, ...args)
+          await plugin[command.method](message, ...args)
         } else {
-          await command.callback.call(mod, message, ...args)
+          await command.callback.call(plugin, message, ...args)
         }
       } else {
         throw new Error('You cannot use this command.')
@@ -246,17 +248,17 @@ export default class Sekshi extends EventEmitter {
     return args
   }
 
-  getModule (name) {
+  getPlugin (name) {
     return this.plugins.get(name)
   }
 
-  loadModules () {
+  loadPlugins () {
     debug('load all')
     this.plugins.update()
       .each((name) => this.plugins.load(name))
   }
 
-  unloadModules () {
+  unloadPlugins () {
     debug('unload all')
     this.plugins.loaded()
       .forEach((name) => this.plugins.unload(name))

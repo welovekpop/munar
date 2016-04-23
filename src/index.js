@@ -1,5 +1,6 @@
 export Adapter from './Adapter'
-export Module from './Module'
+export Module from './Plugin'
+export Plugin from './Plugin'
 export command from './command'
 
 export Message from './Message'

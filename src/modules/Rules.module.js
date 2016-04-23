@@ -12,7 +12,7 @@ export default class Rules extends Module {
 
   @command('rule', { role: command.ROLE.RESIDENTDJ })
   rule (message, n, targetName = null) {
-    const descr = this.sekshi.getDescription()
+    const descr = this.bot.getDescription()
     const rx = new RegExp(`^${n}. `)
     const rule = descr.split('\n').find((line) => rx.test(line))
 

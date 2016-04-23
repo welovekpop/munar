@@ -5,30 +5,30 @@ export default class WLKAutoAchievements extends Module {
   author = 'WE ♥ KPOP'
   description = 'Some automated achievements for WE ♥ KPOP.'
 
-  constructor (sekshi, options) {
-    super(sekshi, options)
+  constructor (bot, options) {
+    super(bot, options)
 
     this.onVote = this.onVote.bind(this)
     this.onGrab = this.onGrab.bind(this)
   }
 
   init () {
-    this.achievements = this.sekshi.getModule('achievements')
+    this.achievements = this.bot.getPlugin('achievements')
     if (!this.achievements || !this.achievements.enabled()) {
-      this.sekshi.sendChat(
-        '@staff The Achievements module must be enabled for the ' +
-        'WLK/AutoAchievements module to work.'
+      this.bot.sendChat(
+        '@staff The Achievements plugin must be enabled for the ' +
+        'WLK/AutoAchievements plugin to work.'
       )
       return this.disable()
     }
 
-    this.sekshi.on(this.sekshi.VOTE, this.onVote)
-    this.sekshi.on(this.sekshi.GRAB_UPDATE, this.onGrab)
+    this.bot.on(this.bot.VOTE, this.onVote)
+    this.bot.on(this.bot.GRAB_UPDATE, this.onGrab)
   }
 
   destroy () {
-    this.sekshi.removeListener(this.sekshi.VOTE, this.onVote)
-    this.sekshi.removeListener(this.sekshi.GRAB_UPDATE, this.onGrab)
+    this.bot.removeListener(this.bot.VOTE, this.onVote)
+    this.bot.removeListener(this.bot.GRAB_UPDATE, this.onGrab)
   }
 
   give (user, name) {
@@ -38,7 +38,7 @@ export default class WLKAutoAchievements extends Module {
     if (user) {
       this.achievements.unlockAchievement(user, name).then((unlock) => {
         if (unlock) {
-          unlock.set('giver', this.sekshi.getSelf().id).save()
+          unlock.set('giver', this.bot.getSelf().id).save()
           return this.achievements.notifyUnlocked(unlock)
         }
       })
@@ -46,9 +46,8 @@ export default class WLKAutoAchievements extends Module {
   }
 
   onVote (vote) {
-    const sekshi = this.sekshi
-    const dj = sekshi.getCurrentDJ()
-    const votes = sekshi.getVotes()
+    const dj = this.bot.getCurrentDJ()
+    const votes = this.bot.getVotes()
     const negative = votes.filter((v) => v.direction === -1).length
     // bad choice
     if (negative === 4) this.give(dj, 'badchoice')
@@ -59,13 +58,12 @@ export default class WLKAutoAchievements extends Module {
   }
 
   onGrab () {
-    const sekshi = this.sekshi
-    const dj = sekshi.getCurrentDJ()
+    const dj = this.bot.getCurrentDJ()
     // grabd
-    if (sekshi.getGrabs().length === 5) this.give(dj, 'grabd')
+    if (this.bot.getGrabs().length === 5) this.give(dj, 'grabd')
     // exquisite
-    if (sekshi.getGrabs().length === 10) this.give(dj, 'exquisite')
+    if (this.bot.getGrabs().length === 10) this.give(dj, 'exquisite')
     // producer
-    if (sekshi.getGrabs().length === 20) this.give(dj, 'producer')
+    if (this.bot.getGrabs().length === 20) this.give(dj, 'producer')
   }
 }

@@ -13,6 +13,7 @@ export default class RedditFeed extends Module {
 
   defaultOptions () {
     return {
+      output: [],
       subreddits: [ 'kpop' ],
       interval: 300000,
       format: '[r/$subreddit] $poster posted: $title $posturl'
@@ -21,7 +22,9 @@ export default class RedditFeed extends Module {
 
   init () {
     this.lastPost = ''
-    this.timer = setTimeout(this.runTimer.bind(this), 0)
+    this.timer = setTimeout(() => {
+      this.runTimer()
+    }, 0)
   }
 
   destroy () {
@@ -29,6 +32,11 @@ export default class RedditFeed extends Module {
       clearTimeout(this.timer)
       this.timer = null
     }
+  }
+
+  getOutput () {
+    const [ adapterName, channel ] = this.options.output
+    return this.adapter(adapterName).getChannel(channel)
   }
 
   @command('updatereddit', { role: command.ROLE.MANAGER })
@@ -69,7 +77,7 @@ export default class RedditFeed extends Module {
               .replace(/\$title\b/g, () => decode(post.data.title))
               .replace(/\$url\b/g, post.data.url)
               .replace(/\$posturl\b/g, `https://reddit.com/${post.data.id}`)
-            this.sekshi.sendChat(message)
+            this.getOutput().sendChat(message)
           })
         }
 
@@ -78,7 +86,9 @@ export default class RedditFeed extends Module {
           this.lastPost = posts[0].data.name
         }
 
-        this.timer = setTimeout(this.runTimer.bind(this), this.options.interval)
+        this.timer = setTimeout(() => {
+          this.runTimer()
+        }, this.options.interval)
       })
       .catch((e) => { debug('reddit error', e) })
   }

@@ -29,7 +29,7 @@ export default class SongBan extends Module {
   onAdvance = (booth, { media }) => {
     BannedMedia.findOne({ cid: media.cid, format: media.format }).exec()
       .then((banned) => {
-        const modSkip = this.bot.getModule('modskip')
+        const modSkip = this.bot.getPlugin('modskip')
         if (banned && modSkip) {
           modSkip.lockskip(
             this.bot.getSelf(),
@@ -75,7 +75,7 @@ export default class SongBan extends Module {
 
   @command('banskip', 'bs', { role: command.ROLE.BOUNCER })
   banskip (message, ...reason) {
-    const modSkip = this.bot.getModule('modskip')
+    const modSkip = this.bot.getPlugin('modskip')
     if (modSkip) {
       modSkip.skip(message, ...reason)
     }

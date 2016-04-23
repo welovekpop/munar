@@ -17,7 +17,7 @@ export default class MediaStats extends Module {
       : { cid: media.cid }
 
     const since = utils.spanToTime(span)
-    const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
+    const currentStart = moment.utc(this.bot.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
     const mediaModel = await Media.findOne(query)
 
     return await HistoryEntry.find({ media: mediaModel.id })
@@ -56,7 +56,7 @@ export default class MediaStats extends Module {
       ? { cid: media }
       : { cid: media.cid }
 
-    const currentStart = moment.utc(this.sekshi.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
+    const currentStart = moment.utc(this.bot.getStartTime(), 'YYYY-MM-DD HH:mm:ss')
     const mediaModel = await Media.findOne(query).lean()
     return await HistoryEntry.findOne({ media: mediaModel._id })
       .where('time').lt(currentStart.toDate())
@@ -67,7 +67,7 @@ export default class MediaStats extends Module {
   // chat commands
   @command('lastplayed')
   async lastplayed (message) {
-    const currentMedia = this.sekshi.getCurrentMedia()
+    const currentMedia = this.bot.getCurrentMedia()
     if (!currentMedia) return
     const mostRecent = await this.getLastPlay(currentMedia)
     if (mostRecent) {
@@ -83,7 +83,7 @@ export default class MediaStats extends Module {
   async playcount (message, span = 'w') {
     const hours = moment().diff(utils.spanToTime(span), 'hours')
     const allTime = span === 'f'
-    const currentMedia = this.sekshi.getCurrentMedia()
+    const currentMedia = this.bot.getCurrentMedia()
     if (!currentMedia) {
       return
     }
@@ -150,7 +150,7 @@ export default class MediaStats extends Module {
   @command('tagged', { role: command.ROLE.RESIDENTDJ })
   async tagged (message, cid) {
     if (!cid) {
-      let media = this.sekshi.getCurrentMedia()
+      let media = this.bot.getCurrentMedia()
       if (!media) return
       cid = media.cid
     }
@@ -164,7 +164,7 @@ export default class MediaStats extends Module {
     let title
     let media = await Media.findOne({ cid: cid }).lean()
     if (!media) {
-      media = this.sekshi.getCurrentMedia()
+      media = this.bot.getCurrentMedia()
       newTag.unshift(cid)
     }
     if (!media) return

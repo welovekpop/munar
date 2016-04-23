@@ -98,12 +98,12 @@ export default class Disconnect extends Module {
         (e) => { debug('drop remove error', e) }
       )
     }
-    if (this.sekshi.getWaitlist().indexOf(drop.id) < 0) {
-      this.sekshi.addToWaitlist(drop.id, () => {
-        this.sekshi.moveDJ(drop.id, drop.position, removeDrop)
+    if (this.bot.getWaitlist().indexOf(drop.id) < 0) {
+      this.bot.addToWaitlist(drop.id, () => {
+        this.bot.moveDJ(drop.id, drop.position, removeDrop)
       })
     } else {
-      this.sekshi.moveDJ(drop.id, drop.position, removeDrop)
+      this.bot.moveDJ(drop.id, drop.position, removeDrop)
     }
   }
 

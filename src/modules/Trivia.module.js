@@ -116,7 +116,7 @@ export default class Trivia extends TriviaCore {
       const points = Object.keys(this._points)
         .map((uid) => ({
           uid: uid,
-          user: this.sekshi.getUserByID(uid, true),
+          user: message.source.getUser(uid),
           points: this._points[uid]
         }))
         // exclude users who left the room

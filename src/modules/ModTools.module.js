@@ -137,7 +137,7 @@ export default class ModTools extends Module {
   @command('eatshit', 'es', { role: command.ROLE.BOUNCER })
   eatshit (message, targetName, duration = 'd') {
     this.bot.findUser(targetName).then((target) => {
-      const emotes = this.bot.getModule('emotes')
+      const emotes = this.bot.getPlugin('emotes')
       emotes && emotes.emote(message, 'eatshit', target.username)
       this.mute(message, targetName)
       setTimeout(() => {
@@ -149,8 +149,8 @@ export default class ModTools extends Module {
   // alias to !lastroulette, !lasttrivia
   @command('lastgame', { role: command.ROLE.BOUNCER })
   lastgame (message) {
-    const roulette = this.bot.getModule('roulette')
-    const trivia = this.bot.getModule('trivia')
+    const roulette = this.bot.getPlugin('roulette')
+    const trivia = this.bot.getPlugin('trivia')
 
     if (roulette && roulette.enabled()) {
       roulette.lastroulette(message.user)

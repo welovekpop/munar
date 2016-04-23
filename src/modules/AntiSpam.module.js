@@ -12,11 +12,11 @@ export default class AntiSpam extends Module {
   }
 
   init () {
-    this.sekshi.on('message', this.onMessage)
+    this.bot.on('message', this.onMessage)
   }
 
   destroy () {
-    this.sekshi.removeListener('message', this.onMessage)
+    this.bot.removeListener('message', this.onMessage)
   }
 
   isAFK (message) {

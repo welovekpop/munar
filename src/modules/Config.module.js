@@ -6,7 +6,7 @@ const configCommands = [ 'set', 'get', 'add', 'remove' ]
 
 export default class Config extends Module {
   author = 'ReAnna'
-  description = 'Keeps module configuration.'
+  description = 'Keeps plugin configuration.'
 
   @command('set', { role: command.ROLE.MANAGER })
   setCommand (message, ns, option, value) {
@@ -19,20 +19,20 @@ export default class Config extends Module {
   }
 
   set (message, ns, option, value) {
-    let mod = this.sekshi.getModule(ns)
+    let plugin = this.bot.getPlugin(ns)
     if (/^[0-9]+$/.test(value)) value = parseInt(value, 10)
     if (/^true|false$/.test(value)) value = value === 'true'
     debug('value', typeof value, value)
-    mod.setOption(option, value)
+    plugin.setOption(option, value)
     message.reply(`"${ns}.${option}" set to ${value}`)
   }
 
   get (message, ns, option) {
-    let mod = this.sekshi.getModule(ns)
+    let plugin = this.bot.getPlugin(ns)
     if (option) {
-      message.reply(`"${ns}.${option}": ${mod.getOption(option)}`)
+      message.reply(`"${ns}.${option}": ${plugin.getOption(option)}`)
     } else {
-      let options = mod.getOptions()
+      let options = plugin.getOptions()
       debug('all options', options)
       for (let option in options) {
         message.reply(`${ns}.${option}: ${options[option]}`)
@@ -41,8 +41,8 @@ export default class Config extends Module {
   }
 
   add (message, ns, option, ...values) {
-    let mod = this.sekshi.getModule(ns)
-    let arr = mod.getOption(option)
+    let plugin = this.bot.getPlugin(ns)
+    let arr = plugin.getOption(option)
     if (arr == null) {
       arr = values
     } else if (Array.isArray(arr)) {
@@ -51,19 +51,19 @@ export default class Config extends Module {
       message.reply(`"${ns}.${option}" is not a list.`)
       return
     }
-    mod.setOption(option, arr)
+    plugin.setOption(option, arr)
     message.reply(`added values to "${ns}.${option}".`)
   }
   remove (message, ns, option, ...values) {
-    let mod = this.sekshi.getModule(ns)
-    let arr = mod.getOption(option)
+    let plugin = this.bot.getPlugin(ns)
+    let arr = plugin.getOption(option)
     if (Array.isArray(arr)) {
       arr = arr.filter((val) => values.indexOf(val) === -1)
     } else {
       message.reply(`"${ns}.${option}" is not a list.`)
       return
     }
-    mod.setOption(option, arr)
+    plugin.setOption(option, arr)
     message.reply(`removed values from "${ns}.${option}".`)
   }
 
@@ -74,12 +74,12 @@ export default class Config extends Module {
       return
     }
     if (!ns) {
-      message.reply('You should provide a module to configure.')
+      message.reply('You should provide a plugin to configure.')
     }
 
-    const mod = this.sekshi.getModule(ns)
-    if (!mod) {
-      message.reply(`Could not find module "${ns}".`)
+    const plugin = this.bot.getPlugin(ns)
+    if (!plugin) {
+      message.reply(`Could not find plugin "${ns}".`)
       return
     }
 

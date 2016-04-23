@@ -135,7 +135,7 @@ export default class UserKarma extends Module {
       return
     }
     if (username.charAt(0) === '@') username = username.slice(1)
-    let other = this.sekshi.getUserByName(username, true)
+    let other = message.source.getUserByName(username)
     if (!other) {
       message.reply('That\'s not a real person…')
       return

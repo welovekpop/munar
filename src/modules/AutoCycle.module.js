@@ -20,22 +20,22 @@ export default class AutoCycle extends Module {
   }
 
   destroy () {
-    this.sekshi.removeListener('waitlist:update', this.onUpdate)
+    this.source.removeListener('waitlist:update', this.onUpdate)
   }
 
   onUpdate = (waitlist) => {
     const length = waitlist.length
-    const cycle = this.sekshi.doesWaitlistCycle()
+    const cycle = this.bot.doesWaitlistCycle()
     debug('cycle', cycle, length, this.options.cycle, this.options.uncycle)
     if (cycle && length >= this.options.uncycle) {
-      this.sekshi.setCycle(false, () => {
-        this.sekshi.sendChat(
+      this.bot.setCycle(false, () => {
+        this.source.send(
           '@djs DJ Cycle is disabled because of the long wait list. ' +
           'Remember to rejoin the waitlist after your play!'
         )
       })
     } else if (!cycle && length <= this.options.cycle) {
-      this.sekshi.setCycle(true)
+      this.bot.setCycle(true)
     }
   }
 }
