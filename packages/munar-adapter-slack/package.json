@@ -1,0 +1,22 @@
+{
+  "name": "munar-adapter-slack",
+  "version": "1.0.0",
+  "description": "Slack.com adapter for Munar",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin",
+    "munar-adapter",
+    "slack"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "slack-client": "^1.5.1"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}
