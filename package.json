@@ -14,11 +14,11 @@
   ],
   "homepage": "https://welovekpop.club/sekshibot",
   "dependencies": {
-    "array-find": "^0.1.1",
+    "array-find": "^1.0.0",
     "array-findindex": "^0.1.0",
-    "array-includes": "^2.0.0",
-    "bluebird": "^2.9.34",
-    "csv-parse": "^0.1.4",
+    "array-includes": "^3.0.2",
+    "bluebird": "^3.3.5",
+    "csv-parse": "^1.1.0",
     "debug": "*",
     "ent": "^2.2.0",
     "js-emoji": "iamcal/js-emoji#16dcafc2",
@@ -26,17 +26,17 @@
     "mkdirp": "^0.5.1",
     "moment": "^2.9.0",
     "mongoose": "^4.0.0",
-    "object-assign": "^2.0.0",
+    "object-assign": "^4.0.1",
     "plugged": "2.x",
-    "promise": "^6.1.0",
+    "promise": "^7.1.1",
     "random-item": "^1.0.0",
-    "recursive-readdir": "^1.2.1",
+    "recursive-readdir": "^2.0.0",
     "regexp-quote": "0.0.0",
     "request": "^2.58.0",
-    "snoocore": "2.x"
+    "snoocore": "3.3.1"
   },
   "devDependencies": {
-    "babel": "5.x"
+    "babel": "6.5.2"
   },
   "scripts": {
     "start": "node lib/app.js",
