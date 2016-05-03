@@ -24,7 +24,7 @@ export default class Triggers extends Plugin {
 
   add (name, response) {
     this.addCommand(name, (message, ...params) => {
-      message.reply(this.run(response, message, ...params))
+      message.send(this.run(response, message, ...params))
     })
   }
 
