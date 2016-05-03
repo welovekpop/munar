@@ -1,0 +1,26 @@
+{
+  "name": "munar-plugin-karma",
+  "version": "1.0.0",
+  "description": "Munar plugin that allows users to give each other internet points.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin"
+  ],
+  "author": "brookiebeast",
+  "contributors": [
+    "Nicholai Goodall <Kranoscorp@gmail.com>",
+    "Renée Kooi <renee@kooi.me>"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "moment": "^2.13.0",
+    "random-item": "^1.0.0"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}
