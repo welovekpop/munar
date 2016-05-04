@@ -70,7 +70,7 @@ export default class Slack extends Adapter {
       ...slackMessage.toJSON()
     })
     if (slackMessage.type === 'message') {
-      if (slackMessage.subtype === 'message_changed') {
+      if (slackMessage.subtype && slackMessage.subtype !== 'me_message') {
         return
       }
       const channel = this.getChannel(slackMessage.channel)
