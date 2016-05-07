@@ -1,5 +1,4 @@
 import includes from 'array-includes'
-import * as path from 'path'
 import EventEmitter from 'events'
 
 const debug = require('debug')('munar:pluginmanager')
@@ -10,16 +9,8 @@ export default class PluginManager extends EventEmitter {
   constructor (bot, options = {}) {
     super()
 
-    if (typeof options === 'string') {
-      options = { dir: options }
-    }
-
     this.options = options
     this.bot = bot
-  }
-
-  getConfigFile (name) {
-    return path.join(this.bot.getConfigDir(), `${name.toLowerCase()}.json`)
   }
 
   known () {
@@ -32,17 +23,8 @@ export default class PluginManager extends EventEmitter {
       .map((plugin) => plugin.name)
   }
 
-  async updateLocalPlugins (dir) {
-    return []
-  }
-
   async update () {
     let plugins = []
-    if (this.options.dir) {
-      const localPlugins = await this.updateLocalPlugins(this.options.dir)
-      plugins = [ ...plugins, ...localPlugins ]
-    }
-
     for (const { name, path } of plugins) {
       if (!this.plugins.some((plugin) => plugin.name === name)) {
         this.register(name, path)
@@ -101,7 +83,8 @@ export default class PluginManager extends EventEmitter {
 
     const m = require(meta.path)
     const PluginClass = m.default || m
-    const plugin = new PluginClass(this.bot, this.getConfigFile(meta.name))
+
+    const plugin = new PluginClass(this.bot)
 
     meta.instance = plugin
 

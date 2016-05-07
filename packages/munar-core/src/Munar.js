@@ -1,5 +1,4 @@
 import EventEmitter from 'events'
-import path from 'path'
 
 import includes from 'array-includes'
 import mongoose from 'mongoose'
@@ -23,10 +22,8 @@ export default class Munar extends EventEmitter {
     this.options = options
     this.db = mongoose.connect(options.mongo)
 
-    this.plugins = new PluginManager(this, path.join(__dirname, 'modules'))
+    this.plugins = new PluginManager(this)
     this.trigger = options.trigger || '!'
-
-    this._configDir = path.join(__dirname, '../.config')
 
     this.model('User', UserModel, this)
     this.model('ChatMessage', ChatMessageModel, this)
@@ -238,9 +235,5 @@ export default class Munar extends EventEmitter {
     debug('unload all')
     this.plugins.loaded()
       .forEach((name) => this.plugins.unload(name))
-  }
-
-  getConfigDir () {
-    return this._configDir
   }
 }

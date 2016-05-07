@@ -1,7 +1,4 @@
-import mkdirp from 'mkdirp'
 import EventEmitter from 'events'
-import fs from 'fs'
-import { dirname } from 'path'
 import command from './command'
 
 const debug = require('debug')('munar:plugin')
@@ -12,18 +9,16 @@ export default class Plugin extends EventEmitter {
 
   static defaultOptions = {}
 
-  constructor (bot, optionsFile) {
+  constructor (bot, options) {
     super()
-
-    this._optionsFile = optionsFile
 
     this.bot = bot
     this.options = {
       ...this.constructor.defaultOptions,
-      ...this.loadOptions()
+      ...options
     }
 
-    debug('init', this.constructor.name, optionsFile)
+    debug('init', this.constructor.name)
   }
 
   init () {
@@ -49,29 +44,24 @@ export default class Plugin extends EventEmitter {
     return this.bot.getAdapter(name)
   }
 
-  enable (opts = {}) {
+  enable () {
     if (!this.enabled()) {
       this._enabled = true
-      // don't save immediately on boot
-      if (!opts.silent) {
-        this.saveOptions()
-      }
 
       if (this[command.symbol]) {
         this.commands = this[command.symbol].slice()
       }
 
+      this.emit('enable')
       this.init()
     }
   }
-  disable (opts = {}) {
+  disable () {
     if (this.enabled()) {
       this.destroy()
       this._enabled = false
       this.commands = []
-      if (!opts.silent) {
-        this.saveOptions()
-      }
+      this.emit('disable')
     }
   }
   enabled () {
@@ -114,32 +104,10 @@ export default class Plugin extends EventEmitter {
 
   setOption (name, value) {
     const oname = this._getOptionName(name)
-    if (oname in this.options) {
-      this.options[oname] = value
-      this.saveOptions()
-    }
+    this.options[oname] = value
   }
 
   getOptions () {
     return this.options
-  }
-
-  loadOptions () {
-    try {
-      debug('loading options', this._optionsFile)
-      return JSON.parse(fs.readFileSync(this._optionsFile, 'utf8'))
-    } catch (e) {
-      return {}
-    }
-  }
-
-  saveOptions (options = this.getOptions()) {
-    debug('saving options', this._optionsFile)
-    options = {
-      ...options,
-      $enabled: this.enabled()
-    }
-    mkdirp.sync(dirname(this._optionsFile))
-    fs.writeFileSync(this._optionsFile, JSON.stringify(options, null, 2), 'utf8')
   }
 }
