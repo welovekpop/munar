@@ -103,7 +103,6 @@ export default class PluginManager extends EventEmitter {
     if (meta) {
       debug('unload', meta.name)
 
-      meta.instance.saveOptions()
       meta.instance.disable({ silent: true })
       delete require.cache[meta.path]
       this.unregister(meta.name)
