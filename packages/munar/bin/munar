@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+const fs = require('fs')
+const path = require('path')
+
+const start = require('../lib/').default
+const args = require('minimist')(process.argv.slice(2))
+
+const file = args.config || args._[0]
+const contents = fs.readFileSync(path.resolve(file), 'utf8')
+
+const options = JSON.parse(contents)
+
+start(options)
+  .then(() => console.log('Running'))
+  .catch(err => {
+    console.error(err.stack)
+    process.exit(1)
+  })

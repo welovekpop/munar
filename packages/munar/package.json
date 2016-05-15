@@ -1,0 +1,21 @@
+{
+  "name": "munar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "bin": "bin/munar",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar",
+    "bot"
+  ],
+  "author": "Renée Kooi <renee@kooi.me>",
+  "license": "ISC",
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "munar-core": "^1.0.0",
+    "munar-plugin-system": "^1.0.0"
+  }
+}
