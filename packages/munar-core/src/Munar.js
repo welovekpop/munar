@@ -45,10 +45,13 @@ export default class Munar extends EventEmitter {
     return this._adapters[name]
   }
 
-  use (plugin, options) {
+  use (plugin, options = {}) {
     if (typeof plugin === 'string') {
       let path = require.resolve(`munar-plugin-${plugin}`)
       this.plugins.register(plugin, path)
+      if (options.enable) {
+        this.plugins.load(plugin, { enable: true })
+      }
     } else {
       throw new TypeError('¯\\_(ツ)_/¯')
     }

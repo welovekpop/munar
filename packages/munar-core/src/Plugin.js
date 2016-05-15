@@ -46,6 +46,8 @@ export default class Plugin extends EventEmitter {
 
   enable () {
     if (!this.enabled()) {
+      debug('enable', this.constructor.name)
+
       this._enabled = true
 
       if (this[command.symbol]) {
@@ -58,6 +60,8 @@ export default class Plugin extends EventEmitter {
   }
   disable () {
     if (this.enabled()) {
+      debug('disable', this.constructor.name)
+
       this.destroy()
       this._enabled = false
       this.commands = []

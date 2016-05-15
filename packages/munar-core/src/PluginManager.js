@@ -74,7 +74,7 @@ export default class PluginManager extends EventEmitter {
     return meta ? meta.instance : null
   }
 
-  load (pluginName) {
+  load (pluginName, opts = {}) {
     const meta = this.getMeta(pluginName)
 
     if (meta.instance) return meta.instance
@@ -88,12 +88,11 @@ export default class PluginManager extends EventEmitter {
 
     meta.instance = plugin
 
-    // enable system plugins by default
-    if (meta.name === 'System' || plugin.getOption('$enabled')) {
-      plugin.enable({ silent: true })
-    }
-
     this.emit('load', plugin, meta.name)
+
+    if (opts.enable) {
+      plugin.enable()
+    }
 
     return plugin
   }
@@ -103,7 +102,7 @@ export default class PluginManager extends EventEmitter {
     if (meta) {
       debug('unload', meta.name)
 
-      meta.instance.disable({ silent: true })
+      meta.instance.disable()
       delete require.cache[meta.path]
       this.unregister(meta.name)
 
