@@ -101,13 +101,17 @@ export default class PluginManager extends EventEmitter {
     const meta = this.getMeta(pluginName)
     if (meta) {
       debug('unload', meta.name)
+      const instance = meta.instance
 
-      meta.instance.disable()
+      if (instance) {
+        instance.disable()
+      }
       delete require.cache[meta.path]
-      this.unregister(meta.name)
 
-      this.emit('unload', meta.instance, meta.name)
-      return meta.instance
+      this.emit('unload', instance, meta.name)
+
+      delete meta.instance
+      return instance
     }
 
     return null
