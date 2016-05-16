@@ -1,9 +1,7 @@
-import SourceMixin from './SourceMixin'
 import { linkNames } from './utils'
 
 export default class SlackChannel {
   constructor (slack, channel) {
-    Object.assign(this, SourceMixin)
     this.slack = slack
     this.client = slack.client
     this.channel = channel
@@ -19,12 +17,26 @@ export default class SlackChannel {
     return this.slack.getUserByName(name)
   }
 
+  getChannels () {
+    return this.slack.getChannels()
+  }
+  getChannel (id) {
+    return this.slack.getChannel(id)
+  }
+  getChannelByName (name) {
+    return this.slack.getChannelByName(name)
+  }
+
   reply (message, text) {
     this.send(`@${message.username} ${text}`)
   }
 
   send (text) {
     this.channel.send(linkNames(this.slack, text))
+  }
+
+  canExecute (message) {
+    return true
   }
 
   toString () {

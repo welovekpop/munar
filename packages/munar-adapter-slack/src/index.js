@@ -6,9 +6,7 @@ import Channel from './Channel'
 import Message from './Message'
 import User from './User'
 
-import SourceMixin from './SourceMixin'
-
-const debug = require('debug')('sekshi:adapter:slack')
+const debug = require('debug')('munar:adapter:slack')
 
 const AUTORECONNECT = true
 const AUTOMARK = true
@@ -18,8 +16,6 @@ export default class Slack extends Adapter {
 
   constructor (bot, options) {
     super(bot)
-
-    Object.assign(this, SourceMixin)
 
     this.options = options
   }
@@ -62,6 +58,21 @@ export default class Slack extends Adapter {
     return Object.keys(channels).map((id) => {
       return new Channel(this, this.client.channels[id])
     })
+  }
+
+  getChannel (id) {
+    const channel = this.client.getChannelGroupOrDMByID(id)
+    return channel ? new Channel(this, channel) : null
+  }
+
+  getChannelByName (name) {
+    let channel
+    if (name[0] === '@') {
+      channel = this.client.getDMByName(name.slice(1))
+    } else {
+      channel = this.client.getChannelByName(name)
+    }
+    return channel ? new Channel(this, channel) : null
   }
 
   onMessage = (slackMessage) => {
