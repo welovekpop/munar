@@ -71,7 +71,7 @@ export default class UserKarma extends Plugin {
         target: usar._id
       }).select('amount')
       const karma = karmaList.reduce((a, b) => a + b.amount, 0)
-      let msg = `@${user.username} you have ${karma} karma`
+      let msg = `you have ${karma} karma`
       if (!allTime) msg += ` from the past ${utils.days(hours)}`
       message.reply(`${msg}.`)
     }
