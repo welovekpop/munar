@@ -95,16 +95,6 @@ export default class Munar extends EventEmitter {
     )
 
     this.loadPlugins()
-
-    // the event is fired on nextTick so plugins can simply listen for "pluginloaded"
-    // and get events for *all* the plugins when loadPlugins() is called, even for those
-    // that register earlier
-    this.plugins.on('load', (plugin, name) => {
-      setImmediate(() => { this.emit('pluginloaded', plugin, name) })
-    })
-    this.plugins.on('unload', (plugin, name) => {
-      setImmediate(() => { this.emit('pluginunloaded', plugin, name) })
-    })
   }
 
   async stop () {
