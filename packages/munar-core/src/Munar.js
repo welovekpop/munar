@@ -17,13 +17,20 @@ const ownerSymbol = Symbol('owner')
 export default class Munar extends EventEmitter {
   _adapters = {}
 
+  static defaultOptions = {
+    mongo: 'mongodb://localhost:27017/munar',
+    trigger: '!'
+  }
+
   constructor (options = {}) {
     super()
-    this.options = options
-    this.db = mongoose.connect(options.mongo)
+    this.options = {
+      ...this.constructor.defaultOptions,
+      ...options
+    }
+    this.db = mongoose.connect(this.options.mongo)
 
     this.plugins = new PluginManager(this)
-    this.trigger = options.trigger || '!'
 
     this.model('User', UserModel, this)
     this.model('ChatMessage', ChatMessageModel, this)
@@ -111,7 +118,7 @@ export default class Munar extends EventEmitter {
 
   onMessage = (message) => {
     this.emit('message', message)
-    if (message.text && message.text.startsWith(this.trigger)) {
+    if (message.text && message.text.startsWith(this.options.trigger)) {
       this.executeMessage(message)
         .catch((e) => message.reply(`Error: ${e.message}`))
     }
@@ -121,7 +128,7 @@ export default class Munar extends EventEmitter {
     const { source } = message
 
     let args = this.parseArguments(message)
-    let commandName = args.shift().replace(this.trigger, '').toLowerCase()
+    let commandName = args.shift().replace(this.options.trigger, '').toLowerCase()
 
     async function tryCommand (pluginName) {
       const plugin = this.plugins.get(pluginName)

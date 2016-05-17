@@ -3,11 +3,8 @@ import { Munar } from 'munar-core'
 export default async function run (opts) {
   const adapters = opts.adapters || []
   const plugins = opts.plugins || []
-  const mongoUri = opts.mongo || 'mongodb://localhost:27017/munar'
 
-  const bot = new Munar({
-    mongo: mongoUri
-  })
+  const bot = new Munar(opts)
 
   bot.use('system', { enable: true })
 
