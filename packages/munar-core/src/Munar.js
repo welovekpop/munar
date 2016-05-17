@@ -52,6 +52,16 @@ export default class Munar extends EventEmitter {
     return this._adapters[name]
   }
 
+  getChannel (name) {
+    const split = name.indexOf(':')
+    const adapterName = split > -1 ? name.slice(0, split) : name
+    const channel = split > -1 ? name.slice(split + 1) : 'main'
+    const adapter = this.getAdapter(adapterName)
+    return adapter.getChannelByName
+      ? adapter.getChannelByName(channel)
+      : adapter.getChannel(channel)
+  }
+
   use (plugin, options = {}) {
     if (typeof plugin === 'string') {
       let path = require.resolve(`munar-plugin-${plugin}`)
