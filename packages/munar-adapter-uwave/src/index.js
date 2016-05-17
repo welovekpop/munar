@@ -1,22 +1,26 @@
 import got from 'got'
 import WebSocket from 'ws'
+import EventEmitter from 'events'
 import { Adapter, User } from 'munar-core'
 
 const debug = require('debug')('munar:adapter:uwave')
 
 import Message from './Message'
+import Waitlist from './Waitlist'
 
 export default class UwaveAdapter extends Adapter {
   static adapterName = 'uwave'
 
   users = []
-  waitlist = []
+  socketEvents = new EventEmitter()
 
   constructor (bot, options) {
     super(bot)
 
     this.options = options
     this.apiUrl = options.api.replace(/\/+$/, '')
+
+    this.waitlist = new Waitlist(this)
   }
 
   // Base Adapter
@@ -91,6 +95,7 @@ export default class UwaveAdapter extends Adapter {
     const { body } = await this.request('get', 'now')
     this.users = body.users.map(this.toBotUser, this)
     this.self = this.toBotUser(body.user)
+    this.waitlist.waitlist = body.waitlist
   }
 
   async deleteMessage (id) {
@@ -148,19 +153,6 @@ export default class UwaveAdapter extends Adapter {
       user.sourceUser.role = role
 
       this.receive('user:update', user, { role })
-    },
-
-    waitlistUpdate (waitlist) {
-      this.waitlist = waitlist
-    },
-    waitlistJoin ({ waitlist }) {
-      this.waitlist = waitlist
-    },
-    waitlistLeave ({ waitlist }) {
-      this.waitlist = waitlist
-    },
-    waitlistMove ({ waitlist }) {
-      this.waitlist = waitlist
     }
   }
 
@@ -175,6 +167,7 @@ export default class UwaveAdapter extends Adapter {
       return
     }
 
+    this.socketEvents.emit(command, data)
     if (command in this.socketHandlers) {
       this.socketHandlers[command].call(this, data)
     }
