@@ -24,7 +24,6 @@ export default class UserKarma extends Plugin {
     const User = this.model('User')
     const Karma = this.model('Karma')
 
-    const { user } = message
     let self = false
     if (username && /(^[dwmf]$)|(^\d+$)/.test(username)) {
       self = true
@@ -38,37 +37,37 @@ export default class UserKarma extends Plugin {
     if (!self && username) {
       const adapter = message.source.constructor.adapterName
       const other = message.source.getUserByName(username)
-      let usar
+      let user
       if (other) {
-        usar = await User.from(other)
+        user = await User.from(other)
       }
-      if (!usar) {
-        usar = await User.findOne({
+      if (!user) {
+        user = await User.findOne({
           adapter,
           username: RegExp(`^${escapeStringRegExp(username)}$`, 'i')
         })
       }
-      if (!usar) {
+      if (!user) {
         message.reply(`I don't know ${username} yet`)
         return undefined
       }
       const karmaList = await Karma.find({
         createdAt: { $gte: since.toDate() },
-        target: usar._id
+        target: user._id
       }).select('amount')
       const karma = karmaList.reduce((a, b) => a + b.amount, 0)
       let msg = `${username} has ${karma} karma`
       if (!allTime) msg += ` from the past ${utils.days(hours)}`
       message.reply(`${msg}.`)
     } else {
-      const usar = await User.from(message.user)
-      if (!usar) {
+      const user = await User.from(message.user)
+      if (!user) {
         message.reply('who are you?')
         return undefined
       }
       const karmaList = await Karma.find({
         createdAt: { $gte: since.toDate() },
-        target: usar._id
+        target: user._id
       }).select('amount')
       const karma = karmaList.reduce((a, b) => a + b.amount, 0)
       let msg = `you have ${karma} karma`
