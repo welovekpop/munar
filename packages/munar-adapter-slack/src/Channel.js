@@ -32,7 +32,7 @@ export default class SlackChannel {
   }
 
   send (text) {
-    this.channel.send(linkNames(this.slack, text))
+    this.client.sendMessage(linkNames(this.slack, text), this.channel.id)
   }
 
   canExecute (message) {

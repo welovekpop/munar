@@ -11,10 +11,10 @@
     "munar-adapter",
     "slack"
   ],
-  "author": "",
+  "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "slack-client": "^1.5.1"
+    "@slack/client": "^3.1.0"
   },
   "peerDependencies": {
     "munar-core": "^1.0.0"

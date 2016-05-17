@@ -1,4 +1,8 @@
-import SlackClient from 'slack-client'
+import {
+  RtmClient,
+  MemoryDataStore,
+  CLIENT_EVENTS as EVENTS
+} from '@slack/client'
 
 import { Adapter } from 'munar-core'
 
@@ -8,11 +12,10 @@ import User from './User'
 
 const debug = require('debug')('munar:adapter:slack')
 
-const AUTORECONNECT = true
-const AUTOMARK = true
-
 export default class Slack extends Adapter {
   static adapterName = 'slack'
+
+  store = new MemoryDataStore()
 
   constructor (bot, options) {
     super(bot)
@@ -22,13 +25,18 @@ export default class Slack extends Adapter {
 
   async connect () {
     return new Promise((resolve, reject) => {
-      this.client = new SlackClient(this.options.token, AUTORECONNECT, AUTOMARK)
-      this.client.on('open', () => {
-        debug('connected', this.client.team.name)
-        resolve()
+      this.client = new RtmClient(this.options.token, {
+        dataStore: this.store,
+        autoReconnect: true,
+        autoMark: true
       })
-      this.client.on('loggedIn', (self) => {
-        this.self = new User(this, self)
+      this.client.on(EVENTS.RTM.RTM_CONNECTION_OPENED, (self) => {
+        const team = this.store.getTeamById(this.client.activeTeamId)
+        const user = this.store.getUserById(this.client.activeUserId)
+        debug('connected', team.name, user.name)
+        this.self = new User(this, user)
+
+        resolve()
       })
       this.client.on('message', this.onMessage)
       this.client.on('error', reject)
@@ -47,30 +55,33 @@ export default class Slack extends Adapter {
   }
 
   getUsers () {
-    const users = this.client.users
+    const users = this.store.users
     return Object.keys(users).map((id) => {
-      return new User(this, this.client.users[id])
+      return new User(this, this.store.getUserById(id))
     })
   }
 
   getChannels () {
-    const channels = this.client.channels
+    const channels = this.store.channels
     return Object.keys(channels).map((id) => {
-      return new Channel(this, this.client.channels[id])
+      return new Channel(this, this.store.getChannelById(id))
     })
   }
 
   getChannel (id) {
-    const channel = this.client.getChannelGroupOrDMByID(id)
+    const channel = this.store.getChannelGroupOrDMById(id)
     return channel ? new Channel(this, channel) : null
   }
 
   getChannelByName (name) {
     let channel
     if (name[0] === '@') {
-      channel = this.client.getDMByName(name.slice(1))
+      channel = this.store.getDMByName(name.slice(1))
+      if (!channel) {
+        channel = this.store.getBotByName(name.slice(1))
+      }
     } else {
-      channel = this.client.getChannelByName(name)
+      channel = this.store.getChannelByName(name)
     }
     return channel ? new Channel(this, channel) : null
   }
@@ -78,7 +89,7 @@ export default class Slack extends Adapter {
   onMessage = (slackMessage) => {
     debug([slackMessage.type, slackMessage.subtype].filter(Boolean).join(':'), {
       user: slackMessage.user,
-      ...slackMessage.toJSON()
+      ...slackMessage
     })
     if (slackMessage.type === 'message') {
       if (slackMessage.subtype && slackMessage.subtype !== 'me_message') {
@@ -93,7 +104,6 @@ export default class Slack extends Adapter {
   }
 
   normalizeMessage (text = '') {
-    const client = this.client
     return text.trim()
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
@@ -101,8 +111,8 @@ export default class Slack extends Adapter {
       .replace(/<!channel>/g, '@channel')
       .replace(/<!group>/g, '@group')
       .replace(/<!everyone>/g, '@everyone')
-      .replace(/<#(C\w+)\|?(\w+)?>/g, (_, channelId) => `#${client.getChannelByID(channelId).name}`)
-      .replace(/<@(U\w+)\|?(\w+)?>/g, (_, userId) => `@${client.getUserByID(userId).name}`)
+      .replace(/<#(C\w+)\|?(\w+)?>/g, (_, channelId) => `#${this.getChannel(channelId).name}`)
+      .replace(/<@(U\w+)\|?(\w+)?>/g, (_, userId) => `@${this.getUser(userId).name}`)
       .replace(/<(?!!)(\S+)>/g, (_, link) => link)
       .replace(/<!(\w+)\|?(\w+)?>/g, (_, command, label) => `<${label || command}>`)
   }
