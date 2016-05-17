@@ -38,6 +38,7 @@
     "parser": "babel-eslint"
   },
   "scripts": {
+    "link": "ls packages | { while read p ; do [ -L node_modules/$p ] || ln -s ../packages/$p node_modules ; done }",
     "test": "standard gulpfile.js packages/*/src/**/*.js",
     "watch": "gulp watch",
     "build": "gulp",
