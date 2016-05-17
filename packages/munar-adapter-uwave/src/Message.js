@@ -11,11 +11,7 @@ export default class UwaveMessage extends Message {
     return this.user && this.user.username
   }
 
-  get id () {
-    return `${this.sourceMessage._id}-${this.sourceMessage.timestamp}`
-  }
-
   delete () {
-    this.source.deleteMessage(this.id)
+    this.source.deleteMessage(this.sourceMessage.id)
   }
 }
