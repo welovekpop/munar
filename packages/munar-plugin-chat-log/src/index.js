@@ -37,9 +37,10 @@ export default class ChatLog extends Plugin {
         return
       }
       const [msg] = await ChatMessage.find({ user: target })
-        .sort({ time: -1 })
+        .sort({ createdAt: -1 })
+        .select('createdAt')
         .limit(1)
-      const time = moment(msg.time)
+      const time = moment(msg.createdAt)
       message.reply(
         `${target.username} last uttered a word on ` +
         `${time.format('LL [at] LT')} (${time.fromNow()}).`
