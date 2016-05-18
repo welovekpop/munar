@@ -55,6 +55,10 @@ export default class Adapter extends EventEmitter {
     return users.find((user) => user.username.toLowerCase() === name)
   }
 
+  getAdapterName () {
+    return this.constructor.adapterName
+  }
+
   getSource () {
     return this
   }

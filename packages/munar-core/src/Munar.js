@@ -43,8 +43,8 @@ export default class Munar extends EventEmitter {
   }
 
   adapter (SourceAdapter, options) {
-    const name = SourceAdapter.adapterName
     const adapter = new SourceAdapter(this, options)
+    const name = adapter.getAdapterName()
     this._adapters[name] = adapter
   }
 

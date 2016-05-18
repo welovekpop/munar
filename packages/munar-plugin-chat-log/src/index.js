@@ -25,7 +25,7 @@ export default class ChatLog extends Plugin {
     const ChatMessage = this.bot.model('ChatMessage')
     const User = this.bot.model('User')
 
-    const adapter = message.source.constructor.adapterName
+    const adapter = message.source.getAdapterName()
     const targetName = nameParts.join(' ')
     try {
       const target = await User.findOne({
@@ -56,7 +56,7 @@ export default class ChatLog extends Plugin {
 
     try {
       const user = await User.from(message.user)
-      const adapter = message.source.constructor.adapterName
+      const adapter = message.source.getAdapterName()
       await ChatMessage.create({
         adapter,
         sourceId: message.id,

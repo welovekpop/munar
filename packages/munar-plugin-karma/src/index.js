@@ -35,7 +35,7 @@ export default class UserKarma extends Plugin {
 
     if (username && username.charAt(0) === '@') username = username.slice(1)
     if (!self && username) {
-      const adapter = message.source.constructor.adapterName
+      const adapter = message.source.getAdapterName()
       const other = message.source.getUserByName(username)
       let user
       if (other) {

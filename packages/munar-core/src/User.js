@@ -7,7 +7,7 @@ export default class User {
   }
 
   compoundId () {
-    const adapter = this.source.constructor.adapterName
+    const adapter = this.source.getAdapterName()
     return {
       adapter,
       sourceId: this.id
