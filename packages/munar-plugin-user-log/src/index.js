@@ -12,7 +12,7 @@ export default class UserLog extends Plugin {
     this.onUserUpdate = this.onUserUpdate.bind(this)
   }
 
-  init () {
+  async init () {
     this.bot.on('user:join', this.onUserJoin)
     this.bot.on('user:update', this.onUserUpdate)
 
@@ -20,10 +20,16 @@ export default class UserLog extends Plugin {
       return [...users, ...adapter.getUsers()]
     }, [])
 
-    Promise.all(allUsers.map(this.onUserJoin)).catch((error) => {
+    try {
+      await Promise.all(
+        allUsers.map((user) =>
+          this.onUserJoin(user.source, user)
+        )
+      )
+    } catch (error) {
       console.error('Could not register all joined users')
       console.error(error.stack)
-    })
+    }
   }
 
   destroy () {
@@ -31,12 +37,12 @@ export default class UserLog extends Plugin {
     this.bot.removeListener('user:update', this.onUserUpdate)
   }
 
-  async onUserJoin (user) {
+  async onUserJoin (adapter, user) {
     debug('join', `${user.username} (${user.id})`)
     const User = this.model('User')
     try {
       const userModel = await User.from(user)
-      if (!userModel && user.source) {
+      if (!userModel && adapter) {
         await User.create({
           ...user.compoundId(),
           username: user.username
@@ -47,7 +53,7 @@ export default class UserLog extends Plugin {
     }
   }
 
-  async onUserUpdate (user, update) {
+  async onUserUpdate (adapter, user, update) {
     if (!user) return
     debug('update', update)
   }
