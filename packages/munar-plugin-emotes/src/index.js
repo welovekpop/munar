@@ -2,7 +2,7 @@ import { Plugin, command, permissions } from 'munar-core'
 import request from 'request'
 import Promise from 'bluebird'
 
-const debug = require('debug')('sekshi:emotes')
+const debug = require('debug')('munar:emotes')
 
 import { EmoteModel } from './models'
 
