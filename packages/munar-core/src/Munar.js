@@ -236,7 +236,7 @@ export default class Munar extends EventEmitter {
   }
 
   loadPlugins () {
-    debug('load all')
+    debug('load all', this.plugins.known())
     this.plugins.known()
       .forEach((name) => this.plugins.load(name))
   }
