@@ -2,14 +2,15 @@
 
 const fs = require('fs')
 const path = require('path')
+const json5 = require('json5')
 
 const start = require('../lib/').default
 const args = require('minimist')(process.argv.slice(2))
 
-const file = args.config || args._[0]
-const contents = fs.readFileSync(path.resolve(file), 'utf8')
+const file = path.resolve(args.config || args._[0])
+const contents = fs.readFileSync(file, 'utf8')
 
-const options = JSON.parse(contents)
+const options = json5.parse(contents)
 
 start(options)
   .then(() => console.log('Running'))
