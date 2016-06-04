@@ -1,8 +1,10 @@
-import { Munar } from 'munar-core'
+import requireRelative from 'require-relative'
 
-export default async function run (opts) {
+export default async function run (opts, dirname = __dirname) {
   const adapters = opts.adapters || []
   const plugins = opts.plugins || []
+
+  const Munar = requireRelative('munar-core', dirname).default
 
   const bot = new Munar(opts)
 
