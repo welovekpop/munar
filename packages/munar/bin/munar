@@ -10,7 +10,12 @@ const args = require('minimist')(process.argv.slice(2))
 const file = path.resolve(args.config || args._[0])
 const contents = fs.readFileSync(file, 'utf8')
 
-const options = json5.parse(contents)
+var options
+try {
+  options = json5.parse(contents)
+} catch (e) {
+  options = require(file)
+}
 
 start(options)
   .then(() => console.log('Running'))
