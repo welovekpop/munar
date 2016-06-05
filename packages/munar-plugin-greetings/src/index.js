@@ -16,12 +16,12 @@ export default class Greetings extends Plugin {
     ]
   }
 
-  init () {
+  enable () {
     this.lastGreeted = -1
     this.bot.on('user:join', this.greet)
   }
 
-  destroy () {
+  disable () {
     this.bot.removeListener('user:join', this.greet)
   }
 

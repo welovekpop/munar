@@ -50,7 +50,7 @@ export default class System extends Plugin {
     } else {
       const plugin = this.manager().get(name)
       if (plugin) {
-        plugin.disable()
+        this.manager().disable(plugin)
         message.reply(`Plugin "${name}" disabled.`)
       } else {
         message.reply(`Could not find the "${name}" plugin.`)
@@ -60,16 +60,17 @@ export default class System extends Plugin {
 
   @command('enable', { role: permissions.ADMIN })
   enableplugin (message, name) {
-    let plugin = this.manager().get(name)
+    const manager = this.manager()
+    let plugin = manager.get(name)
     if (!plugin) {
       try {
-        plugin = this.manager().load(name)
+        plugin = manager.load(name)
       } catch (e) {
         console.error(e)
         message.reply(`Could not load the "${name}" plugin.`)
       }
     }
-    plugin.enable()
+    manager.enable(plugin)
     message.reply(`Plugin "${name}" enabled.`)
   }
 
@@ -95,9 +96,14 @@ export default class System extends Plugin {
 
   @command('listplugins', { role: permissions.MODERATOR })
   listplugins (message) {
-    const text = this.manager().known().map((name) => {
-      const plugin = this.manager().get(name)
-      return `${name} ${plugin && plugin.enabled() ? '✔' : '✘'}`
+    const manager = this.manager()
+    const text = manager.known().map((name) => {
+      const plugin = manager.get(name)
+      let status = '❔'
+      if (plugin) {
+        status = manager.enabled(plugin) ? '✔' : '✘'
+      }
+      return `${name} ${status}`
     })
     message.reply(text.sort().join(', '))
   }

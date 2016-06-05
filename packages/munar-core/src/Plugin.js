@@ -4,7 +4,6 @@ import command from './command'
 const debug = require('debug')('munar:plugin')
 
 export default class Plugin extends EventEmitter {
-  _enabled = false
   commands = []
 
   static defaultOptions = {}
@@ -18,12 +17,11 @@ export default class Plugin extends EventEmitter {
       ...options
     }
 
-    debug('init', this.constructor.name)
-  }
+    if (this[command.symbol]) {
+      this.commands = this[command.symbol].slice()
+    }
 
-  init () {
-  }
-  destroy () {
+    debug('init', this.constructor.name)
   }
 
   models (models) {
@@ -45,31 +43,17 @@ export default class Plugin extends EventEmitter {
   }
 
   enable () {
-    if (!this.enabled()) {
-      debug('enable', this.constructor.name)
-
-      this._enabled = true
-
-      if (this[command.symbol]) {
-        this.commands = this[command.symbol].slice()
-      }
-
-      this.emit('enable')
-      this.init()
-    }
+    // Compat
+    this.init && this.init()
   }
+
   disable () {
-    if (this.enabled()) {
-      debug('disable', this.constructor.name)
-
-      this.destroy()
-      this._enabled = false
-      this.commands = []
-      this.emit('disable')
-    }
+    // Compat
+    this.destroy && this.destroy()
   }
+
   enabled () {
-    return this._enabled
+    return this.bot.plugins.enabled(this)
   }
 
   addCommand (name, opts, cb = null) {

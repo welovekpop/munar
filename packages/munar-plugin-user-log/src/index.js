@@ -12,7 +12,7 @@ export default class UserLog extends Plugin {
     this.onUserUpdate = this.onUserUpdate.bind(this)
   }
 
-  async init () {
+  async enable () {
     this.bot.on('user:join', this.onUserJoin)
     this.bot.on('user:update', this.onUserUpdate)
 
@@ -32,7 +32,7 @@ export default class UserLog extends Plugin {
     }
   }
 
-  destroy () {
+  disable () {
     this.bot.removeListener('user:join', this.onUserJoin)
     this.bot.removeListener('user:update', this.onUserUpdate)
   }
