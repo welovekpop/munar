@@ -3,6 +3,7 @@ import Ultron from 'ultron'
 import { Adapter, User } from 'munar-core'
 
 import Message from './PlugdjMessage'
+import Waitlist from './Waitlist'
 
 const debug = require('debug')('munar:adapter:plugdj')
 
@@ -25,6 +26,11 @@ export default class PlugdjAdapter extends Adapter {
     this.events = new Ultron(this.plugged)
 
     this.plugged.invokeLogger((message) => debug(message))
+    this.waitlist = new Waitlist(this)
+  }
+
+  getWaitlist () {
+    return this.waitlist
   }
 
   toBotUser (user) {
