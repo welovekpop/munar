@@ -73,6 +73,8 @@ export default class PlugdjAdapter extends Adapter {
     this.plugged.sendChat(text)
   }
 
+  deleteMessage = promisify(this.plugged.removeChatMessage)
+
   getSelf () {
     return this.toBotUser(this.plugged.getSelf())
   }

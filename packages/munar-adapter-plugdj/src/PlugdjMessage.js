@@ -12,6 +12,6 @@ export default class PlugdjMessage extends Message {
   }
 
   delete () {
-    this.source.removeMessage(this.sourceMessage.id)
+    return this.source.deleteMessage(this.sourceMessage.id)
   }
 }
