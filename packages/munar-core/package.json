@@ -14,6 +14,7 @@
     "lodash.last": "^3.0.0",
     "mkdirp": "^0.5.1",
     "mongoose": "^4.4.14",
-    "mongoose-model-decorators": "^0.3.1"
+    "mongoose-model-decorators": "^0.3.1",
+    "mongoose-random": "^0.1.1"
   }
 }
