@@ -1,8 +1,0 @@
-export const User = require('./models/User')
-export const Media = require('./models/Media')
-export const Karma = require('./models/Karma')
-export const HistoryEntry = require('./models/HistoryEntry')
-export const Vote = require('./models/Vote')
-export const Grab = require('./models/Grab')
-export const ChatMessage = require('./models/ChatMessage')
-export const Trigger = require('./models/Trigger')

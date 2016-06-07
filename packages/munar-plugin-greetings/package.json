@@ -1,0 +1,20 @@
+{
+  "name": "munar-plugin-greetings",
+  "version": "1.0.0",
+  "description": "Munar plugin to greet new users.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "random-item": "^1.0.0"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}

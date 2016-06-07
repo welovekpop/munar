@@ -1,4 +1,0 @@
-{
-  "room": "my-favourite-room",
-  "mongo": "mongodb://localhost/mydatabase"
-}

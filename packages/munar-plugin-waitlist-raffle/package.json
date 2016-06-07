@@ -1,0 +1,22 @@
+{
+  "name": "munar-plugin-waitlist-raffle",
+  "version": "1.0.0",
+  "description": "Munar plugin to hold random raffles for waitlist positions.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "moment": "^2.13.0",
+    "random-item": "^1.0.0"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}

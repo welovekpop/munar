@@ -1,0 +1,10 @@
+language: node_js
+sudo: false
+script:
+  - npm run link
+  - npm run build
+  - npm test
+node_js:
+  - "4"
+  - "5"
+  - "6"

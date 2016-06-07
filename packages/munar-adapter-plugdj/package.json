@@ -1,0 +1,26 @@
+{
+  "name": "munar-adapter-plugdj",
+  "version": "1.0.0",
+  "description": "plug.dj adapter for Munar",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin",
+    "munar-adapter",
+    "plugdj",
+    "plug.dj"
+  ],
+  "author": "Renée Kooi <renee@kooi.me>",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "pify": "^2.3.0",
+    "plugged": "^2.6.0",
+    "ultron": "^1.0.2"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}

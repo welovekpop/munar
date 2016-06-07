@@ -1,0 +1,22 @@
+{
+  "name": "munar-plugin-chat-log",
+  "version": "1.0.0",
+  "description": "Munar plugin that stores chat messages.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "escape-string-regexp": "^1.0.5",
+    "moment": "^2.13.0"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0",
+    "munar-plugin-user-log": "^1.0.0"
+  }
+}

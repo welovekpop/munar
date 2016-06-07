@@ -1,0 +1,24 @@
+{
+  "name": "munar-adapter-uwave",
+  "version": "1.0.0",
+  "description": "üWave adapter for Munar",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin",
+    "munar-adapter",
+    "u-wave"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "got": "^6.3.0",
+    "ws": "^1.1.0"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}
