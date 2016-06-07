@@ -12,11 +12,11 @@ export default class ChatLog extends Plugin {
     this.onChat = this.onChat.bind(this)
   }
 
-  init () {
+  enable () {
     this.bot.on('message', this.onChat)
   }
 
-  destroy () {
+  disable () {
     this.bot.removeListener('message', this.onChat)
   }
 

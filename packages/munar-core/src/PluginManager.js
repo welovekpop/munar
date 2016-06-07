@@ -1,10 +1,13 @@
 import includes from 'array-includes'
 import EventEmitter from 'events'
 
+import Plugin from './Plugin'
+
 const debug = require('debug')('munar:pluginmanager')
 
 export default class PluginManager extends EventEmitter {
   plugins = []
+  enabledPlugins = new Set()
 
   constructor (bot, options = {}) {
     super()
@@ -74,6 +77,37 @@ export default class PluginManager extends EventEmitter {
     return meta ? meta.instance : null
   }
 
+  enabled (pluginName) {
+    const plugin = pluginName instanceof Plugin ? pluginName : this.get(pluginName)
+    return this.enabledPlugins.has(plugin)
+  }
+
+  enable (pluginName) {
+    const plugin = pluginName instanceof Plugin ? pluginName : this.get(pluginName)
+    if (plugin && !this.enabled(plugin)) {
+      debug('enable', plugin.constructor.name)
+
+      this.emit('enable')
+
+      this.enabledPlugins.add(plugin)
+      plugin.enable()
+    }
+  }
+
+  disable (pluginName) {
+    const plugin = pluginName instanceof Plugin ? pluginName : this.get(pluginName)
+    if (plugin && plugin.enabled()) {
+      debug('disable', plugin.constructor.name)
+
+      plugin.disable()
+
+      plugin.emit('disable')
+
+      plugin.commands = []
+      this.enabledPlugins.delete(plugin)
+    }
+  }
+
   load (pluginName, opts = {}) {
     const meta = this.getMeta(pluginName)
 
@@ -91,7 +125,7 @@ export default class PluginManager extends EventEmitter {
     this.emit('load', plugin, meta.name)
 
     if (opts.enable) {
-      plugin.enable()
+      this.enable(plugin)
     }
 
     return plugin
@@ -104,7 +138,7 @@ export default class PluginManager extends EventEmitter {
       const instance = meta.instance
 
       if (instance) {
-        instance.disable()
+        this.disable(instance, { unloading: true })
       }
       delete require.cache[meta.path]
 

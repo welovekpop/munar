@@ -15,7 +15,7 @@ export default class Triggers extends Plugin {
     })
   }
 
-  async init () {
+  async enable () {
     const triggers = await this.model('Trigger').find()
     triggers.forEach((link) => {
       this.add(link._id, link.response)
