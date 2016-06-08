@@ -1,0 +1,20 @@
+{
+  "name": "munar-plugin-reddit-feed",
+  "version": "1.0.0",
+  "description": "Munar plugin that posts about new Reddit posts.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin"
+  ],
+  "author": "Renée Kooi <renee@kooi.me>",
+  "license": "ISC",
+  "dependencies": {
+    "got": "^6.3.0"
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}
