@@ -118,7 +118,7 @@ export default class PluginManager extends EventEmitter {
     const m = require(meta.path)
     const PluginClass = m.default || m
 
-    const plugin = new PluginClass(this.bot)
+    const plugin = new PluginClass(this.bot, opts)
 
     meta.instance = plugin
 
