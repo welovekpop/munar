@@ -1,18 +1,12 @@
 import promisify from 'pify'
 import Ultron from 'ultron'
+import Plugged from 'plugged'
 import { Adapter, User } from 'munar-core'
 
 import Message from './PlugdjMessage'
 import Waitlist from './Waitlist'
 
 const debug = require('debug')('munar:adapter:plugdj')
-
-// Override Plugged's staging config
-Object.assign(require('plugged/conf/config'), {
-  provider: 'https://plug.dj',
-  socket: 'wss://godj.plug.dj:443/socket'
-})
-const Plugged = require('plugged')
 
 export default class PlugdjAdapter extends Adapter {
   static adapterName = 'plugdj'
