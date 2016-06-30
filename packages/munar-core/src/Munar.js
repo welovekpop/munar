@@ -67,7 +67,7 @@ export default class Munar extends EventEmitter {
       let path = require.resolve(`munar-plugin-${plugin}`)
       this.plugins.register(plugin, path)
       if (options.enable) {
-        this.plugins.load(plugin, { enable: true })
+        this.plugins.load(plugin, options)
       }
     } else {
       throw new TypeError('¯\\_(ツ)_/¯')
