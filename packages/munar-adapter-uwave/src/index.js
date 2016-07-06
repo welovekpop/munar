@@ -26,6 +26,7 @@ export default class UwaveAdapter extends Adapter {
   // Base Adapter
 
   async connect () {
+    this.shouldClose = false
     await Promise.all([
       this.getNow(),
       this.connectSocket()
@@ -33,6 +34,7 @@ export default class UwaveAdapter extends Adapter {
   }
 
   disconnect () {
+    this.shouldClose = true
     this.socket.close()
   }
 
@@ -116,6 +118,7 @@ export default class UwaveAdapter extends Adapter {
 
   connectSocket () {
     return new Promise((resolve, reject) => {
+      debug('connecting socket')
       this.socket = new WebSocket(this.options.socket)
       this.socket.on('open', () => {
         debug('send', this.options.token)
@@ -123,6 +126,19 @@ export default class UwaveAdapter extends Adapter {
         resolve()
       })
       this.socket.on('message', this.onSocketMessage)
+
+      let reconnecting = false
+      const reconnect = () => {
+        if (reconnecting) return
+        reconnecting = true
+        debug('reconnecting in 1000ms')
+        setTimeout(() => this.connectSocket(), 1000)
+      }
+
+      this.socket.on('error', reconnect)
+      this.socket.on('close', () => {
+        if (!this.shouldClose) reconnect()
+      })
     })
   }
 
