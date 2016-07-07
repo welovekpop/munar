@@ -5,12 +5,12 @@ export default class Message {
     this.sourceMessage = sourceMessage
   }
 
-  reply (text) {
-    this.source.reply(this, text)
+  reply (text, ...args) {
+    this.source.reply(this, text, ...args)
   }
 
-  send (text) {
-    this.source.send(text)
+  send (text, ...args) {
+    this.source.send(text, ...args)
   }
 
   toString () {
