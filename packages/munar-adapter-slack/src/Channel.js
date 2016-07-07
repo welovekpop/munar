@@ -39,6 +39,10 @@ export default class SlackChannel {
     return true
   }
 
+  getAdapterName () {
+    return this.slack.getAdapterName()
+  }
+
   toString () {
     return `slack:${this.channel.name}`
   }
