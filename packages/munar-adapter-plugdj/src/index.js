@@ -5,6 +5,8 @@ import { Adapter, User } from 'munar-core'
 
 import Message from './PlugdjMessage'
 import Waitlist from './Waitlist'
+import DJBooth from './DJBooth'
+import DJHistory from './DJHistory'
 
 const debug = require('debug')('munar:adapter:plugdj')
 
@@ -21,10 +23,20 @@ export default class PlugdjAdapter extends Adapter {
 
     this.plugged.invokeLogger((message) => debug(message))
     this.waitlist = new Waitlist(this)
+    this.djBooth = new DJBooth(this)
+    this.djHistory = new DJHistory(this)
   }
 
   getWaitlist () {
     return this.waitlist
+  }
+
+  getDJBooth () {
+    return this.djBooth
+  }
+
+  getDJHistory () {
+    return this.djHistory
   }
 
   toBotUser (user) {
