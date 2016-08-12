@@ -7,6 +7,8 @@ const debug = require('debug')('munar:adapter:uwave')
 
 import Message from './Message'
 import Waitlist from './Waitlist'
+import DJBooth from './DJBooth'
+import DJHistory from './DJHistory'
 
 export default class UwaveAdapter extends Adapter {
   static adapterName = 'uwave'
@@ -21,6 +23,8 @@ export default class UwaveAdapter extends Adapter {
     this.apiUrl = options.api.replace(/\/+$/, '')
 
     this.waitlist = new Waitlist(this)
+    this.djBooth = new DJBooth(this)
+    this.djHistory = new DJHistory(this)
   }
 
   // Base Adapter
@@ -108,6 +112,14 @@ export default class UwaveAdapter extends Adapter {
 
   getWaitlist () {
     return this.waitlist
+  }
+
+  getDJBooth () {
+    return this.djBooth
+  }
+
+  getDJHistory () {
+    return this.djHistory
   }
 
   toBotUser (user) {
