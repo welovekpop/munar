@@ -1,6 +1,6 @@
 {
   "name": "munar-adapter-slack",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Slack.com adapter for Munar",
   "main": "lib/index.js",
   "scripts": {
