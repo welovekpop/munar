@@ -6,7 +6,7 @@ export default class RedditFeed extends Plugin {
     subreddits: [],
     template: '[r/$subreddit] $title https://redd.it/$id',
     output: '',
-    interval: 20 // seconds
+    interval: 60 // seconds
   }
 
   timer = null
