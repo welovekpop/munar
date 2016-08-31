@@ -104,7 +104,7 @@ export default class Triggers extends Plugin {
     const User = this.model('User')
     name = name.toLowerCase()
     response = response.join(' ')
-    if (name[0] === this.bot.trigger) {
+    if (name[0] === this.bot.options.trigger) {
       name = name.slice(1)
     }
     let trig = new Trigger({
@@ -122,7 +122,7 @@ export default class Triggers extends Plugin {
   async removeTrigger (message, name) {
     const Trigger = this.model('Trigger')
     name = name.toLowerCase()
-    if (name[0] === this.bot.trigger) {
+    if (name[0] === this.bot.options.trigger) {
       name = name.slice(1)
     }
     await Trigger.remove({ _id: name })
