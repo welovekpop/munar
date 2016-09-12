@@ -31,6 +31,18 @@ export default class UwaveAdapter extends Adapter {
 
   async connect () {
     this.shouldClose = false
+    if (!this.options.token) {
+      const { body } = await this.request('post', 'auth/login', {
+        email: this.options.email,
+        password: this.options.password
+      })
+      if (body && body.jwt) {
+        this.options.token = body.jwt
+      } else {
+        throw new Error('Could not log in.')
+      }
+    }
+
     await Promise.all([
       this.getNow(),
       this.connectSocket()

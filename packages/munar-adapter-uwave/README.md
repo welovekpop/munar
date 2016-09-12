@@ -10,13 +10,17 @@ $ npm install --save munar-adapter-uwave
 
 ## Usage
 
-```json
+```js
 {
   "adapters": [
     ["uwave", {
       "api": "https://u-wave.net/v1",
       "socket": "wss://u-wave.net",
-      "token": "<your JWT>"
+      // Using an authentication token:
+      "token": "<jwt>",
+      // Or an email address and password:
+      "email": "your@email.address",
+      "password": "123456"
     }]
   ]
 }
