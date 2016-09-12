@@ -265,7 +265,7 @@ export default class UserKarma extends Plugin {
     if (reasonList.length > 0) {
       let chosen = random(reasonList)
       message.reply(`you were bumped by @${chosen.giver.username} ` +
-                    `${chosen.reason}" ${moment(chosen.createdAt).fromNow()}`)
+                    `"${chosen.reason}" ${moment(chosen.createdAt).fromNow()}`)
     } else {
       message.reply('no one can explain your mysterious allure.')
     }
