@@ -1,3 +1,4 @@
+import { stringify } from 'qs'
 import { normalizeMedia } from './DJBooth'
 
 export default class DJHistory {
@@ -11,8 +12,14 @@ export default class DJHistory {
     // entry will be the current song.
     const start = booth.getMedia() !== null ? 1 : 0
 
-    const { body } = await this.uw.request('get', `booth/history?limit=${limit + start}`)
-    return body.result.slice(start).map((entry) => ({
+    const query = stringify({
+      page: {
+        offset: 0,
+        limit: limit + start
+      }
+    })
+    const { body } = await this.uw.request('get', `booth/history?${query}`)
+    return body.data.slice(start).map((entry) => ({
       media: normalizeMedia(entry.media),
       playedAt: new Date(entry.playedAt)
     }))

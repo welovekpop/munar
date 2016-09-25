@@ -36,8 +36,8 @@ export default class UwaveAdapter extends Adapter {
         email: this.options.email,
         password: this.options.password
       })
-      if (body && body.jwt) {
-        this.options.token = body.jwt
+      if (body && body.meta && body.meta.jwt) {
+        this.options.token = body.meta.jwt
       } else {
         throw new Error('Could not log in.')
       }
