@@ -168,7 +168,7 @@ export default class UwaveAdapter extends Adapter {
 
   socketHandlers = {
     chatMessage (data) {
-      const message = new Message(this, data, this.getUser(data._id))
+      const message = new Message(this, data, this.getUser(data.userID))
       this.receive('message', message)
     },
     join (user) {
