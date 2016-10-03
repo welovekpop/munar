@@ -1,5 +1,6 @@
 import { stringify } from 'qs'
 import { normalizeMedia } from './DJBooth'
+import mergeIncludedModels from './mergeIncludedModels'
 
 export default class DJHistory {
   constructor (uw) {
@@ -14,12 +15,12 @@ export default class DJHistory {
 
     const query = stringify({
       page: {
-        offset: 0,
+        offset: start,
         limit: limit + start
       }
     })
     const { body } = await this.uw.request('get', `booth/history?${query}`)
-    return body.data.slice(start).map((entry) => ({
+    return mergeIncludedModels(body).map((entry) => ({
       media: normalizeMedia(entry.media),
       playedAt: new Date(entry.playedAt)
     }))
