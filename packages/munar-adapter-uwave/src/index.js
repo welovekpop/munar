@@ -1,6 +1,7 @@
 import got from 'got'
 import WebSocket from 'ws'
 import EventEmitter from 'events'
+import { stringify } from 'qs'
 import { Adapter, User } from 'munar-core'
 
 const debug = require('debug')('munar:adapter:uwave')
@@ -105,6 +106,10 @@ export default class UwaveAdapter extends Adapter {
       options.headers = {
         'content-type': 'application/json'
       }
+    }
+    // For nested query parameters (like page[offset])
+    if (options.query) {
+      options.query = stringify(options.query, { encode: false })
     }
     return got(url, options)
   }
