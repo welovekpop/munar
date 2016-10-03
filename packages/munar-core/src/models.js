@@ -1,6 +1,7 @@
 import { Schema } from 'mongoose'
 import { Plugin } from 'mongoose-model-decorators'
 import random from 'mongoose-random'
+import escapeStringRegExp from 'escape-string-regexp'
 
 const { ObjectId } = Schema.Types
 
@@ -25,6 +26,22 @@ export class UserModel {
       return Promise.resolve(null)
     }
     return this.findOne(user.compoundId())
+  }
+
+  static findByUsername (adapter, username) {
+    if (!username) {
+      username = adapter
+      return this.findOne({
+        username: new RegExp(`^${escapeStringRegExp(username)}$`, 'i')
+      })
+    }
+    if (typeof adapter === 'object' && adapter.getAdapterName) {
+      adapter = adapter.getAdapterName()
+    }
+    return this.findOne({
+      adapter,
+      username: new RegExp(`^${escapeStringRegExp(username)}$`, 'i')
+    })
   }
 }
 
