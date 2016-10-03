@@ -27,7 +27,7 @@ export default class DJHistorySkip extends Plugin {
   }
 
   onAdvance = (adapter, { next }) => {
-    if (supportsHistory(adapter)) {
+    if (supportsHistory(adapter) && next) {
       // Ensure that we only skip the next song once the previous lockskip has
       // completed.
       const doSkip = () => this.maybeSkip(adapter, next)
