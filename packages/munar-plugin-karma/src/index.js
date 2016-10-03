@@ -1,7 +1,6 @@
 import { Plugin, command } from 'munar-core'
 import random from 'random-item'
 import moment from 'moment'
-import escapeStringRegExp from 'escape-string-regexp'
 import * as utils from './utils'
 
 import KarmaModel from './Karma'
@@ -42,14 +41,11 @@ export default class UserKarma extends Plugin {
         user = await User.from(other)
       }
       if (!user) {
-        user = await User.findOne({
-          adapter,
-          username: RegExp(`^${escapeStringRegExp(username)}$`, 'i')
-        })
+        user = await User.findByUsername(adapter, username)
       }
       if (!user) {
         message.reply(`I don't know ${username} yet`)
-        return undefined
+        return
       }
       const karmaList = await Karma.find({
         createdAt: { $gte: since.toDate() },
@@ -63,7 +59,7 @@ export default class UserKarma extends Plugin {
       const user = await User.from(message.user)
       if (!user) {
         message.reply('who are you?')
-        return undefined
+        return
       }
       const karmaList = await Karma.find({
         createdAt: { $gte: since.toDate() },
@@ -142,7 +138,6 @@ export default class UserKarma extends Plugin {
       if (reason && reason.length > 0) {
         bump.reason = reason.join(' ')
       }
-      console.log(bump)
       await bump.save()
 
       if (reason && reason.length > 0) {
