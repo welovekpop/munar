@@ -235,6 +235,28 @@ export default class Munar extends EventEmitter {
     return this.plugins.get(name)
   }
 
+  /**
+   * Find a user from any adapter, defaulting to a given one. Useful when
+   * commands should act on a target user, on any adapter, eg:
+   *
+   *    !karma @someone - karma of @someone on the current adapter
+   *    !karma slack:@someone - karma of @someone on Slack
+   */
+  findUser (username, { adapter = null } = {}) {
+    // A name like "slack:jenn"
+    const parts = username.split(':')
+    if (parts.length > 1 && this.getAdapter(parts[0])) {
+      username = parts.slice(1).join(':')
+      adapter = this.getAdapter(parts[0])
+    }
+
+    if (username[0] === '@') {
+      username = username.slice(1)
+    }
+
+    return this.model('User').findByUsername(adapter, username)
+  }
+
   loadPlugins () {
     debug('load all', this.plugins.known())
     this.plugins.known()

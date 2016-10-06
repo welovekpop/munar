@@ -41,7 +41,7 @@ export default class UserKarma extends Plugin {
         user = await User.from(other)
       }
       if (!user) {
-        user = await User.findByUsername(adapter, username)
+        user = await this.bot.findUser(username, { adapter: adapter })
       }
       if (!user) {
         message.reply(`I don't know ${username} yet`)
@@ -52,7 +52,7 @@ export default class UserKarma extends Plugin {
         target: user._id
       }).select('amount')
       const karma = karmaList.reduce((a, b) => a + b.amount, 0)
-      let msg = `${username} has ${karma} karma`
+      let msg = `${user.username} has ${karma} karma`
       if (!allTime) msg += ` from the past ${utils.days(hours)}`
       message.reply(`${msg}.`)
     } else {

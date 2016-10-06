@@ -1,6 +1,5 @@
 import { Plugin, command } from 'munar-core'
 
-import escapeStringRegExp from 'escape-string-regexp'
 import moment from 'moment'
 
 export default class ChatLog extends Plugin {
@@ -23,15 +22,11 @@ export default class ChatLog extends Plugin {
   @command('lastspoke')
   async showLastSpoke (message, ...nameParts) {
     const ChatMessage = this.bot.model('ChatMessage')
-    const User = this.bot.model('User')
 
     const adapter = message.source.getAdapterName()
     const targetName = nameParts.join(' ')
     try {
-      const target = await User.findOne({
-        adapter,
-        username: RegExp(`^${escapeStringRegExp(targetName)}$`, 'i')
-      })
+      const target = await this.bot.findUser(targetName, { adapter: adapter })
       if (!target) {
         message.reply('Could not find a user by that name.')
         return

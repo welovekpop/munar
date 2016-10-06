@@ -35,6 +35,7 @@ export class UserModel {
         username: new RegExp(`^${escapeStringRegExp(username)}$`, 'i')
       })
     }
+
     if (typeof adapter === 'object' && adapter.getAdapterName) {
       adapter = adapter.getAdapterName()
     }
