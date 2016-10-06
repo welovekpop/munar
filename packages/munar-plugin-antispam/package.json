@@ -1,0 +1,17 @@
+{
+  "name": "munar-plugin-antispam",
+  "version": "0.0.0",
+  "description": "Munar plugin for auto-deleting spam.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin"
+  ],
+  "author": "Renée Kooi <renee@kooi.me>",
+  "license": "ISC",
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}
