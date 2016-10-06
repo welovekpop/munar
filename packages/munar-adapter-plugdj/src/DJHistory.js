@@ -12,7 +12,7 @@ export default class DJHistory {
     return this.plug.plugged
   }
 
-  convertUser(raw) {
+  convertUser (raw) {
     const user = this.plugged.getUserByID(raw.id)
     if (user) {
       return this.plug.toBotUser(user)
