@@ -4,6 +4,7 @@ export default class SlackChannel {
   constructor (slack, channel) {
     this.slack = slack
     this.client = slack.client
+    this.webClient = slack.webClient
     this.channel = channel
   }
 

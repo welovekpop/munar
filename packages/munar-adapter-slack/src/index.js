@@ -1,5 +1,6 @@
 import {
   RtmClient,
+  WebClient,
   MemoryDataStore,
   CLIENT_EVENTS as EVENTS
 } from '@slack/client'
@@ -40,6 +41,8 @@ export default class Slack extends Adapter {
       })
       this.client.on('message', this.onMessage)
       this.client.on('error', reject)
+
+      this.webClient = new WebClient(this.options.token)
 
       this.client.login()
     })

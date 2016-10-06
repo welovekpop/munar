@@ -10,6 +10,7 @@ export default class SlackMessage extends Message {
   }
 
   delete () {
-    this.sourceMessage.deleteMessage()
+    const { webClient } = this.source
+    return webClient.chat.delete(this.sourceMessage.ts, this.sourceMessage.channel)
   }
 }
