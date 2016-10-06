@@ -12,10 +12,19 @@ export default class DJHistory {
     return this.plug.plugged
   }
 
+  convertUser(raw) {
+    const user = this.plugged.getUserByID(raw.id)
+    if (user) {
+      return this.plug.toBotUser(user)
+    }
+    return this.plug.toBotUser(raw)
+  }
+
   async getRecent (limit) {
     const history = await this.getRoomHistory()
     return history.slice(0, limit).map((entry) => ({
       media: convertMedia(entry.media),
+      user: this.convertUser(entry.user),
       playedAt: new Date(entry.timestamp)
     }))
   }
