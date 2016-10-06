@@ -1,5 +1,6 @@
 import { Plugin } from 'munar-core'
 import delay from 'delay'
+import moment from 'moment'
 
 const supportsHistory = (adapter) =>
   typeof adapter.getDJHistory === 'function'
@@ -80,7 +81,12 @@ export default class DJHistorySkip extends Plugin {
     const lastPlay = history.find((entry) => this.isSameSong(entry.media, media))
     if (lastPlay) {
       const { username } = await adapter.getDJBooth().getDJ()
-      adapter.send(`@${username} This song is in the history.`)
+      const duration = moment.duration(Date.now() - lastPlay.playedAt, 'milliseconds')
+      adapter.send(
+        `@${username} This song was played ${duration.humanize()} ago` +
+        (lastPlay.user ? ` by ${lastPlay.user.username}` : '') +
+        '.'
+      )
       if (supportsBoothSkipping(adapter)) {
         await delay(500)
         await this.lockskip(adapter, this.options.position)
