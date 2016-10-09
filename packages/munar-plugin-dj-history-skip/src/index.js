@@ -67,10 +67,11 @@ export default class DJHistorySkip extends Plugin {
     if (supportsBoothLockskipping(adapter)) {
       await booth.lockskip({ position })
     } else {
+      const waitlistLength = (await waitlist.all()).length
       // Attempt to lockskip manually.
       await booth.skip()
-      const newDJ = await booth.getDJ()
-      if (dj.id !== newDJ.id) {
+      if (waitlistLength > position) {
+        await delay(1000)
         await waitlist.move(dj.id, position)
       }
     }
