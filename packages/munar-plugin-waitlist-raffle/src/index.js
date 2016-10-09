@@ -21,7 +21,7 @@ export default class WaitlistRaffle extends Plugin {
   static description = 'Run raffles for a waitlist position.'
 
   static defaultOptions = {
-    duration: 20,
+    duration: 60,
     minPosition: 4,
     winnerPosition: 2,
     winMessage: 'Raffle winner: @$winner. Congratulations!'
