@@ -31,6 +31,7 @@
     "gulp-plumber": "^1.1.0",
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.5",
+    "jest": "^16.0.2",
     "standard": "^7.1.0",
     "through2": "^2.0.1"
   },
@@ -39,7 +40,9 @@
   },
   "scripts": {
     "link": "ls packages | { while read p ; do [ -L node_modules/$p ] || ln -s ../packages/$p node_modules ; done }",
-    "test": "standard gulpfile.js packages/*/src/**/*.js",
+    "lint": "standard gulpfile.js packages/*/src/**/*.js",
+    "jest": "jest packages/*/src",
+    "test": "npm run jest && npm run lint",
     "watch": "gulp watch",
     "build": "gulp",
     "prepublish": "npm run build"
