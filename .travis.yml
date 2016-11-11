@@ -1,8 +1,9 @@
 language: node_js
 sudo: false
+install:
+  - npm install
+  - npm run prepare
 script:
-  - npm run link
-  - npm run build
   - npm test
 node_js:
   - "4"
