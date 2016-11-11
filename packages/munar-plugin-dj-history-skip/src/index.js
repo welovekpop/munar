@@ -1,15 +1,10 @@
 import { Plugin } from 'munar-core'
+import lockskip from 'munar-helper-booth-lockskip'
 import delay from 'delay'
 import moment from 'moment'
 
 const supportsHistory = (adapter) =>
   typeof adapter.getDJHistory === 'function'
-const supportsBoothSkipping = (adapter) =>
-  typeof adapter.getDJBooth === 'function' &&
-  typeof adapter.getDJBooth().skip === 'function'
-const supportsBoothLockskipping = (adapter) =>
-  typeof adapter.getDJBooth === 'function' &&
-  typeof adapter.getDJBooth().lockskip === 'function'
 
 export default class DJHistorySkip extends Plugin {
   static defaultOptions = {
@@ -59,24 +54,6 @@ export default class DJHistorySkip extends Plugin {
     return true
   }
 
-  async lockskip (adapter, position = 1) {
-    const booth = adapter.getDJBooth()
-    const waitlist = adapter.getWaitlist()
-    const dj = await booth.getDJ()
-
-    if (supportsBoothLockskipping(adapter)) {
-      await booth.lockskip({ position })
-    } else {
-      const waitlistLength = (await waitlist.all()).length
-      // Attempt to lockskip manually.
-      await booth.skip()
-      if (waitlistLength > position) {
-        await delay(1000)
-        await waitlist.move(dj.id, position)
-      }
-    }
-  }
-
   async maybeSkip (adapter, media) {
     const history = await adapter.getDJHistory().getRecent(this.options.limit)
     const lastPlay = history.find((entry) => this.isSameSong(entry.media, media))
@@ -88,10 +65,8 @@ export default class DJHistorySkip extends Plugin {
         (lastPlay.user ? ` by ${lastPlay.user.username}` : '') +
         '.'
       )
-      if (supportsBoothSkipping(adapter)) {
-        await delay(500)
-        await this.lockskip(adapter, this.options.position)
-      }
+      await delay(500)
+      await lockskip(adapter, { position: this.options.position })
     }
   }
 }
