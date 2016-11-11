@@ -13,7 +13,7 @@ export default class DJBooth extends EventEmitter {
     super()
     this.plug = plug
 
-    this.plugged.on(this.plugged.ADVANCE, (booth, playback, media, previous) => {
+    this.plugged.on(this.plugged.ADVANCE, (booth, playback, previous) => {
       plug.receive('djBooth:advance', {
         previous: previous ? convertMedia(previous.media) : null,
         next: this.getMedia()
