@@ -1,5 +1,7 @@
 language: node_js
 sudo: false
+before_install:
+  - '[[ "$(npm -v)" =~ ^2 ]] && npm i -g npm@latest || true'
 install:
   - npm install
   - npm run prepare
