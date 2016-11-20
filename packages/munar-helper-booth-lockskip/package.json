@@ -1,0 +1,17 @@
+{
+  "name": "munar-helper-booth-lockskip",
+  "version": "1.0.0",
+  "description": "Helper function to lock-skip DJ Booths with Munar bots.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-helper"
+  ],
+  "author": "Renée Kooi <renee@kooi.me>",
+  "license": "ISC",
+  "dependencies": {
+    "delay": "^1.3.1"
+  }
+}
