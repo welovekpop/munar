@@ -12,9 +12,7 @@ class PluginConfigModel {
   static schema = {
     _id: { type: String, index: true, unique: true },
     enabled: { type: Boolean, default: false },
-    options: {
-      default: {}
-    }
+    options: {}
   }
 }
 
@@ -33,7 +31,6 @@ export default class Config extends Plugin {
 
   enable () {
     const events = new Ultron(this.bot.plugins)
-    events.on('discovered', this.onPluginDiscovered)
     events.on('load', this.onPluginLoad)
 
     this.events.push(events)
@@ -44,7 +41,7 @@ export default class Config extends Plugin {
     this.events = []
   }
 
-  set (message, ns, option, value) {
+  async set (message, ns, option, value) {
     const plugin = this.bot.getPlugin(ns)
     if (/^[0-9]+$/.test(value)) {
       value = parseInt(value, 10)
@@ -54,11 +51,11 @@ export default class Config extends Plugin {
     }
     debug('value', typeof value, value)
     plugin.setOption(option, value)
-    this.save(ns, plugin.getOptions())
+    await this.save(ns, plugin.getOptions())
     message.reply(`"${ns}.${option}" set to ${value}`)
   }
 
-  get (message, ns, option) {
+  async get (message, ns, option) {
     let plugin = this.bot.getPlugin(ns)
     if (option) {
       message.reply(`"${ns}.${option}": ${plugin.getOption(option)}`)
@@ -71,7 +68,7 @@ export default class Config extends Plugin {
     }
   }
 
-  add (message, ns, option, ...values) {
+  async add (message, ns, option, ...values) {
     const plugin = this.bot.getPlugin(ns)
     let arr = plugin.getOption(option)
     if (arr == null) {
@@ -79,56 +76,55 @@ export default class Config extends Plugin {
     } else if (Array.isArray(arr)) {
       arr = arr.concat(values)
     } else {
-      message.reply(`"${ns}.${option}" is not a list.`)
+      throw new TypeError(`"${ns}.${option}" is not a list.`)
       return
     }
     plugin.setOption(option, arr)
-    this.save(ns, plugin.getOptions())
+    await this.save(ns, plugin.getOptions())
     message.reply(`added values to "${ns}.${option}".`)
   }
-  remove (message, ns, option, ...values) {
+  async remove (message, ns, option, ...values) {
     const plugin = this.bot.getPlugin(ns)
     let arr = plugin.getOption(option)
     if (Array.isArray(arr)) {
       arr = arr.filter((val) => values.indexOf(val) === -1)
     } else {
-      message.reply(`"${ns}.${option}" is not a list.`)
-      return
+      throw new TypeError(`"${ns}.${option}" is not a list.`)
     }
     plugin.setOption(option, arr)
-    this.save(ns, plugin.getOptions())
+    await this.save(ns, plugin.getOptions())
     message.reply(`removed values from "${ns}.${option}".`)
   }
 
   @command('config', 'cf', { role: permissions.MANAGER })
-  config (message, command, ns, ...args) {
+  async config (message, command, ns, ...args) {
     if (configCommands.indexOf(command) === -1) {
-      message.reply(`"${command}" is not a command.`)
-      return
+      throw new Error(`"${command}" is not a command.`)
     }
     if (!ns) {
-      message.reply('You should provide a plugin to configure.')
+      throw new Error('You should provide a plugin to configure.')
     }
 
     const plugin = this.bot.getPlugin(ns)
     if (!plugin) {
-      message.reply(`Could not find plugin "${ns}".`)
-      return
+      throw new Error(`Could not find plugin "${ns}".`)
     }
 
-    this[command](message, ns, ...args)
+    await this[command](message, ns, ...args)
   }
 
-  onPluginDiscovered = async (name) => {
-    debug('load config', name)
+  onPluginLoad = async (instance, name) => {
     const { options, enabled } = await this.load(name)
-    await this.bot.plugins.load(name, {
-      ...options.toJSON(),
-      enable: enabled
+    Object.keys(options).forEach((optionName) => {
+      instance.setOption(optionName, options[optionName])
     })
-  }
 
-  onPluginLoad = (instance, name) => {
+    if (enabled && !instance.enabled()) {
+      instance.enable()
+    } else if (!enabled && instance.enabled()) {
+      instance.disable()
+    }
+
     const onChange = () => this.onChange(name, instance)
 
     this.events.push(
