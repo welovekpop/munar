@@ -20,9 +20,9 @@
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.5",
     "jest": "^16.0.2",
+    "lerna": "2.0.0-beta.32",
     "standard": "^7.1.0",
-    "through2": "^2.0.1",
-    "lerna": "2.0.0-beta.30"
+    "through2": "^2.0.1"
   },
   "standard": {
     "parser": "babel-eslint"
