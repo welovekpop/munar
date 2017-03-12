@@ -112,8 +112,18 @@ export default class Emotes extends Plugin {
   @command('emotes')
   async emotes (message) {
     debug('listing emotes')
+    let url
+
+    const server = this.bot.getPlugin('serve')
+    if (server) {
+      url = server.getUrl('emotes')
+    }
     if (this.options.url) {
-      message.reply(`Emotes can be found at ${this.options.url} !`)
+      url = this.options.url
+    }
+
+    if (url) {
+      message.reply(`Emotes can be found at ${url} !`)
       return
     }
     const emotes = await this.model('Emote').find().sort('id')
