@@ -98,7 +98,7 @@ export default class Triggers extends Plugin {
     return tokens
   }
 
-  @command('trigger', { role: permissions.MODERATOR })
+  @command('addtrigger', 'trigger', { role: permissions.MODERATOR })
   async createTrigger (message, name, ...response) {
     const Trigger = this.model('Trigger')
     const User = this.model('User')
