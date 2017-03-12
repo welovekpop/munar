@@ -1,7 +1,7 @@
 {
-  "name": "munar-plugin-emotes",
-  "version": "1.0.0",
-  "description": "Munar plugin for sharing reaction GIFs.",
+  "name": "munar-plugin-serve",
+  "version": "0.0.0",
+  "description": "Munar plugin to allow other plugins to serve a web interface.",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,13 +9,10 @@
   "keywords": [
     "munar-plugin"
   ],
-  "author": "",
+  "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.3.5",
-    "debug": "^2.2.0",
-    "request": "^2.72.0",
-    "truncate-url": "^1.0.0"
+    "micro": "^7.1.0"
   },
   "peerDependencies": {
     "munar-core": "^1.0.0"
