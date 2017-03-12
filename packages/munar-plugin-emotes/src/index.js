@@ -5,6 +5,7 @@ import Promise from 'bluebird'
 const debug = require('debug')('munar:emotes')
 
 import { EmoteModel } from './models'
+import { renderEmotesList } from './serve'
 
 const cleanId = (id) => id.toLowerCase()
 
@@ -139,5 +140,12 @@ export default class Emotes extends Plugin {
     if (emote) {
       this.sendEmote(message, target, emote.url)
     }
+  }
+
+  async serve (req, res) {
+    res.setHeader('content-type', 'text/html')
+
+    const emotes = await this.model('Emote').find().sort('id')
+    return renderEmotesList(emotes)
   }
 }
