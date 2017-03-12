@@ -4,10 +4,18 @@ import micro, { createError } from 'micro'
 
 export default class Serve extends Plugin {
   static defaultOptions = {
-    port: 3000
+    port: 3000,
+    baseUrl: null
   }
 
   enable () {
+    if (!this.options.baseUrl) {
+      throw new Error(
+        'serve: Please provide the base URL that Munar will serve its pages ' +
+        'from in the `baseUrl` option.'
+      )
+    }
+
     this.server = micro(this.onRequest)
 
     this.server.listen(this.options.port)
@@ -15,6 +23,11 @@ export default class Serve extends Plugin {
 
   disable () {
     this.server.close()
+  }
+
+  getUrl (path) {
+    const base = this.options.baseUrl.replace(/\/+$/, '')
+    return `${base}/${path.replace(/^\/+/, '')}`
   }
 
   onRequest = async (req, res) => {
