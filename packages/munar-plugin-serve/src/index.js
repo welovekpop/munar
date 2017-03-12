@@ -25,6 +25,11 @@ export default class Serve extends Plugin {
       throw createError(404, 'That plugin does not exist or does not expose a web interface.')
     }
 
+    // Remove plugin name from the URL.
+    const parts = req.url.split('/')
+    parts.splice(1, 1)
+    req.url = parts.join('/')
+
     return plugin.serve(req, res, {
       send: micro.send,
       sendError: micro.sendError,
