@@ -126,7 +126,9 @@ export default class Emotes extends Plugin {
       message.reply(`Emotes can be found at ${url} !`)
       return
     }
-    const emotes = await this.model('Emote').find().sort('id')
+    const emotes = await this.model('Emote')
+      .find()
+      .sort('_id')
     const emoteIds = emotes.map((emote) => emote.id)
     message.reply(`Emotes: ${emoteIds.join(', ')}`)
   }
@@ -155,7 +157,9 @@ export default class Emotes extends Plugin {
   async serve (req, res) {
     res.setHeader('content-type', 'text/html')
 
-    const emotes = await this.model('Emote').find().sort('id')
+    const emotes = await this.model('Emote')
+      .find()
+      .sort('_id')
     return renderEmotesList(emotes)
   }
 }
