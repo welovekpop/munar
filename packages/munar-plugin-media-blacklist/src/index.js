@@ -58,13 +58,22 @@ export default class MediaBlacklist extends Plugin {
       if (!supportsBooth(message.source)) {
         throw new Error(
           'This adapter does not support retrieving the current media. ' +
-          'You can still add media to the blacklist by using `!blacklist ' +
-          'sourceType:sourceID`, for example `!blacklist youtube:QfUX9XcA7b4`.'
+          'You can still add media to the blacklist by using `!blacklist add ' +
+          'sourceType:sourceID`, for example `!blacklist add youtube:QfUX9XcA7b4`.'
         )
       }
 
       reason = `${itemID} ${reason}`
       item = await message.source.getDJBooth().getMedia()
+    }
+
+    if (!item) {
+      throw new Error(
+        'No media is currently being played. ' +
+        'You can still add specific media to the blacklist by using ' +
+        '`!blacklist add sourceType:sourceID`, for example ' +
+        '`!blacklist add youtube:QfUX9XcA7b4`.'
+      )
     }
 
     const blacklisted = await this.getBlacklistItem(item)
