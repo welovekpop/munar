@@ -14,23 +14,32 @@ $ npm install --save munar-plugin-media-blacklist
 The Blacklist plugin adds chat commands for managing the blacklist. All commands
 can only be used by moderators.
 
-### `!blacklist "<reason>"`
+### `!blacklist add "<reason>"`
 
 Add the current media to the blacklist.
 
 **Example**
 
- - !blacklist "This track has terrible audio quality."
+ - !blacklist add "This track has terrible audio quality."
 
-### `!blacklist <media> "<reason>"`
+### `!blacklist add <media> "<reason>"`
 
 Add a specific media to the blacklist. `<media>` contains the source type and
 source ID, separated by a colon `:`.
 
 **Example**
 
- - !blacklist youtube:nkMgmtU3rno "Video flickers A LOT. Please play an
-   alternative version that doesn't trigger seizures."
+ - !blacklist add youtube:nkMgmtU3rno "Video flickers A LOT. Please play an
+   alternative version that doesn't cause headaches."
+
+### `!blacklist remove <media>`
+
+Remove a media from the blacklist. `<media>` contains the source type and
+source ID, separated by a colon `:`.
+
+**Example**
+
+ - !blacklist remove youtube:qLphUlWywF4
 
 ## Usage
 

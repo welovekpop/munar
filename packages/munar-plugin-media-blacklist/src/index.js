@@ -87,10 +87,37 @@ export default class MediaBlacklist extends Plugin {
     message.reply(`Added "${item.sourceType}:${item.sourceID}" to the blacklist.`)
   }
 
+  async removeBlacklistItem (message, itemID) {
+    if (!itemID || !itemID.includes(':')) {
+      throw new Error(
+        'You must provide a media item to remove from the blacklist. Use ' +
+        '`!blacklist remove sourceType:sourceID`, for example ' +
+        '`!blacklist remove youtube:QfUX9XcA7b4`.'
+      )
+    }
+
+    const [ sourceType, sourceID ] = itemID.split(':')
+    const item = { sourceType, sourceID }
+
+    const blacklisted = await this.getBlacklistItem(item)
+    if (!blacklisted) {
+      message.reply('That media is not blacklisted.')
+      return
+    }
+
+    await blacklisted.remove()
+
+    message.reply(`Removed "${item.sourceType}:${item.sourceID}" from the blacklist.`)
+  }
+
   @command('blacklist', { role: permissions.MODERATOR })
   triageBlacklist (message, action, ...args) {
     if (action === 'add') {
       return this.addBlacklistItem(message, ...args)
+    }
+
+    if (action === 'remove') {
+      return this.removeBlacklistItem(message, ...args)
     }
 
     throw new Error('Unknown blacklist command.')
