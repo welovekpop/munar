@@ -49,7 +49,6 @@ export default class MediaBlacklist extends Plugin {
     })
   }
 
-  @command('blacklist', { role: permissions.MODERATOR })
   async addBlacklistItem (message, itemID = '', reason = '') {
     let item
     if (itemID && /^\w+:\w+$/.test(itemID)) {
@@ -77,6 +76,15 @@ export default class MediaBlacklist extends Plugin {
     await this.createBlacklistItem(message.user, item, reason)
 
     message.reply(`Added "${item.sourceType}:${item.sourceID}" to the blacklist.`)
+  }
+
+  @command('blacklist', { role: permissions.MODERATOR })
+  triageBlacklist (message, action, ...args) {
+    if (action === 'add') {
+      return this.addBlacklistItem(message, ...args)
+    }
+
+    throw new Error('Unknown blacklist command.')
   }
 
   onAdvance = async (adapter, { next }) => {
