@@ -22,7 +22,8 @@ export default class DJHistorySkip extends Plugin {
     this.bot.removeListener('djBooth:advance', this.onAdvance)
   }
 
-  onAdvance = (adapter, { next }) => {
+  onAdvance = (adapter) => {
+    const next = adapter.getDJBooth().getEntry()
     if (supportsHistory(adapter) && next) {
       // Ensure that we only skip the next song once the previous lockskip has
       // completed.
@@ -54,9 +55,13 @@ export default class DJHistorySkip extends Plugin {
     return true
   }
 
-  async maybeSkip (adapter, media) {
+  isHistoryMatch (a, b) {
+    return this.isSameSong(a.media, b.media) && a.id !== b.id
+  }
+
+  async maybeSkip (adapter, current) {
     const history = await adapter.getDJHistory().getRecent(this.options.limit)
-    const lastPlay = history.find((entry) => this.isSameSong(entry.media, media))
+    const lastPlay = history.find((entry) => this.isHistoryMatch(entry, current))
     if (lastPlay) {
       const { username } = await adapter.getDJBooth().getDJ()
       const duration = moment.duration(Date.now() - lastPlay.playedAt, 'milliseconds')

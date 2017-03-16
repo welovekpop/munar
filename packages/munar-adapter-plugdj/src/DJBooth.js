@@ -25,6 +25,20 @@ export default class DJBooth extends EventEmitter {
     return this.plug.plugged
   }
 
+  getEntry () {
+    const entry = this.plugged.getPlayback()
+    if (!entry) {
+      return null
+    }
+
+    return {
+      id: entry.historyID,
+      media: this.getMedia(),
+      user: this.getDJ(),
+      playedAt: new Date(entry.startTime)
+    }
+  }
+
   getMedia () {
     const media = this.plugged.getMedia()
     if (!media) {

@@ -28,6 +28,19 @@ export default class DJBooth {
     })
   }
 
+  getEntry () {
+    if (!this.booth) {
+      return null
+    }
+
+    return {
+      id: this.booth.historyID,
+      media: this.getMedia(),
+      user: this.getDJ(),
+      playedAt: new Date(this.booth.playedAt)
+    }
+  }
+
   getMedia () {
     if (!this.booth) {
       return null
