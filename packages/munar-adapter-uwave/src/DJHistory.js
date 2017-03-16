@@ -20,6 +20,7 @@ export default class DJHistory {
     }
     const { body } = await this.uw.request('get', 'booth/history', query)
     return mergeIncludedModels(body).map((entry) => ({
+      id: entry._id,
       media: normalizeMedia(entry.media),
       user: this.uw.toBotUser(entry.user),
       playedAt: new Date(entry.playedAt)
