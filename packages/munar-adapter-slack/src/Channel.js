@@ -1,7 +1,16 @@
 import { linkNames } from './utils'
+import rename from 'rename-prop'
 
 const defaultMessageOptions = {
   as_user: true
+}
+
+function normalizeMessageOptions (options) {
+  if (options.titleLink) {
+    rename(options, 'titleLink', 'title_link')
+  }
+
+  return options
 }
 
 export default class SlackChannel {
@@ -42,7 +51,10 @@ export default class SlackChannel {
       chatClient.postMessage(
         this.channel.id,
         linkNames(this.slack, text),
-        { ...defaultMessageOptions, ...opts }
+        normalizeMessageOptions({
+          ...defaultMessageOptions,
+          ...opts
+        })
       )
     } else {
       this.client.sendMessage(linkNames(this.slack, text), this.channel.id)
