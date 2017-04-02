@@ -1,7 +1,7 @@
 {
   "name": "munar-plugin-events-calendar",
   "version": "0.0.0",
-  "description": "Munar plugin to greet new users.",
+  "description": "Munar plugin that uses Google Calendar to inform users about planned events.",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,9 @@
   "license": "ISC",
   "dependencies": {
     "debug": "^2.6.3",
-    "googleapis": "^18.0.0"
+    "googleapis": "^18.0.0",
+    "moment": "^2.18.1",
+    "pify": "^2.3.0"
   },
   "peerDependencies": {
     "munar-core": "^1.0.0"
