@@ -26,6 +26,8 @@ export default class Slack extends Adapter {
 
   async connect () {
     return new Promise((resolve, reject) => {
+      this.web = new WebClient(this.options.token)
+
       this.client = new RtmClient(this.options.token, {
         dataStore: this.store,
         autoReconnect: true,

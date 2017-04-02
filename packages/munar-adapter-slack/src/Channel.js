@@ -1,4 +1,17 @@
 import { linkNames } from './utils'
+import rename from 'rename-prop'
+
+const defaultMessageOptions = {
+  as_user: true
+}
+
+function normalizeMessageOptions (options) {
+  if (options.titleLink) {
+    rename(options, 'titleLink', 'title_link')
+  }
+
+  return options
+}
 
 export default class SlackChannel {
   constructor (slack, channel) {
@@ -28,12 +41,24 @@ export default class SlackChannel {
     return this.slack.getChannelByName(name)
   }
 
-  reply (message, text) {
-    this.send(`@${message.username} ${text}`)
+  reply (message, text, opts = undefined) {
+    this.send(`@${message.username} ${text}`, opts)
   }
 
-  send (text) {
-    this.client.sendMessage(linkNames(this.slack, text), this.channel.id)
+  send (text, opts = undefined) {
+    if (typeof opts === 'object' && Object.keys(opts).length > 0) {
+      const chatClient = this.slack.web.chat
+      chatClient.postMessage(
+        this.channel.id,
+        linkNames(this.slack, text),
+        normalizeMessageOptions({
+          ...defaultMessageOptions,
+          ...opts
+        })
+      )
+    } else {
+      this.client.sendMessage(linkNames(this.slack, text), this.channel.id)
+    }
   }
 
   canExecute (message) {
