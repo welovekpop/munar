@@ -43,6 +43,16 @@ export default class EventsCalendar extends Plugin {
     if (hours < 24) {
       text += ` (${hours} hours from now)`
     }
-    message.reply(text)
+
+    message.reply(text, {
+      // For Slack!
+      attachments: [
+        {
+          title: event.summary,
+          titleLink: event.htmlLink,
+          text: event.description
+        }
+      ]
+    })
   }
 }
