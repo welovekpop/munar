@@ -10,12 +10,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@captemulation/get-parameter-names": "^1.0.0",
     "array-includes": "^3.0.2",
     "escape-string-regexp": "^1.0.5",
+    "joi": "^10.3.0",
+    "join-component": "^1.1.0",
     "lodash.last": "^3.0.0",
     "mkdirp": "^0.5.1",
     "mongoose": "^4.4.14",
     "mongoose-model-decorators": "^0.3.1",
-    "mongoose-random": "^0.1.1"
+    "mongoose-random": "^0.1.1",
+    "pify": "^2.3.0"
   }
 }

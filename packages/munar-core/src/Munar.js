@@ -6,6 +6,7 @@ import { createSchema } from 'mongoose-model-decorators'
 import Promise from 'bluebird'
 
 import PluginManager from './PluginManager'
+import argumentParser from './argumentParser'
 import { UserModel, ChatMessageModel } from './models'
 
 const debug = require('debug')('munar:core')
@@ -140,6 +141,10 @@ export default class Munar extends EventEmitter {
         (com) => includes(com.names, commandName)
       )
       if (!command) return
+
+      if (command.arguments) {
+        args = await argumentParser.parse(args, command.arguments)
+      }
 
       if (command.ninjaVanish && message) {
         message.delete()
