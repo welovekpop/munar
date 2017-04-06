@@ -1,0 +1,19 @@
+{
+  "name": "munar-plugin-usage",
+  "version": "0.0.0",
+  "description": "Munar plugin to display usage information for other plugins.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin"
+  ],
+  "author": "Renée Kooi <renee@kooi.me>",
+  "license": "ISC",
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "munar-core": "^1.0.0"
+  }
+}
