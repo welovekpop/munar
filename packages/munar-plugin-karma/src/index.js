@@ -18,7 +18,13 @@ export default class UserKarma extends Plugin {
     })
   }
 
-  @command('karma')
+  @command('karma', {
+    description: 'Show a user\'s karma.',
+    arguments: [
+      command.arg.user(),
+      command.arg.string()
+    ]
+  })
   async karma (message, username, time = 'w') {
     const User = this.model('User')
     const Karma = this.model('Karma')
@@ -72,7 +78,12 @@ export default class UserKarma extends Plugin {
     }
   }
 
-  @command('karmawhores')
+  @command('karmawhores', {
+    description: 'Show the top 5 most popular users.',
+    arguments: [
+      command.arg.string()
+    ]
+  })
   async karmawhores (message, time = 'w') {
     const User = this.model('User')
     const Karma = this.model('Karma')
@@ -108,7 +119,12 @@ export default class UserKarma extends Plugin {
     }
   }
 
-  @command('bump')
+  @command('bump', {
+    description: 'Increase someone\'s karma.',
+    arguments: [
+      command.arg.user()
+    ]
+  })
   async bump (message, username, ...reason) {
     const User = this.model('User')
     const Karma = this.model('Karma')
@@ -150,7 +166,12 @@ export default class UserKarma extends Plugin {
     }
   }
 
-  @command('thump')
+  @command('thump', {
+    description: 'Decrease someone\'s karma.',
+    arguments: [
+      command.arg.user()
+    ]
+  })
   async thump (message, username, ...reason) {
     const User = this.model('User')
     const Karma = this.model('Karma')
@@ -191,7 +212,12 @@ export default class UserKarma extends Plugin {
     }
   }
 
-  @command('bitch')
+  @command('bitch', {
+    description: 'Show the user who has given you the most karma recently.',
+    arguments: [
+      command.arg.string()
+    ]
+  })
   async bitch (message, time = 'w') {
     const User = this.model('User')
     const Karma = this.model('Karma')
@@ -219,7 +245,12 @@ export default class UserKarma extends Plugin {
     }
   }
 
-  @command('pimp')
+  @command('pimp', {
+    description: 'Show the user who has received the most karma from you recently.',
+    arguments: [
+      command.arg.string()
+    ]
+  })
   async pimp (message, time = 'w') {
     const User = this.model('User')
     const Karma = this.model('Karma')
@@ -247,7 +278,9 @@ export default class UserKarma extends Plugin {
     }
   }
 
-  @command('fistbump')
+  @command('fistbump', {
+    description: 'Show a random bump.'
+  })
   async fistbump (message) {
     const User = this.model('User')
     const Karma = this.model('Karma')
@@ -266,7 +299,9 @@ export default class UserKarma extends Plugin {
     }
   }
 
-  @command('fistthump')
+  @command('fistthump', {
+    description: 'Show a random thump.'
+  })
   async fistthump (message) {
     const User = this.model('User')
     const Karma = this.model('Karma')
