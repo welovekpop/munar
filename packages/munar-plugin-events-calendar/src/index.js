@@ -40,7 +40,9 @@ export default class EventsCalendar extends Plugin {
     })
 
     let text = `The next event is ${event.summary}, scheduled ${calendar}.`
-    if (hours < 24) {
+    if (hours < 1) {
+      text += ` (${start.fromNow(true)} from now)`
+    } else if (hours < 24) {
       text += ` (${hours} hours from now)`
     }
 
