@@ -98,7 +98,15 @@ export default class Triggers extends Plugin {
     return tokens
   }
 
-  @command('addtrigger', 'trigger', { role: permissions.MODERATOR })
+  @command('addtrigger', 'trigger', {
+    role: permissions.MODERATOR,
+    description: 'Define a new trigger.',
+    arguments: [
+      command.arg.string()
+        .regex(/^.\w+$/)
+        .description('The name of the trigger.')
+    ]
+  })
   async createTrigger (message, name, ...response) {
     const Trigger = this.model('Trigger')
     const User = this.model('User')
@@ -118,7 +126,15 @@ export default class Triggers extends Plugin {
     this.add(name, response)
   }
 
-  @command('deltrigger', { role: command.ROLE.BOUNCER })
+  @command('deltrigger', {
+    role: command.ROLE.BOUNCER,
+    description: 'Delete a trigger.',
+    arguments: [
+      command.arg.string()
+        .regex(/^.\w+$/)
+        .description('The name of the trigger.')
+    ]
+  })
   async removeTrigger (message, name) {
     const Trigger = this.model('Trigger')
     name = name.toLowerCase()
