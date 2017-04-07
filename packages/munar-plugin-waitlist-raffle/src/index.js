@@ -38,7 +38,10 @@ export default class WaitlistRaffle extends Plugin {
     this.onEnd = this.onEnd.bind(this)
   }
 
-  @command('raffle', { role: permissions.MODERATOR })
+  @command('raffle', {
+    role: permissions.MODERATOR,
+    description: 'Start a raffle. Users can type `!play` for a chance to be moved up in the waitlist.'
+  })
   startRaffle (message) {
     if (this.running) {
       return
@@ -60,7 +63,9 @@ export default class WaitlistRaffle extends Plugin {
     )
   }
 
-  @command('play')
+  @command('play', {
+    description: 'Enter a raffle.'
+  })
   async enterRaffle (message) {
     const { user } = message
 
@@ -83,7 +88,9 @@ export default class WaitlistRaffle extends Plugin {
     }
   }
 
-  @command('withdraw')
+  @command('withdraw', {
+    description: 'Withdraw from participation in a raffle.'
+  })
   withdraw (message) {
     const { user } = message
     let i = this.players.findIndex((player) => player.id === user.id)
@@ -93,7 +100,9 @@ export default class WaitlistRaffle extends Plugin {
     message.delete()
   }
 
-  @command('players')
+  @command('players', {
+    description: 'List the users participating in the current raffle.'
+  })
   showPlayers (message) {
     if (!this.running) {
       return

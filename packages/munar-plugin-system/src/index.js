@@ -1,6 +1,9 @@
 import { Plugin, command, permissions } from 'munar-core'
 import pkg from 'munar-core/package.json'
 
+const argPluginName = command.arg.string()
+  .description('Plugin Name')
+
 export default class System extends Plugin {
   static description = 'Simple tools for plugin management & system information'
 
@@ -8,12 +11,18 @@ export default class System extends Plugin {
     return this.bot.plugins
   }
 
-  @command('version')
+  @command('version', {
+    description: 'Show the current bot version.'
+  })
   version (message) {
     message.reply(`Running ${pkg.name} v${pkg.version}`)
   }
 
-  @command('reload', { role: permissions.ADMIN })
+  @command('reload', {
+    role: permissions.ADMIN,
+    description: 'Reload a plugin.',
+    arguments: [ argPluginName.required() ]
+  })
   reloadplugin (message, name) {
     try {
       this.manager().reload(name)
@@ -23,7 +32,11 @@ export default class System extends Plugin {
     }
   }
 
-  @command('unload', { role: permissions.ADMIN })
+  @command('unload', {
+    role: permissions.ADMIN,
+    description: 'Unload a plugin.',
+    arguments: [ argPluginName.required() ]
+  })
   unloadplugin (message, name) {
     try {
       this.manager().unload(name)
@@ -33,7 +46,11 @@ export default class System extends Plugin {
     }
   }
 
-  @command('load', { role: permissions.ADMIN })
+  @command('load', {
+    role: permissions.ADMIN,
+    description: 'Load a plugin.',
+    arguments: [ argPluginName.required() ]
+  })
   loadplugin (message, name) {
     try {
       this.manager().load(name)
@@ -43,7 +60,11 @@ export default class System extends Plugin {
     }
   }
 
-  @command('disable', { role: permissions.ADMIN })
+  @command('disable', {
+    role: permissions.ADMIN,
+    description: 'Disable a plugin.',
+    arguments: [ argPluginName.required() ]
+  })
   disableplugin (message, name) {
     if (name.toLowerCase() === 'system') {
       message.reply('Cannot disable the System plugin.')
@@ -58,7 +79,11 @@ export default class System extends Plugin {
     }
   }
 
-  @command('enable', { role: permissions.ADMIN })
+  @command('enable', {
+    role: permissions.ADMIN,
+    description: 'Enable a plugin.',
+    arguments: [ argPluginName.required() ]
+  })
   enableplugin (message, name) {
     const manager = this.manager()
     let plugin = manager.get(name)
@@ -74,7 +99,11 @@ export default class System extends Plugin {
     message.reply(`Plugin "${name}" enabled.`)
   }
 
-  @command('plugininfo', { role: permissions.MODERATOR })
+  @command('plugininfo', {
+    role: permissions.MODERATOR,
+    description: 'Show status information about a plugin.',
+    arguments: [ argPluginName.required() ]
+  })
   plugininfo (message, name) {
     if (!name || name.length === 0) {
       message.reply('Usage: !plugininfo "pluginname"')
@@ -94,7 +123,10 @@ export default class System extends Plugin {
     }
   }
 
-  @command('listplugins', { role: permissions.MODERATOR })
+  @command('listplugins', {
+    role: permissions.MODERATOR,
+    description: 'Show a list of known plugins, and their current status.'
+  })
   listplugins (message) {
     const manager = this.manager()
     const text = manager.known().map((name) => {
@@ -108,7 +140,10 @@ export default class System extends Plugin {
     message.reply(text.sort().join(', '))
   }
 
-  @command('exit', { role: permissions.ADMIN })
+  @command('exit', {
+    role: permissions.ADMIN,
+    description: 'Stop the bot.'
+  })
   exit (message) {
     message.reply('okay... </3 T_T')
     this.bot.stop()

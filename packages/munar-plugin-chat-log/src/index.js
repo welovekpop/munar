@@ -19,12 +19,14 @@ export default class ChatLog extends Plugin {
     this.bot.removeListener('message', this.onChat)
   }
 
-  @command('lastspoke')
-  async showLastSpoke (message, ...nameParts) {
+  @command('lastspoke', {
+    description: 'Show the last time a user said something.',
+    arguments: [ command.arg.user() ]
+  })
+  async showLastSpoke (message, targetName) {
     const ChatMessage = this.bot.model('ChatMessage')
 
     const adapter = message.source.getAdapterName()
-    const targetName = nameParts.join(' ')
     try {
       const target = await this.bot.findUser(targetName, { adapter: adapter })
       if (!target) {
