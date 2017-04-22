@@ -18,6 +18,7 @@ parser.parse = (input, schema) => {
     parser.array()
       .required()
       .ordered(schema)
+      .items(parser.any()) // Accept excess arguments.
       .error((errors) => {
         const missing = errors.find((err) => err.type === 'array.includesRequiredKnowns')
 
