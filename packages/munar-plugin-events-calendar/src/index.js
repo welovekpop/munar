@@ -33,9 +33,14 @@ export default class EventsCalendar extends Plugin {
     }
 
     const event = body.items[0]
-    const start = moment(event.start.dateTime)
+    const start = moment.utc(event.start.dateTime)
     const hours = start.diff(moment(), 'hours')
     const calendar = start.calendar(null, {
+      lastDay: '[Yesterday at] LT [GMT]',
+      sameDay: '[Today at] LT [GMT]',
+      nextDay: '[Tomorrow at] LT [GMT]',
+      lastWeek: '[last] dddd [at] LT [GMT]',
+      nextWeek: 'dddd [at] LT [GMT]',
       sameElse: `for MMMM Do`
     })
 
