@@ -4,7 +4,7 @@ import truncate from 'truncate-url'
 function Emote ({ id, url }) {
   return html`
     <tr class="stripe-dark">
-      <td class="pv2 ph3">${id}</td>
+      <td class="pv2 ph3 name">${id}</td>
       <td class="pv2 ph3">
         <a href="${url}" title="${url}" class="link dim light-pink" target="_blank">
           ${truncate(url, 50)}
@@ -12,6 +12,17 @@ function Emote ({ id, url }) {
       </td>
     </tr>
   `
+}
+
+function onclick (event) {
+  if (!event.target.classList.contains('name')) {
+    return
+  }
+  var s = window.getSelection()
+  var r = document.createRange()
+  r.selectNodeContents(event.target)
+  s.removeAllRanges()
+  s.addRange(r)
 }
 
 export function renderEmotesList (emotes) {
@@ -31,6 +42,9 @@ export function renderEmotesList (emotes) {
           ${emotes.map(Emote)}
         </tbody>
       </table>
+      <script>
+        if (document.body.classList) onclick = ${onclick.toString()}
+      </script>
     </body>
     </html>
   `.toString()
