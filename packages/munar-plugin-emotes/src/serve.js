@@ -1,8 +1,21 @@
+import html from 'bel'
 import truncate from 'truncate-url'
 
+function Emote ({ id, url }) {
+  return html`
+    <tr class="stripe-dark">
+      <td class="pv2 ph3">${id}</td>
+      <td class="pv2 ph3">
+        <a href="${url}" title="${url}" class="link dim light-pink" target="_blank">
+          ${truncate(url, 50)}
+        </a>
+      </td>
+    </tr>
+  `
+}
+
 export function renderEmotesList (emotes) {
-  return `
-    <!DOCTYPE html>
+  return html`
     <html>
     <head>
       <meta charset="utf-8">
@@ -15,19 +28,10 @@ export function renderEmotesList (emotes) {
           <th class="pv2 ph3 ttu">URL</th>
         </tr></thead>
         <tbody>
-          ${emotes.map((emote) => `
-            <tr class="stripe-dark">
-              <td class="pv2 ph3">${emote.id}</td>
-              <td class="pv2 ph3">
-                <a href="${emote.url}" title="${emote.url}" class="link dim light-pink" target="_blank">
-                  ${truncate(emote.url, 50)}
-                </a>
-              </td>
-            </tr>
-          `).join('')}
+          ${emotes.map(Emote)}
         </tbody>
       </table>
     </body>
     </html>
-  `.replace(/\s+/g, ' ')
+  `.toString()
 }
