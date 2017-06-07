@@ -12,10 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bel": "^4.6.1",
-    "bluebird": "^3.3.5",
-    "debug": "^2.2.0",
-    "request": "^2.72.0",
+    "bel": "^5.0.0",
+    "bluebird": "^3.5.0",
+    "debug": "^2.6.8",
+    "request": "^2.81.0",
     "truncate-url": "^1.0.0"
   },
   "peerDependencies": {

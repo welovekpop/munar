@@ -16,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "debug": "^2.2.0",
-    "pify": "^2.3.0",
+    "pify": "^3.0.0",
     "plugged": "^2.6.1",
     "ultron": "^1.0.2"
   },
