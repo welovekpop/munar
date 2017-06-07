@@ -13,19 +13,25 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
+    "babel-jest": "^20.0.3",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-newer": "^1.1.0",
     "gulp-plumber": "^1.1.0",
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.5",
-    "jest": "^16.0.2",
+    "jest": "^20.0.4",
     "lerna": "^2.0.0-rc.5",
     "standard": "^10.0.2",
     "through2": "^2.0.1"
   },
   "standard": {
     "parser": "babel-eslint"
+  },
+  "jest": {
+    "transform": {
+      "\\.js$": "babel-jest"
+    }
   },
   "scripts": {
     "prepare": "lerna bootstrap && npm run link && npm run build",
