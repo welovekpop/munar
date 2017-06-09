@@ -1,0 +1,26 @@
+{
+  "name": "munar-adapter-discord",
+  "version": "0.0.0",
+  "description": "DiscordApp adapter for Munar",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "munar-plugin",
+    "munar-adapter",
+    "discord",
+    "discordapp"
+  ],
+  "author": "Renée Kooi <renee@kooi.me>",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "eris": "^0.8.1",
+    "rename-prop": "^1.0.0",
+    "tsml": "^1.0.1"
+  },
+  "peerDependencies": {
+    "munar-core": "^2.0.0"
+  }
+}
