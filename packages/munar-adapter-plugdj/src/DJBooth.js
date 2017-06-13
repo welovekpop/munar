@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import pify from 'pify'
 
 export const convertMedia = (media) => ({
   sourceType: media.format === 1 ? 'youtube' : 'soundcloud',
@@ -50,5 +51,13 @@ export default class DJBooth extends EventEmitter {
   getDJ () {
     const dj = this.plugged.getDJ()
     return dj ? this.plug.getUser(dj.id) : null
+  }
+
+  skip () {
+    if (!this.plugged.getMedia()) {
+      return
+    }
+    const skip = pify(this.plugged.skipDJ).bind(this.plugged)
+    return skip()
   }
 }
