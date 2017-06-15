@@ -1,3 +1,4 @@
+import { permissions } from 'munar-core'
 import { linkNames } from './utils'
 import rename from 'rename-prop'
 
@@ -61,8 +62,12 @@ export default class SlackChannel {
     }
   }
 
-  canExecute (message) {
-    return true
+  canExecute (message, command) {
+    const user = message.user.sourceUser
+    if (user.is_admin) {
+      return true
+    }
+    return command.role <= permissions.NONE
   }
 
   getAdapterName () {
