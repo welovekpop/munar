@@ -1,8 +1,8 @@
 import { Plugin, command, permissions } from 'munar-core'
 import last from 'lodash.last'
-
 import { TriggerModel } from './models'
 import * as vars from './vars'
+import { renderTriggers } from './serve'
 
 export default class Triggers extends Plugin {
   static description = 'Throws text at people.'
@@ -144,5 +144,18 @@ export default class Triggers extends Plugin {
     await Trigger.remove({ _id: name })
     this.removeCommand(name)
     message.reply(`Removed trigger "!${name}"`)
+  }
+
+  async serve () {
+    const Trigger = this.model('Trigger')
+
+    const triggers = await Trigger.find()
+      .sort({ _id: 1 })
+      .lean()
+
+    return renderTriggers({
+      triggers,
+      triggerCharacter: this.bot.options.trigger
+    })
   }
 }
