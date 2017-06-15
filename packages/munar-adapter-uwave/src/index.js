@@ -88,7 +88,7 @@ export default class UwaveAdapter extends Adapter {
 
   canExecute (message, command) {
     const user = message.user.sourceUser
-    const userRole = user.roles
+    const userRole = user.roles && user.roles.length > 0
       ? getRoleFromList(user.roles)
       : getRoleFromId(user.role)
     const requiredRole = command.role
