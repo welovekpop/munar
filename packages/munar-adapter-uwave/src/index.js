@@ -102,7 +102,7 @@ export default class UwaveAdapter extends Adapter {
     if (method === 'get') {
       Object.assign(options.query, data)
     } else {
-      options.body = JSON.stringify(data)
+      options.body = data
       options.headers = {
         'content-type': 'application/json'
       }
