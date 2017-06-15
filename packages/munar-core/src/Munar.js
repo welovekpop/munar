@@ -150,7 +150,7 @@ export default class Munar extends EventEmitter {
         message.delete()
       }
 
-      if (source.canExecute(message)) {
+      if (source.canExecute(message, command)) {
         if (command.method) {
           await plugin[command.method](message, ...args)
         } else {
