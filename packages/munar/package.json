@@ -1,6 +1,6 @@
 {
   "name": "munar",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "lib/index.js",
   "bin": "bin/munar",
@@ -16,7 +16,7 @@
   "dependencies": {
     "json5": "^0.5.0",
     "minimist": "^1.2.0",
-    "munar-core": "^1.2.1",
+    "munar-core": "^1.2.2",
     "munar-plugin-system": "^1.1.0",
     "require-relative": "^0.8.7"
   }

@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-greetings",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Munar plugin to greet new users.",
   "main": "lib/index.js",
   "scripts": {
