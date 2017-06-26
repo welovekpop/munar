@@ -117,16 +117,18 @@ export default class UwaveAdapter extends Adapter {
     let url = `${this.apiUrl}/${endpoint}`
     const options = {
       method,
-      query: { token: this.options.token },
+      headers: {
+        authorization: `JWT ${this.options.token}`
+      },
       json: true
     }
     if (method === 'get') {
-      Object.assign(options.query, data)
+      options.query = data
     } else {
       options.body = data
-      options.headers = {
+      Object.assign(options.headers, {
         'content-type': 'application/json'
-      }
+      })
     }
     // For nested query parameters (like page[offset])
     if (options.query) {
