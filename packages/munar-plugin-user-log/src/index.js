@@ -40,11 +40,18 @@ export default class UserLog extends Plugin {
   async onUserJoin (adapter, user) {
     debug('join', `${user.username} (${user.id})`)
     const User = this.model('User')
+    if (!adapter) {
+      return
+    }
     try {
       const userModel = await User.from(user)
-      if (!userModel && adapter) {
+      if (!userModel) {
         await User.create({
           ...user.compoundId(),
+          username: user.username
+        })
+      } else {
+        await userModel.update({
           username: user.username
         })
       }
@@ -56,5 +63,14 @@ export default class UserLog extends Plugin {
   async onUserUpdate (adapter, user, update) {
     if (!user) return
     debug('update', update)
+
+    if (update.username) {
+      const userModel = await User.from(user)
+      if (userModel) {
+        await userModel.update({
+          username: user.username
+        })
+      }
+    }
   }
 }
