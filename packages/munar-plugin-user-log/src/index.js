@@ -50,7 +50,7 @@ export default class UserLog extends Plugin {
           ...user.compoundId(),
           username: user.username
         })
-      } else {
+      } else if (userModel.username !== user.username) {
         await userModel.update({
           username: user.username
         })
