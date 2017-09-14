@@ -110,8 +110,25 @@ export default class MediaBlacklist extends Plugin {
     message.reply(`Removed "${item.sourceType}:${item.sourceID}" from the blacklist.`)
   }
 
+  async addBlacklistItemAndSkip (message, reason) {
+    if (!supportsBooth(message.source)) {
+      throw new Error('This adapter does not support skipping.')
+    }
+    await this.addBlacklistItem(message, null, reason)
+    try {
+      await lockskip(message.source, { position: 2, reason })
+    } catch (err) {
+      message.reply('Could not force skip, please do it manually!')
+    }
+    return null
+  }
+
   @command('blacklist', { role: permissions.MODERATOR })
-  triageBlacklist (message, action, ...args) {
+  async triageBlacklist (message, action, ...args) {
+    if (action === 'skip') {
+      return this.addBlacklistItemAndSkip(message, args[0])
+    }
+
     if (action === 'add') {
       return this.addBlacklistItem(message, ...args)
     }
