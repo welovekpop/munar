@@ -225,6 +225,11 @@ export default class UwaveAdapter extends Adapter {
   }
 
   onSocketMessage = (message) => {
+    // Ignore pings
+    if (message === '-') {
+      return
+    }
+
     let command
     let data
 
