@@ -62,6 +62,8 @@ export default class UserLog extends Plugin {
 
   async onUserUpdate (adapter, user, update) {
     if (!user) return
+
+    const User = this.model('User')
     debug('update', update)
 
     if (update.username) {
