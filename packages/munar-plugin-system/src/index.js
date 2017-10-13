@@ -15,7 +15,12 @@ export default class System extends Plugin {
     description: 'Show the current bot version.'
   })
   version (message) {
-    message.reply(`Running ${pkg.name} v${pkg.version}`)
+    if (this.bot.options.name && this.bot.options.version) {
+      const app = this.bot.options
+      message.reply(`Running ${app.name} v${app.version}, using ${pkg.name} v${pkg.version}`)
+    } else {
+      message.reply(`Running ${pkg.name} v${pkg.version}`)
+    }
   }
 
   @command('reload', {
