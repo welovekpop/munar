@@ -16,8 +16,8 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "debug": "^2.2.0",
-    "moment": "^2.13.0",
+    "debug": "^3.1.0",
+    "moment": "^2.19.1",
     "random-item": "^1.0.0"
   },
   "peerDependencies": {
