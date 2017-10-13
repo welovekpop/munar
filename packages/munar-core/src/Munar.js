@@ -29,7 +29,9 @@ export default class Munar extends EventEmitter {
       ...this.constructor.defaultOptions,
       ...options
     }
-    this.db = mongoose.connect(this.options.mongo)
+    this.db = mongoose.connect(this.options.mongo, {
+      useMongoClient: true
+    })
 
     this.plugins = new PluginManager(this)
 
