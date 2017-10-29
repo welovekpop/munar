@@ -60,4 +60,27 @@ export default class DJBooth extends EventEmitter {
     const skip = pify(this.plugged.skipDJ).bind(this.plugged)
     return skip()
   }
+
+  async lockskip ({ position }) {
+    const skipDJ = pify(this.plugged.skipDJ).bind(this.plugged)
+    const addToWaitlist = pify(this.plugged.addToWaitlist).bind(this.plugged)
+    const moveDJ = pify(this.plugged.moveDJ).bind(this.plugged)
+    const setLock = pify(this.plugged.setLock).bind(this.plugged)
+
+    const { id } = this.getDJ()
+    if (this.plugged.doesWaitlistCycle()) {
+      await skipDJ(id)
+      await moveDJ(id, position)
+    } else {
+      const locked = this.plugged.isWaitlistLocked()
+      try {
+        await setLock(true, false)
+        await skipDJ(id)
+        await addToWaitlist(id)
+        await moveDJ(id, position)
+      } finally {
+        await setLock(locked, false)
+      }
+    }
+  }
 }
