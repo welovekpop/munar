@@ -12,17 +12,18 @@
     "node": ">= 4"
   },
   "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "babel-jest": "^20.0.3",
+    "@babel/core": "^7.0.0-beta.42",
+    "babel-eslint": "^8.2.2",
+    "babel-jest": "^22.4.3",
     "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-newer": "^1.1.0",
-    "gulp-plumber": "^1.1.0",
+    "gulp-babel": "^8.0.0-beta.2",
+    "gulp-newer": "^1.4.0",
+    "gulp-plumber": "^1.2.0",
     "gulp-util": "^3.0.7",
-    "gulp-watch": "^4.3.5",
-    "jest": "^20.0.4",
-    "lerna": "^2.4.0",
-    "standard": "^10.0.2",
+    "gulp-watch": "^5.0.0",
+    "jest": "^22.4.3",
+    "lerna": "^2.9.0",
+    "standard": "^10.0.3",
     "through2": "^2.0.1"
   },
   "standard": {
