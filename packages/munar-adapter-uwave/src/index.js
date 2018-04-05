@@ -168,13 +168,19 @@ export default class UwaveAdapter extends Adapter {
 
   // Sockets
 
-  connectSocket () {
-    return new Promise((resolve, reject) => {
+  async getSocketAuth () {
+    const { body } = await this.request('get', 'auth/socket')
+    return body.data.socketToken
+  }
+  async connectSocket () {
+    const socketToken = await this.getSocketAuth()
+
+    return await new Promise((resolve, reject) => {
       debug('connecting socket')
       this.socket = new WebSocket(this.options.socket)
       this.socket.on('open', () => {
-        debug('send', this.options.token)
-        this.socket.send(this.options.token)
+        debug('send', socketToken)
+        this.socket.send(socketToken)
         resolve()
       })
       this.socket.on('message', this.onSocketMessage)
