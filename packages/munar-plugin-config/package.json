@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-config",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Munar plugin for managing plugin options.",
   "main": "lib/index.js",
   "scripts": {
