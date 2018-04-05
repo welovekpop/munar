@@ -30,7 +30,7 @@ function logCompiling () {
 
 gulp.task('build', () => {
   return gulp.src(src)
-    .pipe(plumber())
+    // .pipe(plumber())
     .pipe(rename(/packages\/(.*?)\/src\//, 'packages/$1/lib/'))
     .pipe(newer(dest))
     .pipe(logCompiling())
