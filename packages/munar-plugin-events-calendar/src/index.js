@@ -1,6 +1,5 @@
 import { Plugin, command } from 'munar-core'
 import googleapis from 'googleapis'
-import pify from 'pify'
 import moment from 'moment'
 
 const debug = require('debug')('munar:events')
@@ -14,11 +13,9 @@ export default class EventsCalendar extends Plugin {
     calendar: ''
   }
 
-  listEvents = pify(gcal.events.list)
-
   @command('nextevent')
   async showNextEvent (message) {
-    const body = await this.listEvents({
+    const body = await gcal.events.list({
       key: this.options.key,
       calendarId: this.options.calendar,
       timeMin: new Date().toISOString(),
