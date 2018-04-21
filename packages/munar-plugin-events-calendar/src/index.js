@@ -34,6 +34,11 @@ export default class EventsCalendar extends Plugin {
 
     const event = body.items[0]
     const start = moment.utc(event.start.dateTime)
+    if (moment().isAfter(start)) {
+      message.reply(`The ${event.summary} event is going on right now!`)
+      return
+    }
+
     const hours = start.diff(moment(), 'hours')
     const calendar = start.calendar(null, {
       lastDay: '[Yesterday at] LT [GMT]',
@@ -41,7 +46,7 @@ export default class EventsCalendar extends Plugin {
       nextDay: '[Tomorrow at] LT [GMT]',
       lastWeek: '[last] dddd [at] LT [GMT]',
       nextWeek: 'dddd [at] LT [GMT]',
-      sameElse: `for MMMM Do`
+      sameElse: 'for MMMM Do'
     })
 
     let text = `The next event is ${event.summary}, scheduled ${calendar}.`
