@@ -46,30 +46,16 @@ export default class PlugdjAdapter extends Adapter {
   // Base Adapter
 
   async connect () {
-    this.plugged.login(this.options)
-
     this.events.on(this.plugged.USER_JOIN, this.onJoin)
     this.events.on(this.plugged.FRIEND_JOIN, this.onJoin)
     this.events.on(this.plugged.USER_LEAVE, this.onLeave)
-
-    this.events.on(this.plugged.LOGOUT_SUCCESS, () => {
-      this.events.remove()
-    })
-
     this.events.on(this.plugged.CHAT, this.onChat)
 
-    return await new Promise((resolve, reject) => {
-      this.events.once(this.plugged.LOGIN_SUCCESS, () => {
-        this.plugged.connect(this.options.room)
-      })
-
-      this.events.on(this.plugged.JOINED_ROOM, resolve)
-      this.events.once(this.plugged.PLUG_ERROR, reject)
-      this.events.once(this.plugged.LOGIN_ERROR, reject)
-    })
+    await promisify(this.plugged.login).call(this.plugged, this.options)
+    await promisify(this.plugged.connect).call(this.plugged, this.options.room)
   }
 
-  disconnect = promisify(this.plugged.logout)
+  disconnect = promisify(this.plugged.logout).bind(this.plugged)
 
   reply (message, text) {
     this.send(`@${message.username} ${text}`)
@@ -79,7 +65,7 @@ export default class PlugdjAdapter extends Adapter {
     this.plugged.sendChat(text)
   }
 
-  deleteMessage = promisify(this.plugged.removeChatMessage)
+  deleteMessage = promisify(this.plugged.removeChatMessage).bind(this.plugged)
 
   getSelf () {
     return this.toBotUser(this.plugged.getSelf())
@@ -105,7 +91,7 @@ export default class PlugdjAdapter extends Adapter {
   }
 
   onChat = (message) => {
-    const user = this.plugged.getUserByID(message.id)
+    const user = this.plugged.getUserById(message.id)
     this.receive('message',
       new Message(this, message, user && this.toBotUser(user))
     )
@@ -118,7 +104,7 @@ export default class PlugdjAdapter extends Adapter {
   }
 
   onLeave = (id) => {
-    const user = this.plugged.getUserByID(id)
+    const user = this.plugged.getUserById(id)
     if (user) {
       this.receive('user:leave', this.toBotUser(user))
     }
