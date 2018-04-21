@@ -12,7 +12,7 @@
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "micro": "^9.0.0"
+    "micro": "^9.1.4"
   },
   "peerDependencies": {
     "munar-core": "^1.0.0"

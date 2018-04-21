@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "munar-helper-booth-lockskip": "^2.0.0",
-    "ultron": "^1.1.0"
+    "ultron": "^1.1.1"
   },
   "peerDependencies": {
     "munar-core": "^1.0.0"

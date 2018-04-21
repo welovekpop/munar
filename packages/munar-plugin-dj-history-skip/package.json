@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "delay": "^2.0.0",
-    "moment": "^2.21.0",
+    "moment": "^2.22.1",
     "munar-helper-booth-lockskip": "^2.0.0"
   },
   "peerDependencies": {
