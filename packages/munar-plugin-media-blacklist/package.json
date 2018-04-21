@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-media-blacklist",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Munar plugin for blacklisting and auto-skipping media.",
   "main": "lib/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "munar-helper-booth-lockskip": "^2.0.0",
+    "munar-helper-booth-lockskip": "^2.0.1",
     "ultron": "^1.1.1"
   },
   "peerDependencies": {

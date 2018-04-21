@@ -1,6 +1,6 @@
 {
   "name": "munar-helper-booth-lockskip",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Helper function to lock-skip DJ Booths with Munar bots.",
   "main": "lib/index.js",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-events-calendar",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Munar plugin that uses Google Calendar to inform users about planned events.",
   "main": "lib/index.js",
   "scripts": {
