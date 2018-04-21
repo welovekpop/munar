@@ -16,9 +16,9 @@
   "dependencies": {
     "debug": "^3.1.0",
     "dot-prop": "^4.2.0",
-    "got": "^7.1.0",
+    "got": "^8.3.0",
     "qs": "^6.5.1",
-    "ws": "^3.2.0"
+    "ws": "^5.1.1"
   },
   "peerDependencies": {
     "munar-core": "^1.0.0"

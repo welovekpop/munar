@@ -126,9 +126,6 @@ export default class UwaveAdapter extends Adapter {
       options.query = data
     } else {
       options.body = data
-      Object.assign(options.headers, {
-        'content-type': 'application/json'
-      })
     }
     // For nested query parameters (like page[offset])
     if (options.query) {
@@ -193,8 +190,11 @@ export default class UwaveAdapter extends Adapter {
         setTimeout(() => this.connectSocket(), 1000)
       }
 
+      this.socket.on('error', debug)
+
       this.socket.on('error', reconnect)
       this.socket.on('close', () => {
+        debug('closed')
         if (!this.shouldClose) reconnect()
       })
     })
