@@ -1,5 +1,5 @@
 import { Plugin, command, permissions } from 'munar-core'
-import request from 'request'
+import got from 'got'
 import Promise from 'bluebird'
 
 const debug = require('debug')('munar:emotes')
@@ -47,25 +47,20 @@ export default class Emotes extends Plugin {
     )
   }
 
-  upload (form) {
-    return new Promise((resolve, reject) => {
-      request.post('https://api.imgur.com/3/image', {
-        headers: {
-          Authorization: `Client-ID ${this.options.key}`
-        },
-        form: form
-      }, (e, res, body) => {
-        if (body) {
-          body = JSON.parse(body)
-          if (body.success) {
-            return resolve(body.data.link.replace('http:', 'https:'))
-          } else {
-            console.log(body)
-          }
-        }
-        reject(e)
-      })
+  async upload (form) {
+    const { body } = await got.post('https://api.imgur.com/3/image', {
+      headers: {
+        Authorization: `Client-ID ${this.options.key}`
+      },
+      body: form,
+      form: true,
+      json: true
     })
+    if (body && body.success) {
+      return body.data.link.replace('http:', 'https:')
+    } else {
+      console.log(body)
+    }
   }
 
   reupload (title, url, cb) {
