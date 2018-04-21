@@ -1,6 +1,6 @@
-# [munar]
+# [munar][]
 
-Extensible multi-backend chat-and-more bot framework from :sparkles: space :sparkles:
+Munar is a framework for building chat bots. It is specifically aimed at supporting multiple backends. It includes tools for persistence, textual chat commands and validation, and permissions, among others.
 
 ## Installation
 
@@ -12,7 +12,7 @@ $ npm install --global munar
 
 ## License
 
-[ISC]
+[ISC][]
 
 [munar]: http://munar.space
 [ISC]: ./LICENSE
