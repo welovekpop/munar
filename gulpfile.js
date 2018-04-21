@@ -10,6 +10,7 @@ const relative = require('path').relative
 
 const src = 'packages/*/src/**/*.js'
 const dest = 'packages/'
+let watching = false
 
 function rename (from, to) {
   return through.obj((file, enc, cb) => {
@@ -30,7 +31,7 @@ function logCompiling () {
 
 gulp.task('build', () => {
   return gulp.src(src)
-    // .pipe(plumber())
+    .pipe(watching ? plumber() : through.obj())
     .pipe(rename(/packages\/(.*?)\/src\//, 'packages/$1/lib/'))
     .pipe(newer(dest))
     .pipe(logCompiling())
@@ -39,6 +40,7 @@ gulp.task('build', () => {
 })
 
 gulp.task('watch', [ 'build' ], () => {
+  watching = true
   watch(src, () => {
     gulp.start('build')
   })
