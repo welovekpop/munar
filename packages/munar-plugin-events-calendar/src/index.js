@@ -1,9 +1,9 @@
 import { Plugin, command } from 'munar-core'
-import googleapis from 'googleapis'
+import { google } from 'googleapis'
 import moment from 'moment'
 
 const debug = require('debug')('munar:events')
-const gcal = googleapis.calendar('v3')
+const gcal = google.calendar('v3')
 
 export default class EventsCalendar extends Plugin {
   static description = 'Google Calendar-based event scheduling.'
