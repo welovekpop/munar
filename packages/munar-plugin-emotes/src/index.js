@@ -86,7 +86,8 @@ export default class Emotes extends Plugin {
     ]
   })
   async addemote (message, id, url) {
-    const user = message.user
+    const User = this.model('User')
+    const user = await User.from(message.user)
     id = cleanId(id)
     debug('addemote', id, url)
     let emote = null
