@@ -8,7 +8,7 @@ export default class PlugdjMessage extends Message {
   }
 
   get username () {
-    return this.sourceMessage.username
+    return this.user.username
   }
 
   delete () {
