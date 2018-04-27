@@ -29,7 +29,7 @@ function logCompiling () {
   })
 }
 
-gulp.task('build', () => {
+function build () {
   return gulp.src(src)
     .pipe(watching ? plumber() : through.obj())
     .pipe(rename(/packages\/(.*?)\/src\//, 'packages/$1/lib/'))
@@ -37,13 +37,13 @@ gulp.task('build', () => {
     .pipe(logCompiling())
     .pipe(babel())
     .pipe(gulp.dest(dest))
-})
+}
 
-gulp.task('watch', [ 'build' ], () => {
+function watchTask () {
   watching = true
-  watch(src, () => {
-    gulp.start('build')
-  })
-})
+  gulp.watch(src, build)
+}
 
-gulp.task('default', [ 'build' ])
+exports.build = build
+exports.watch = gulp.series(watchTask, build)
+exports.default = build
