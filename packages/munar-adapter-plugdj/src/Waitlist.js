@@ -1,37 +1,27 @@
-import promisify from 'pify'
-
 export default class Waitlist {
   constructor (plug) {
     this.plug = plug
-    this.internalMove = promisify(this.plugged.moveDJ)
   }
 
-  get plugged () {
-    return this.plug.plugged
-  }
-
-  get waitlist () {
-    return this.plugged.getWaitlist()
+  get mp () {
+    return this.plug.mp
   }
 
   async at (position) {
-    const id = this.waitlist[position]
-    return id ? this.plugged.getUserByID(id) : null
+    const id = this.mp.waitlist()[position]
+    return id ? this.mp.user(id) : null
   }
 
   async positionOf (user) {
-    if (typeof user === 'object') user = user.id
-    return this.waitlist.indexOf(user)
+    return this.mp.waitlist()
+      .positionOf(user)
   }
 
   async all () {
-    return this.waitlist
-      .map((id) => this.plugged.getUserByID(id))
-      .filter(Boolean)
+    return this.mp.waitlist()
   }
 
   async move (user, position) {
-    if (typeof user === 'object') user = user.id
-    await this.internalMove(user, position)
+    await this.mp.moveDJ(user, position)
   }
 }

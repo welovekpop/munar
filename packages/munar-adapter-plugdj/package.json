@@ -16,8 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "debug": "^3.1.0",
+    "miniplug": "^1.14.0",
     "pify": "^3.0.0",
-    "plugged": "^3.0.3",
     "ultron": "^1.1.1"
   },
   "peerDependencies": {
