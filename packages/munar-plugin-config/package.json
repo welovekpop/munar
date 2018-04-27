@@ -16,6 +16,6 @@
     "ultron": "^1.1.1"
   },
   "peerDependencies": {
-    "munar-core": "^1.0.0"
+    "munar-core": "^2.0.0"
   }
 }

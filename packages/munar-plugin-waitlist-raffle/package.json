@@ -17,6 +17,6 @@
     "random-item": "^1.0.0"
   },
   "peerDependencies": {
-    "munar-core": "^1.0.0"
+    "munar-core": "^2.0.0"
   }
 }

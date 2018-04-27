@@ -15,7 +15,7 @@
     "moment": "^2.22.1"
   },
   "peerDependencies": {
-    "munar-core": "^1.0.0",
+    "munar-core": "^2.0.0",
     "munar-plugin-user-log": "^1.0.0"
   }
 }
