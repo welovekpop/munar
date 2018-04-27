@@ -3,13 +3,14 @@ import WebSocket from 'ws'
 import EventEmitter from 'events'
 import { stringify } from 'qs'
 import { Adapter, User, permissions } from 'munar-core'
-
-const debug = require('debug')('munar:adapter:uwave')
-
+import retrier from 'promise-retry'
+import once from 'once'
 import Message from './Message'
 import Waitlist from './Waitlist'
 import DJBooth from './DJBooth'
 import DJHistory from './DJHistory'
+
+const debug = require('debug')('munar:adapter:uwave')
 
 export default class UwaveAdapter extends Adapter {
   static adapterName = 'uwave'
@@ -44,15 +45,21 @@ export default class UwaveAdapter extends Adapter {
       }
     }
 
-    await Promise.all([
-      this.getNow(),
-      this.connectSocket()
-    ])
+    await retrier(async (retry, n) => {
+      try {
+        const state = await this.getNow()
+        await this.connectSocket(state.socketToken)
+      } catch (err) {
+        debug('retry connect', err)
+        retry(err)
+      }
+    })
   }
 
-  disconnect () {
+  async disconnect () {
     this.shouldClose = true
     this.socket.close()
+    await this.request('delete', 'auth')
   }
 
   reply (message, text) {
@@ -131,6 +138,8 @@ export default class UwaveAdapter extends Adapter {
     if (options.query) {
       options.query = stringify(options.query, { encode: false })
     }
+
+    debug('request', url, options.query, options.body)
     return got(url, options)
   }
 
@@ -139,6 +148,7 @@ export default class UwaveAdapter extends Adapter {
     this.users = body.users.map(this.toBotUser, this)
     this.self = this.toBotUser(body.user)
     this.waitlist.waitlist = body.waitlist
+    return body
   }
 
   async deleteMessage (id) {
@@ -169,33 +179,36 @@ export default class UwaveAdapter extends Adapter {
     const { body } = await this.request('get', 'auth/socket')
     return body.data.socketToken
   }
-  async connectSocket () {
-    const socketToken = await this.getSocketAuth()
+  async connectSocket (socketToken) {
+    if (!socketToken) socketToken = await this.getSocketAuth()
 
     return await new Promise((resolve, reject) => {
-      debug('connecting socket')
+      let sent = false
+      debug('connecting socket', socketToken)
       this.socket = new WebSocket(this.options.socket)
       this.socket.on('open', () => {
+        sent = true
         debug('send', socketToken)
         this.socket.send(socketToken)
         resolve()
       })
       this.socket.on('message', this.onSocketMessage)
 
-      let reconnecting = false
-      const reconnect = () => {
-        if (reconnecting) return
-        reconnecting = true
+      const reconnect = once(() => {
         debug('reconnecting in 1000ms')
-        setTimeout(() => this.connectSocket(), 1000)
-      }
+        setTimeout(() => {
+          this.connect()
+        }, 1000)
+      })
 
-      this.socket.on('error', debug)
-
-      this.socket.on('error', reconnect)
+      this.socket.on('error', (err) => {
+        debug(err)
+        if (!sent) reject(err)
+        else reconnect()
+      })
       this.socket.on('close', () => {
         debug('closed')
-        if (!this.shouldClose) reconnect()
+        if (!this.shouldClose && sent) reconnect()
       })
     })
   }
