@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-serve",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Munar plugin to allow other plugins to serve a web interface.",
   "main": "lib/index.js",
   "scripts": {

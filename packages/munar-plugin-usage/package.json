@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-usage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Munar plugin to display usage information for other plugins.",
   "main": "lib/index.js",
   "scripts": {
@@ -11,7 +11,6 @@
   ],
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
-  "dependencies": {},
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

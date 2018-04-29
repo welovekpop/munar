@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-karma",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Munar plugin that allows users to give each other internet points.",
   "main": "lib/index.js",
   "scripts": {

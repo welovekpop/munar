@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-media-blacklist",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Munar plugin for blacklisting and auto-skipping media.",
   "main": "lib/index.js",
   "scripts": {

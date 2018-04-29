@@ -1,6 +1,6 @@
 {
   "name": "munar-adapter-uwave",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "üWave adapter for Munar",
   "main": "lib/index.js",
   "scripts": {

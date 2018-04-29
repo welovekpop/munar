@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-dj-history-skip",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Munar plugin for auto-skipping songs that are in the DJ History.",
   "main": "lib/index.js",
   "scripts": {

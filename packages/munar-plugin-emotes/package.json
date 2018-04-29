@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-emotes",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Munar plugin for sharing reaction GIFs.",
   "main": "lib/index.js",
   "scripts": {
