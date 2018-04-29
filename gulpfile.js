@@ -1,7 +1,6 @@
 const gulp = require('gulp')
 const babel = require('gulp-babel')
 const plumber = require('gulp-plumber')
-const watch = require('gulp-watch')
 const newer = require('gulp-newer')
 const through = require('through2')
 const log = require('gulp-util').log
