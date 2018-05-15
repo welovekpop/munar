@@ -1,6 +1,6 @@
 {
   "name": "munar-plugin-reddit-feed",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Munar plugin that posts about new Reddit posts.",
   "main": "lib/index.js",
   "scripts": {
