@@ -6,8 +6,10 @@ const through = require('through2')
 const log = require('gulp-util').log
 const colors = require('gulp-util').colors
 const relative = require('path').relative
+const del = require('del')
 
 const src = 'packages/*/src/**/*.js'
+const lib = 'packages/*/lib'
 const dest = 'packages/'
 let watching = false
 
@@ -28,6 +30,10 @@ function logCompiling () {
   })
 }
 
+function clean () {
+  return del(lib)
+}
+
 function build () {
   return gulp.src(src)
     .pipe(watching ? plumber() : through.obj())
@@ -43,6 +49,8 @@ function watchTask () {
   gulp.watch(src, build)
 }
 
+exports.clean = clean
 exports.build = build
 exports.watch = gulp.series(watchTask, build)
 exports.default = build
+exports.prepublish = gulp.series(clean, build)
