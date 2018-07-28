@@ -16,6 +16,9 @@
     "moment": "^2.22.1",
     "random-item": "^1.0.0"
   },
+  "devDependencies": {
+    "munar-core": "^2.0.0"
+  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

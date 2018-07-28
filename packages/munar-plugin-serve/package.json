@@ -14,6 +14,9 @@
   "dependencies": {
     "micro": "^9.1.4"
   },
+  "devDependencies": {
+    "munar-core": "^2.0.0"
+  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

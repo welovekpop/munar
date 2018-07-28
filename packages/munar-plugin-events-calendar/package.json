@@ -16,6 +16,9 @@
     "googleapis": "^29.0.0",
     "moment": "^2.22.1"
   },
+  "devDependencies": {
+    "munar-core": "^2.0.0"
+  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

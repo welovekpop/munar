@@ -17,6 +17,9 @@
     "@slack/client": "^3.14.1",
     "rename-prop": "^1.0.0"
   },
+  "devDependencies": {
+    "munar-core": "^2.0.0"
+  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

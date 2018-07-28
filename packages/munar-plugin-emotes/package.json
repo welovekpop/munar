@@ -18,6 +18,9 @@
     "got": "^8.3.0",
     "truncate-url": "^1.0.0"
   },
+  "devDependencies": {
+    "munar-core": "^2.0.0"
+  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

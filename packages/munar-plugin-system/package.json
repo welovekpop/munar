@@ -11,6 +11,9 @@
   ],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "munar-core": "^2.0.0"
+  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }
