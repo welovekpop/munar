@@ -1,5 +1,5 @@
 module.exports = (api) => {
-  api.cache.forever()
+  api.cache.never()
 
   return {
     presets: [
