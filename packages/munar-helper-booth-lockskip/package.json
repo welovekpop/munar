@@ -12,6 +12,6 @@
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "delay": "^2.0.0"
+    "delay": "^3.0.0"
   }
 }

@@ -16,14 +16,14 @@
   "dependencies": {
     "debug": "^3.1.0",
     "dot-prop": "^4.2.0",
-    "got": "^8.3.0",
+    "got": "^8.3.2",
     "once": "^1.4.0",
     "promise-retry": "^1.1.1",
-    "qs": "^6.5.1",
-    "ws": "^5.1.1"
+    "qs": "^6.5.2",
+    "ws": "^6.0.0"
   },
   "devDependencies": {
-    "munar-core": "^2.0.0"
+    "munar-core": "^2.0.2"
   },
   "peerDependencies": {
     "munar-core": "^2.0.0"

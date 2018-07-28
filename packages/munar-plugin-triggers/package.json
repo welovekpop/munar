@@ -12,14 +12,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bel": "^5.1.7",
     "lodash.last": "^3.0.0",
+    "nanohtml": "^1.2.4",
     "node-emoji": "^1.8.1",
     "random-item": "^1.0.0",
-    "u-wave-parse-chat-markup": "^2.1.0"
+    "u-wave-parse-chat-markup": "^2.3.0"
   },
   "devDependencies": {
-    "munar-core": "^2.0.0"
+    "munar-core": "^2.0.2"
   },
   "peerDependencies": {
     "mongoose": "*",

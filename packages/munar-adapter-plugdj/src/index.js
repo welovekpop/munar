@@ -11,7 +11,7 @@ const debug = require('debug')('munar:adapter:plugdj')
 export default class PlugdjAdapter extends Adapter {
   static adapterName = 'plugdj'
 
-  mp = miniplug({ connect: false })
+  mp = miniplug()
 
   constructor (bot, options) {
     super(bot)

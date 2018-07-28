@@ -1,4 +1,4 @@
-import html from 'bel'
+import html from 'nanohtml'
 import parse from 'u-wave-parse-chat-markup'
 import emoji from 'node-emoji'
 

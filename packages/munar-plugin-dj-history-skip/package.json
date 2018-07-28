@@ -12,12 +12,12 @@
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "delay": "^2.0.0",
-    "moment": "^2.22.1",
+    "delay": "^3.0.0",
+    "moment": "^2.22.2",
     "munar-helper-booth-lockskip": "^2.0.2"
   },
   "devDependencies": {
-    "munar-core": "^2.0.0"
+    "munar-core": "^2.0.2"
   },
   "peerDependencies": {
     "munar-core": "^2.0.0"

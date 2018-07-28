@@ -1,4 +1,4 @@
-import html from 'bel'
+import html from 'nanohtml'
 import truncate from 'truncate-url'
 
 function Emote ({ id, url }) {

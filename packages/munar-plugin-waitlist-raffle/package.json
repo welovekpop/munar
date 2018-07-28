@@ -13,11 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "debug": "^3.1.0",
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "random-item": "^1.0.0"
   },
   "devDependencies": {
-    "munar-core": "^2.0.0"
+    "munar-core": "^2.0.2"
   },
   "peerDependencies": {
     "munar-core": "^2.0.0"

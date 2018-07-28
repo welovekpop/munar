@@ -14,11 +14,11 @@
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "@slack/client": "^3.14.1",
+    "@slack/client": "^3.16.0",
     "rename-prop": "^1.0.0"
   },
   "devDependencies": {
-    "munar-core": "^2.0.0"
+    "munar-core": "^2.0.2"
   },
   "peerDependencies": {
     "munar-core": "^2.0.0"
