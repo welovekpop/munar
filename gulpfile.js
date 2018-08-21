@@ -13,6 +13,16 @@ const lib = 'packages/*/lib'
 const dest = 'packages/'
 let watching = false
 
+function exclude (rx) {
+  return through.obj((file, enc, cb) => {
+    if (rx.test(file.path)) {
+      cb(null)
+    } else {
+      cb(null, file)
+    }
+  })
+}
+
 function rename (from, to) {
   return through.obj((file, enc, cb) => {
     file.origPath = file.path
@@ -37,6 +47,7 @@ function clean () {
 function build () {
   return gulp.src(src)
     .pipe(watching ? plumber() : through.obj())
+    .pipe(exclude(/__tests__/))
     .pipe(rename(/packages\/(.*?)\/src\//, 'packages/$1/lib/'))
     .pipe(newer(dest))
     .pipe(logCompiling())
