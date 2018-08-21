@@ -26,9 +26,6 @@
     "standard": "^11.0.1",
     "through2": "^2.0.1"
   },
-  "standard": {
-    "parser": "babel-eslint"
-  },
   "scripts": {
     "prepare": "lerna bootstrap && npm run build",
     "lint": "standard gulpfile.js packages/*/src/**/*.js",
@@ -37,5 +34,11 @@
     "watch": "gulp watch",
     "build": "gulp",
     "prerelease": "gulp prepublish"
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
