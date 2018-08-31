@@ -190,7 +190,7 @@ export default class UserKarma extends Plugin {
       return
     }
     if (other.id === user.id) {
-      message.reply('You\'re weird.')
+      message.reply('Whatever you want')
     }
 
     const target = await User.from(other)
