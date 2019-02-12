@@ -23,7 +23,7 @@
     "jest": "^24.1.0",
     "lerna": "^3.11.1",
     "standard": "^11.0.1",
-    "through2": "^2.0.1"
+    "through2": "^3.0.0"
   },
   "scripts": {
     "prepare": "lerna bootstrap && npm run build",
