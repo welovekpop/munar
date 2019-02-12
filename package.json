@@ -12,17 +12,16 @@
     "node": ">= 4"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "babel-core": "^7.0.0-bridge.0",
+    "@babel/core": "^7.2.2",
     "babel-eslint": "^9.0.0",
     "del": "^3.0.0",
     "gulp": "^4.0.0",
     "gulp-babel": "^8.0.0",
     "gulp-newer": "^1.4.0",
-    "gulp-plumber": "^1.2.0",
+    "gulp-plumber": "^1.2.1",
     "gulp-util": "^3.0.7",
-    "jest": "^23.5.0",
-    "lerna": "^3.1.2",
+    "jest": "^24.1.0",
+    "lerna": "^3.11.1",
     "standard": "^11.0.1",
     "through2": "^2.0.1"
   },
