@@ -12,18 +12,18 @@
     "node": ">= 4"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
+    "@babel/core": "^7.4.5",
     "babel-eslint": "^10.0.1",
-    "del": "^3.0.0",
-    "gulp": "^4.0.0",
+    "del": "^4.1.1",
+    "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-newer": "^1.4.0",
     "gulp-plumber": "^1.2.1",
     "gulp-util": "^3.0.7",
-    "jest": "^24.1.0",
-    "lerna": "^3.11.1",
+    "jest": "^24.8.0",
+    "lerna": "^3.14.1",
     "standard": "^11.0.1",
-    "through2": "^3.0.0"
+    "through2": "^3.0.1"
   },
   "scripts": {
     "prepare": "lerna bootstrap && npm run build",
