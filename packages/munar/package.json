@@ -16,8 +16,8 @@
   "dependencies": {
     "json5": "^1.0.1",
     "minimist": "^1.2.0",
-    "munar-core": "^2.0.2",
-    "munar-plugin-system": "^2.0.1",
+    "munar-core": "file:../munar-core",
+    "munar-plugin-system": "file:../munar-plugin-system",
     "require-relative": "^0.8.7"
   }
 }

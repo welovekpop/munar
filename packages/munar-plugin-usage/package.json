@@ -11,9 +11,6 @@
   ],
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
-  "devDependencies": {
-    "munar-core": "^2.0.2"
-  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

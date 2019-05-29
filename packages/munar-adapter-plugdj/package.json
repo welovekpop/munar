@@ -21,7 +21,7 @@
     "ultron": "^1.1.1"
   },
   "devDependencies": {
-    "munar-core": "^2.0.2"
+    "munar-core": "file:../munar-core"
   },
   "peerDependencies": {
     "munar-core": "^2.0.0"

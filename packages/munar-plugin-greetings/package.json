@@ -14,9 +14,6 @@
   "dependencies": {
     "random-item": "^1.0.0"
   },
-  "devDependencies": {
-    "munar-core": "^2.0.2"
-  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

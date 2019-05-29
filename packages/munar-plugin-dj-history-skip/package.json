@@ -14,10 +14,7 @@
   "dependencies": {
     "delay": "^3.0.0",
     "moment": "^2.22.2",
-    "munar-helper-booth-lockskip": "^2.0.2"
-  },
-  "devDependencies": {
-    "munar-core": "^2.0.2"
+    "munar-helper-booth-lockskip": "file:../munar-helper-booth-lockskip"
   },
   "peerDependencies": {
     "munar-core": "^2.0.0"

@@ -16,8 +16,5 @@
     "@babel/plugin-proposal-export-namespace-from": "^7.0.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/preset-env": "^7.0.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.0.0"
   }
 }

@@ -18,9 +18,6 @@
     "nanohtml": "^1.2.4",
     "truncate-url": "^1.0.0"
   },
-  "devDependencies": {
-    "munar-core": "^2.0.2"
-  },
   "peerDependencies": {
     "munar-core": "^2.0.0"
   }

@@ -1,6 +1,5 @@
 {
-  "private": true,
-  "license": "MIT",
+  "name": "munar-build",
   "author": "Sooyou",
   "contributors": [
     "brookiebeast",
@@ -8,11 +7,33 @@
     "René Kooi <rene@kooi.me>",
     "schrobby"
   ],
-  "engines": {
-    "node": ">= 4"
+  "dependencies": {
+    "babel-preset-munar": "file:packages/babel-preset-munar",
+    "munar": "file:packages/munar",
+    "munar-adapter-plugdj": "file:packages/munar-adapter-plugdj",
+    "munar-adapter-slack": "file:packages/munar-adapter-slack",
+    "munar-adapter-uwave": "file:packages/munar-adapter-uwave",
+    "munar-core": "file:packages/munar-core",
+    "munar-helper-booth-lockskip": "file:packages/munar-helper-booth-lockskip",
+    "munar-plugin-antispam": "file:packages/munar-plugin-antispam",
+    "munar-plugin-chat-log": "file:packages/munar-plugin-chat-log",
+    "munar-plugin-config": "file:packages/munar-plugin-config",
+    "munar-plugin-dj-history-skip": "file:packages/munar-plugin-dj-history-skip",
+    "munar-plugin-emotes": "file:packages/munar-plugin-emotes",
+    "munar-plugin-events-calendar": "file:packages/munar-plugin-events-calendar",
+    "munar-plugin-greetings": "file:packages/munar-plugin-greetings",
+    "munar-plugin-karma": "file:packages/munar-plugin-karma",
+    "munar-plugin-media-blacklist": "file:packages/munar-plugin-media-blacklist",
+    "munar-plugin-reddit-feed": "file:packages/munar-plugin-reddit-feed",
+    "munar-plugin-serve": "file:packages/munar-plugin-serve",
+    "munar-plugin-system": "file:packages/munar-plugin-system",
+    "munar-plugin-triggers": "file:packages/munar-plugin-triggers",
+    "munar-plugin-usage": "file:packages/munar-plugin-usage",
+    "munar-plugin-user-log": "file:packages/munar-plugin-user-log",
+    "munar-plugin-waitlist-raffle": "file:packages/munar-plugin-waitlist-raffle"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
+    "@babel/core": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "del": "^4.1.1",
     "gulp": "^4.0.2",
@@ -25,19 +46,24 @@
     "standard": "^11.0.1",
     "through2": "^3.0.1"
   },
-  "scripts": {
-    "prepare": "lerna bootstrap && npm run build",
-    "lint": "standard gulpfile.js packages/*/src/**/*.js",
-    "jest": "jest packages/*/src",
-    "test": "npm run jest && npm run lint",
-    "watch": "gulp watch",
-    "build": "gulp",
-    "prerelease": "gulp prepublish"
-  },
-  "standard": {
-    "parser": "babel-eslint"
+  "engines": {
+    "node": ">= 4"
   },
   "jest": {
     "testEnvironment": "node"
+  },
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "gulp",
+    "jest": "jest packages/*/src",
+    "lint": "standard gulpfile.js packages/*/src/**/*.js",
+    "prepare": "lerna bootstrap && npm run build",
+    "prerelease": "gulp prepublish",
+    "test": "npm run jest && npm run lint",
+    "watch": "gulp watch"
+  },
+  "standard": {
+    "parser": "babel-eslint"
   }
 }

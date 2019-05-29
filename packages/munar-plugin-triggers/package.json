@@ -18,9 +18,6 @@
     "random-item": "^1.0.0",
     "u-wave-parse-chat-markup": "^2.3.0"
   },
-  "devDependencies": {
-    "munar-core": "^2.0.2"
-  },
   "peerDependencies": {
     "mongoose": "*",
     "munar-core": "^2.0.0"

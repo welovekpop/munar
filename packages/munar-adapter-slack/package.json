@@ -18,7 +18,7 @@
     "rename-prop": "^1.0.0"
   },
   "devDependencies": {
-    "munar-core": "^2.0.2"
+    "munar-core": "file:../munar-core"
   },
   "peerDependencies": {
     "munar-core": "^2.0.0"
