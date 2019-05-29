@@ -58,7 +58,7 @@
     "build": "gulp",
     "jest": "jest packages/*/src",
     "lint": "standard gulpfile.js packages/*/src/**/*.js",
-    "prepare": "lerna bootstrap && npm run build",
+    "prepare": "npm run build",
     "prerelease": "gulp prepublish",
     "test": "npm run jest && npm run lint",
     "watch": "gulp watch"
