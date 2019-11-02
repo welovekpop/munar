@@ -1,5 +1,4 @@
-import joi from 'joi'
-import pify from 'pify'
+import joi from '@hapi/joi'
 import joinList from 'join-component'
 
 const parser = joi.extend([
@@ -10,25 +9,21 @@ const parser = joi.extend([
   }
 ])
 
-const validate = pify(joi.validate)
-
 parser.parse = (input, schema) => {
-  return validate(
-    input,
-    parser.array()
-      .required()
-      .ordered(schema)
-      .items(parser.any()) // Accept excess arguments.
-      .error((errors) => {
-        const missing = errors.find((err) => err.type === 'array.includesRequiredKnowns')
+  return parser.array()
+    .required()
+    .ordered(schema)
+    .items(parser.any()) // Accept excess arguments.
+    .error((errors) => {
+      const missing = errors.find((err) => err.type === 'array.includesRequiredKnowns')
 
-        if (missing) {
-          return new Error(`Missing parameters: ${joinList(missing.context.knownMisses)}`)
-        }
+      if (missing) {
+        return new Error(`Missing parameters: ${joinList(missing.context.knownMisses)}`)
+      }
 
-        return errors
-      })
-  )
+      return errors
+    })
+    .validateAsync(input)
 }
 
 export default parser

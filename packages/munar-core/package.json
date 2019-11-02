@@ -11,15 +11,14 @@
   "license": "ISC",
   "dependencies": {
     "@captemulation/get-parameter-names": "^1.2.0",
+    "@hapi/joi": "^16.0.0",
     "array-includes": "^3.0.2",
     "escape-string-regexp": "^1.0.5",
-    "joi": "^13.4.0",
     "join-component": "^1.1.0",
     "lodash.last": "^3.0.0",
     "mkdirp": "^0.5.1",
     "mongoose": "^5.2.5",
     "mongoose-model-decorators": "^0.4.0",
-    "mongoose-random": "^0.1.1",
-    "pify": "^3.0.0"
+    "mongoose-random": "^0.1.1"
   }
 }
