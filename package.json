@@ -33,16 +33,16 @@
     "munar-plugin-waitlist-raffle": "file:packages/munar-plugin-waitlist-raffle"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "babel-eslint": "^10.0.1",
-    "del": "^4.1.1",
+    "@babel/core": "^7.6.4",
+    "babel-eslint": "^10.0.3",
+    "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-newer": "^1.4.0",
     "gulp-plumber": "^1.2.1",
     "gulp-util": "^3.0.7",
-    "jest": "^24.8.0",
-    "lerna": "^3.15.0",
+    "jest": "^24.9.0",
+    "lerna": "^3.18.3",
     "standard": "^11.0.1",
     "through2": "^3.0.1"
   },
