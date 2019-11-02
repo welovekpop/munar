@@ -3,8 +3,8 @@ const babel = require('gulp-babel')
 const plumber = require('gulp-plumber')
 const newer = require('gulp-newer')
 const through = require('through2')
-const log = require('gulp-util').log
-const colors = require('gulp-util').colors
+const log = require('fancy-log')
+const chalk = require('chalk')
 const relative = require('path').relative
 const del = require('del')
 
@@ -35,7 +35,7 @@ function logCompiling () {
   return through.obj((file, enc, cb) => {
     const inpath = relative(__dirname, file.origPath)
     const outpath = relative(__dirname, file.path)
-    log(`Compiling '${colors.cyan(inpath)}' to '${colors.cyan(outpath)}'...`)
+    log(`Compiling '${chalk.cyan(inpath)}' to '${chalk.cyan(outpath)}'...`)
     cb(null, file)
   })
 }
