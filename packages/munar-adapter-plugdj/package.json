@@ -15,9 +15,9 @@
   "author": "Renée Kooi <renee@kooi.me>",
   "license": "ISC",
   "dependencies": {
-    "debug": "^3.1.0",
+    "debug": "^4.1.0",
     "miniplug": "^2.0.2",
-    "pify": "^3.0.0",
+    "pify": "^4.0.0",
     "ultron": "^1.1.1"
   },
   "devDependencies": {

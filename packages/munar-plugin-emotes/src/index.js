@@ -1,11 +1,9 @@
 import { Plugin, command, permissions } from 'munar-core'
 import got from 'got'
-import Promise from 'bluebird'
-
-const debug = require('debug')('munar:emotes')
-
 import { EmoteModel } from './models'
 import { renderEmotesList } from './serve'
+
+const debug = require('debug')('munar:emotes')
 
 const cleanId = (id) => id.toLowerCase()
 

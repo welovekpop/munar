@@ -12,9 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "debug": "^3.1.0",
-    "got": "^8.3.2",
+    "debug": "^4.1.0",
+    "got": "^9.6.0",
     "nanohtml": "^1.2.4",
     "truncate-url": "^1.0.0"
   },
