@@ -1,13 +1,11 @@
 import joi from '@hapi/joi'
 import joinList from 'join-component'
 
-const parser = joi.extend([
-  {
-    base: joi.string().replace(/^@/, ''),
-    name: 'user',
-    rules: []
-  }
-])
+const parser = joi.extend({
+  type: 'user',
+  base: joi.string().replace(/^@/, ''),
+  rules: {}
+})
 
 parser.parse = (input, schema) => {
   return parser.array()
