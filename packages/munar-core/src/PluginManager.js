@@ -1,4 +1,3 @@
-import includes from 'array-includes'
 import EventEmitter from 'events'
 import createDebug from 'debug'
 import Plugin from './Plugin'
@@ -36,7 +35,7 @@ export default class PluginManager extends EventEmitter {
 
     const pluginNames = plugins.map((plugin) => plugin.name)
     for (const plugin of this.plugins) {
-      if (!includes(pluginNames, plugin.name)) {
+      if (!pluginNames.includes(plugin.name)) {
         this.unregister(plugin.name)
       }
     }

@@ -12,7 +12,6 @@
   "dependencies": {
     "@captemulation/get-parameter-names": "^1.2.0",
     "@hapi/joi": "^16.0.0",
-    "array-includes": "^3.0.2",
     "escape-string-regexp": "^1.0.5",
     "join-component": "^1.1.0",
     "lodash.last": "^3.0.0",

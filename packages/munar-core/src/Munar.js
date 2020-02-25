@@ -1,5 +1,4 @@
 import EventEmitter from 'events'
-import includes from 'array-includes'
 import mongoose from 'mongoose'
 import { createSchema } from 'mongoose-model-decorators'
 import Promise from 'bluebird'
@@ -137,7 +136,7 @@ export default class Munar extends EventEmitter {
       }
 
       const command = plugin.commands.find(
-        (com) => includes(com.names, commandName)
+        (com) => com.names.includes(commandName)
       )
       if (!command) return
 
