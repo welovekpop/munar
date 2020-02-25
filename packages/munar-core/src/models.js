@@ -6,7 +6,7 @@ import escapeStringRegExp from 'escape-string-regexp'
 const { ObjectId } = Schema.Types
 
 @Plugin(random, { path: '__r' })
-export class UserModel {
+class UserModel {
   static timestamps = true
 
   static schema = {
@@ -46,7 +46,7 @@ export class UserModel {
   }
 }
 
-export class ChatMessageModel {
+class ChatMessageModel {
   static timestamps = true
 
   static schema = {
@@ -65,3 +65,5 @@ export class ChatMessageModel {
     this.source.deleteMessage(this)
   }
 }
+
+export { UserModel, ChatMessageModel }
