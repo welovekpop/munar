@@ -1,8 +1,9 @@
 import { Plugin, command, permissions } from 'munar-core'
 import moment from 'moment'
 import random from 'random-item'
+import createDebug from 'debug'
 
-const debug = require('debug')('munar:raffle')
+const debug = createDebug('munar:raffle')
 
 function assertSupportsRaffles (source) {
   if (typeof source.getWaitlist !== 'function') {

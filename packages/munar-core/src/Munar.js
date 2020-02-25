@@ -1,15 +1,14 @@
 import EventEmitter from 'events'
-
 import includes from 'array-includes'
 import mongoose from 'mongoose'
 import { createSchema } from 'mongoose-model-decorators'
 import Promise from 'bluebird'
-
+import createDebug from 'debug'
 import PluginManager from './PluginManager'
 import argumentParser from './argumentParser'
 import { UserModel, ChatMessageModel } from './models'
 
-const debug = require('debug')('munar:core')
+const debug = createDebug('munar:core')
 
 mongoose.Promise = Promise
 

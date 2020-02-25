@@ -5,12 +5,13 @@ import { stringify } from 'qs'
 import { Adapter, User, permissions } from 'munar-core'
 import retrier from 'promise-retry'
 import once from 'once'
+import createDebug from 'debug'
 import Message from './Message'
 import Waitlist from './Waitlist'
 import DJBooth from './DJBooth'
 import DJHistory from './DJHistory'
 
-const debug = require('debug')('munar:adapter:uwave')
+const debug = createDebug('munar:adapter:uwave')
 
 export default class UwaveAdapter extends Adapter {
   static adapterName = 'uwave'

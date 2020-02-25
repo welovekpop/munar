@@ -1,9 +1,10 @@
 import { Plugin, command, permissions } from 'munar-core'
 import got from 'got'
+import createDebug from 'debug'
 import { EmoteModel } from './models'
 import { renderEmotesList } from './serve'
 
-const debug = require('debug')('munar:emotes')
+const debug = createDebug('munar:emotes')
 
 const cleanId = (id) => id.toLowerCase()
 

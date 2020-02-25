@@ -1,7 +1,8 @@
 import EventEmitter from 'events'
+import createDebug from 'debug'
 import command from './command'
 
-const debug = require('debug')('munar:plugin')
+const debug = createDebug('munar:plugin')
 
 export default class Plugin extends EventEmitter {
   commands = []

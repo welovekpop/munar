@@ -1,6 +1,7 @@
 import { Plugin } from 'munar-core'
+import createDebug from 'debug'
 
-const debug = require('debug')('munar:user-log')
+const debug = createDebug('munar:user-log')
 
 export default class UserLog extends Plugin {
   static description = 'Keeps track of users who visit the channel.'

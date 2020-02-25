@@ -1,11 +1,11 @@
 import { Plugin, command } from 'munar-core'
 import random from 'random-item'
 import moment from 'moment'
+import createDebug from 'debug'
 import * as utils from './utils'
-
 import KarmaModel from './Karma'
 
-const debug = require('debug')('munar:karma')
+const debug = createDebug('munar:karma')
 
 export default class UserKarma extends Plugin {
   static description = 'Keeps track of users\' earned internet points.'

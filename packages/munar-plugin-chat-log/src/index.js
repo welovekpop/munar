@@ -1,5 +1,4 @@
 import { Plugin, command } from 'munar-core'
-
 import moment from 'moment'
 
 export default class ChatLog extends Plugin {

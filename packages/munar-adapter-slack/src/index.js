@@ -4,14 +4,13 @@ import {
   MemoryDataStore,
   CLIENT_EVENTS as EVENTS
 } from '@slack/client'
-
 import { Adapter } from 'munar-core'
-
+import createDebug from 'debug'
 import Channel from './Channel'
 import Message from './Message'
 import User from './User'
 
-const debug = require('debug')('munar:adapter:slack')
+const debug = createDebug('munar:adapter:slack')
 
 export default class Slack extends Adapter {
   static adapterName = 'slack'

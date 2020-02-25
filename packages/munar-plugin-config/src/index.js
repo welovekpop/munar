@@ -1,7 +1,8 @@
 import { Plugin, command, permissions } from 'munar-core'
 import Ultron from 'ultron'
+import createDebug from 'debug'
 
-const debug = require('debug')('munar:config')
+const debug = createDebug('munar:config')
 
 const configCommands = [ 'set', 'get', 'add', 'remove' ]
 

@@ -1,9 +1,9 @@
 import includes from 'array-includes'
 import EventEmitter from 'events'
-
+import createDebug from 'debug'
 import Plugin from './Plugin'
 
-const debug = require('debug')('munar:pluginmanager')
+const debug = createDebug('munar:pluginmanager')
 
 export default class PluginManager extends EventEmitter {
   plugins = []

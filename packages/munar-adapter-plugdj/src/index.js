@@ -1,12 +1,13 @@
 import Ultron from 'ultron'
 import miniplug from 'miniplug'
 import { Adapter, User } from 'munar-core'
+import createDebug from 'debug'
 import Message from './PlugdjMessage'
 import Waitlist from './Waitlist'
 import DJBooth from './DJBooth'
 import DJHistory from './DJHistory'
 
-const debug = require('debug')('munar:adapter:plugdj')
+const debug = createDebug('munar:adapter:plugdj')
 
 export default class PlugdjAdapter extends Adapter {
   static adapterName = 'plugdj'
